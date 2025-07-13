@@ -1012,7 +1012,7 @@ export default function ActivitiesPage() {
             </Button>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+                <CardContent className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
@@ -1023,60 +1023,65 @@ export default function ActivitiesPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-              <SelectTrigger>
-                <SelectValue placeholder="Departemen" />
-              </SelectTrigger>
-              <SelectContent>
-                {departments.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* --- START OF FIX --- */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            {/* This div wraps the dropdowns and makes them grow */}
+            <div className="flex flex-1 flex-col sm:flex-row gap-4 w-full">
+              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Departemen" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept} value={dept}>
+                      {dept}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {statuses.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status === "Semua"
-                      ? "Semua Status"
-                      : status === "planning"
-                        ? "Perencanaan"
-                        : status === "active"
-                          ? "Aktif"
-                          : status === "completed"
-                            ? "Selesai"
-                            : "Dibatalkan"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statuses.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status === "Semua"
+                        ? "Semua Status"
+                        : status === "planning"
+                          ? "Perencanaan"
+                          : status === "active"
+                            ? "Aktif"
+                            : status === "completed"
+                              ? "Selesai"
+                              : "Dibatalkan"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-              <SelectTrigger>
-                <SelectValue placeholder="Prioritas" />
-              </SelectTrigger>
-              <SelectContent>
-                {priorities.map((priority) => (
-                  <SelectItem key={priority} value={priority}>
-                    {priority === "Semua"
-                      ? "Semua Prioritas"
-                      : priority === "high"
-                        ? "Tinggi"
-                        : priority === "medium"
-                          ? "Sedang"
-                          : "Rendah"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
+              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Prioritas" />
+                </SelectTrigger>
+                <SelectContent>
+                  {priorities.map((priority) => (
+                    <SelectItem key={priority} value={priority}>
+                      {priority === "Semua"
+                        ? "Semua Prioritas"
+                        : priority === "high"
+                          ? "Tinggi"
+                          : priority === "medium"
+                            ? "Sedang"
+                            : "Rendah"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* This div wraps the view controls */}
             <div className="flex items-center space-x-2">
               <Button
                 variant={viewMode === "grid" ? "default" : "outline"}
@@ -1384,212 +1389,6 @@ export default function ActivitiesPage() {
 }
 ```
 
-# app\(dashboard)\admin\data-input\page.tsx
-
-```tsx
-"use client"
-
-import { AdminRouteGuard } from "@/components/admin-route-guard"
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Plus, Save, Upload, FileText, Users, Activity } from "lucide-react"
-import { BreadcrumbNav } from "@/components/breadcrumb-nav"
-import { useRouter } from "next/navigation"
-
-export default function DataInputPage() {
-  const [activeTab, setActiveTab] = useState("documents")
-  const router = useRouter()
-
-  return (
-    <AdminRouteGuard>
-      <div className="p-6 space-y-6">
-        {/* Breadcrumb Navigation */}
-        <BreadcrumbNav />
-
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" onClick={() => router.push("/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali
-            </Button>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Input Data Admin</h1>
-            <p className="text-gray-600">Kelola data dokumen, pengguna, dan aktivitas sistem</p>
-          </div>
-          <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-            <Users className="w-4 h-4 mr-1" />
-            Admin Only
-          </Badge>
-        </div>
-
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="documents" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Dokumen
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Pengguna
-            </TabsTrigger>
-            <TabsTrigger value="activities" className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Aktivitas
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Documents Tab */}
-          <TabsContent value="documents" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Input Dokumen Baru</CardTitle>
-                <CardDescription>Tambahkan dokumen baru ke sistem knowledge management</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="doc-title">Judul Dokumen</Label>
-                    <Input id="doc-title" placeholder="Masukkan judul dokumen" />
-                  </div>
-                  <div>
-                    <Label htmlFor="doc-category">Kategori</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih kategori" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sop">SOP</SelectItem>
-                        <SelectItem value="template">Template</SelectItem>
-                        <SelectItem value="laporan">Laporan</SelectItem>
-                        <SelectItem value="panduan">Panduan</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="doc-description">Deskripsi</Label>
-                  <Textarea id="doc-description" placeholder="Deskripsi dokumen" />
-                </div>
-                <div className="flex gap-2">
-                  <Button>
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload File
-                  </Button>
-                  <Button variant="outline">
-                    <Save className="w-4 h-4 mr-2" />
-                    Simpan Draft
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Users Tab */}
-          <TabsContent value="users" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Tambah Pengguna Baru</CardTitle>
-                <CardDescription>Daftarkan pengguna baru ke sistem</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="user-name">Nama Lengkap</Label>
-                    <Input id="user-name" placeholder="Nama lengkap pengguna" />
-                  </div>
-                  <div>
-                    <Label htmlFor="user-email">Email</Label>
-                    <Input id="user-email" type="email" placeholder="email@ziswaf.com" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="user-department">Departemen</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih departemen" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pendayagunaan">Pendayagunaan</SelectItem>
-                        <SelectItem value="penghimpunan">Penghimpunan</SelectItem>
-                        <SelectItem value="keuangan">Keuangan</SelectItem>
-                        <SelectItem value="sdm">SDM</SelectItem>
-                        <SelectItem value="it">IT</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="user-role">Role</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Tambah Pengguna
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Activities Tab */}
-          <TabsContent value="activities" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Input Aktivitas Baru</CardTitle>
-                <CardDescription>Catat aktivitas atau kegiatan organisasi</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="activity-title">Judul Aktivitas</Label>
-                  <Input id="activity-title" placeholder="Nama kegiatan atau aktivitas" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="activity-date">Tanggal</Label>
-                    <Input id="activity-date" type="date" />
-                  </div>
-                  <div>
-                    <Label htmlFor="activity-location">Lokasi</Label>
-                    <Input id="activity-location" placeholder="Lokasi kegiatan" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="activity-description">Deskripsi</Label>
-                  <Textarea id="activity-description" placeholder="Deskripsi aktivitas" />
-                </div>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Tambah Aktivitas
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </AdminRouteGuard>
-  )
-}
-
-```
-
 # app\(dashboard)\admin\users\loading.tsx
 
 ```tsx
@@ -1620,11 +1419,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Search, Plus, MoreHorizontal, Edit, Trash2, UserCheck, UserX, Mail } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Search, Plus, MoreHorizontal, Edit, Trash2, Mail, UserCheck, UserX } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { AdminRouteGuard } from "@/components/admin-route-guard"
 
-const users = [
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  department: string;
+  role: 'admin' | 'user';
+  status: 'active' | 'inactive';
+  lastLogin: string;
+  joinDate: string;
+  avatar: string;
+}
+
+const initialUsers: User[] = [
   {
     id: 1,
     name: "Ahmad Fauzi",
@@ -1687,11 +1508,17 @@ const roles = ["Semua", "admin", "user"]
 const statuses = ["Semua", "active", "inactive"]
 
 export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [searchQuery, setSearchQuery] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("Semua")
   const [roleFilter, setRoleFilter] = useState("Semua")
   const [statusFilter, setStatusFilter] = useState("Semua")
   const router = useRouter()
+
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  // NEW: State for the "Add User" dialog
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [newUser, setNewUser] = useState({ name: '', email: '', department: '', role: 'user' });
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
@@ -1700,9 +1527,31 @@ export default function UsersPage() {
     const matchesDepartment = departmentFilter === "Semua" || user.department === departmentFilter
     const matchesRole = roleFilter === "Semua" || user.role === roleFilter
     const matchesStatus = statusFilter === "Semua" || user.status === statusFilter
-
+    
     return matchesSearch && matchesDepartment && matchesRole && matchesStatus
   })
+
+  // NEW: Function to handle adding a new user
+  const handleAddUser = () => {
+    if (newUser.name && newUser.email && newUser.department) {
+      const newUserObject: User = {
+        id: users.length + 1, // Simple ID generation for demo
+        name: newUser.name,
+        email: newUser.email,
+        department: newUser.department,
+        role: newUser.role as 'admin' | 'user',
+        status: 'active', // New users are active by default
+        lastLogin: new Date().toISOString().slice(0, 16).replace('T', ' '),
+        joinDate: new Date().toISOString().slice(0, 10),
+        avatar: "/placeholder.svg?height=32&width=32",
+      };
+      setUsers(prevUsers => [newUserObject, ...prevUsers]);
+      setNewUser({ name: '', email: '', department: '', role: 'user' });
+      setIsAddUserOpen(false);
+    } else {
+      alert("Please fill all required fields.");
+    }
+  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -1727,14 +1576,7 @@ export default function UsersPage() {
   }
 
   const getRoleText = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "Admin"
-      case "user":
-        return "User"
-      default:
-        return role
-    }
+    return role.charAt(0).toUpperCase() + role.slice(1);
   }
 
   const getStatusText = (status: string) => {
@@ -1751,77 +1593,86 @@ export default function UsersPage() {
   return (
     <AdminRouteGuard>
       <div className="p-6 space-y-6">
-        {/* Breadcrumb Navigation */}
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Manajemen Pengguna</h1>
             <p className="text-gray-600">Kelola pengguna dan hak akses sistem</p>
           </div>
-          <Button className="bg-emerald-600 hover:bg-emerald-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Pengguna
-          </Button>
+          {/* UPDATED: Button is now a trigger for the dialog */}
+          <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-emerald-600 hover:bg-emerald-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Tambah Pengguna
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Tambah Pengguna Baru</DialogTitle>
+                <DialogDescription>Buat akun baru dan tentukan role serta departemen.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="add-name" className="text-right">Nama</Label>
+                  <Input id="add-name" value={newUser.name} onChange={(e) => setNewUser({...newUser, name: e.target.value})} className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="add-email" className="text-right">Email</Label>
+                  <Input id="add-email" type="email" value={newUser.email} onChange={(e) => setNewUser({...newUser, email: e.target.value})} className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="add-department" className="text-right">Departemen</Label>
+                  <Select value={newUser.department} onValueChange={(value) => setNewUser({...newUser, department: value})}>
+                    <SelectTrigger className="col-span-3"><SelectValue placeholder="Pilih Departemen" /></SelectTrigger>
+                    <SelectContent>{departments.filter(d => d !== 'Semua').map(dept => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                 <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="add-role" className="text-right">Role</Label>
+                  <Select value={newUser.role} onValueChange={(value) => setNewUser({...newUser, role: value})}>
+                    <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>Batal</Button>
+                <Button type="submit" onClick={handleAddUser}>Tambah</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        {/* Search and Filters */}
+        {/* Search and Filters Card remains the same */}
         <Card>
           <CardContent className="p-6">
             <div className="space-y-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Cari nama atau email pengguna..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+                <Input placeholder="Cari nama atau email pengguna..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10"/>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                  <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Departemen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {departments.map((dept) => (
-                      <SelectItem key={dept} value={dept}>
-                        {dept}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Departemen" /></SelectTrigger>
+                  <SelectContent>{departments.map((dept) => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent>
                 </Select>
-
                 <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role === "Semua" ? "Semua" : getRoleText(role)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Role" /></SelectTrigger>
+                  <SelectContent>{roles.map((role) => <SelectItem key={role} value={role}>{getRoleText(role)}</SelectItem>)}</SelectContent>
                 </Select>
-
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statuses.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status === "Semua" ? "Semua" : getStatusText(status)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Status" /></SelectTrigger>
+                  <SelectContent>{statuses.map((status) => <SelectItem key={status} value={status}>{getStatusText(status)}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
             </div>
           </CardContent>
         </Card>
-
+        
         {/* Users Table */}
         <Card>
           <CardHeader>
@@ -1845,63 +1696,29 @@ export default function UsersPage() {
                   <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
-                        <Avatar className="w-8 h-8">
-                          <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                          <AvatarFallback>
-                            {user.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{user.name}</div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
-                        </div>
+                        <Avatar className="w-8 h-8"><AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} /><AvatarFallback>{user.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback></Avatar>
+                        <div><div className="font-medium">{user.name}</div><div className="text-sm text-gray-500">{user.email}</div></div>
                       </div>
                     </TableCell>
                     <TableCell>{user.department}</TableCell>
-                    <TableCell>
-                      <Badge className={getRoleColor(user.role)}>{getRoleText(user.role)}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(user.status)}>{getStatusText(user.status)}</Badge>
-                    </TableCell>
+                    <TableCell><Badge className={getRoleColor(user.role)}>{getRoleText(user.role)}</Badge></TableCell>
+                    <TableCell><Badge className={getStatusColor(user.status)}>{getStatusText(user.status)}</Badge></TableCell>
                     <TableCell className="text-sm text-gray-500">{user.lastLogin}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
+                        <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Pengguna
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Mail className="mr-2 h-4 w-4" />
-                            Kirim Email
-                          </DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setEditingUser(user)}><Edit className="mr-2 h-4 w-4" />Edit Pengguna</DropdownMenuItem>
+                          <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Kirim Email</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          {user.status === "active" ? (
-                            <DropdownMenuItem>
-                              <UserX className="mr-2 h-4 w-4" />
-                              Nonaktifkan
-                            </DropdownMenuItem>
+                          {user.status === 'active' ? (
+                            <DropdownMenuItem><UserX className="mr-2 h-4 w-4" />Nonaktifkan</DropdownMenuItem>
                           ) : (
-                            <DropdownMenuItem>
-                              <UserCheck className="mr-2 h-4 w-4" />
-                              Aktifkan
-                            </DropdownMenuItem>
+                            <DropdownMenuItem><UserCheck className="mr-2 h-4 w-4" />Aktifkan</DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Hapus Pengguna
-                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600"><Trash2 className="mr-2 h-4 w-4" />Hapus Pengguna</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -1912,10 +1729,29 @@ export default function UsersPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Edit User Dialog (already implemented) */}
+      <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Pengguna</DialogTitle>
+            <DialogDescription>Perbarui informasi dan role untuk {editingUser?.name}.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="name" className="text-right">Nama</Label><Input id="name" defaultValue={editingUser?.name} className="col-span-3" /></div>
+            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="email" className="text-right">Email</Label><Input id="email" type="email" defaultValue={editingUser?.email} className="col-span-3" /></div>
+            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="department" className="text-right">Departemen</Label><Select defaultValue={editingUser?.department}><SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger><SelectContent>{departments.filter(d => d !== 'Semua').map(dept => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent></Select></div>
+            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="role" className="text-right">Role</Label><Select defaultValue={editingUser?.role}><SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger><SelectContent>{roles.filter(r => r !== 'Semua').map(role => <SelectItem key={role} value={role}>{getRoleText(role)}</SelectItem>)}</SelectContent></Select></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingUser(null)}>Batal</Button>
+            <Button type="submit">Simpan Perubahan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminRouteGuard>
   )
 }
-
 ```
 
 # app\(dashboard)\admin\verification\loading.tsx
@@ -5042,15 +4878,6 @@ export default function Loading() {
 
 ```
 
-# app\(dashboard)\documents\mandatory\loading.tsx
-
-```tsx
-export default function Loading() {
-  return null
-}
-
-```
-
 # app\(dashboard)\documents\page.tsx
 
 ```tsx
@@ -5059,12 +4886,13 @@ export default function Loading() {
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Filter, Plus, FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle } from "lucide-react"
+import { Plus, FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle, Search} from "lucide-react"
 import Link from "next/link"
-import { useAuth } from "@/hooks/use-auth" // <-- STEP 1: IMPORT THE AUTH HOOK
+import { useAuth } from "@/hooks/use-auth"
+import { DocumentFilters, DocumentFilterValues } from "@/components/document-filters"
 
+// Define the Document interface
 interface Document {
   id: string
   title: string
@@ -5080,159 +4908,153 @@ interface Document {
   downloads: number
   tags: string[]
   verification_status: "approved" | "pending" | "rejected"
+  category: string;
+  priority: string;
 }
 
+// Mock data for the page
+const mockDocuments: Document[] = [
+    {
+      id: "1",
+      title: "Panduan Penyaluran Beasiswa 2024",
+      description: "Dokumen panduan lengkap untuk proses penyaluran beasiswa tahun 2024",
+      department: "Pendayagunaan",
+      author: "Ahmad Fauzi",
+      created_at: "2024-01-15",
+      file_type: "PDF",
+      file_size: "2.5 MB",
+      is_favorite: true,
+      is_mandatory: true,
+      views: 245,
+      downloads: 89,
+      tags: ["beasiswa", "panduan", "2024"],
+      verification_status: "approved",
+      category: "Panduan",
+      priority: "high",
+    },
+    {
+      id: "2",
+      title: "Laporan Keuangan Q4 2023",
+      description: "Laporan keuangan triwulan keempat tahun 2023",
+      department: "Keuangan",
+      author: "Siti Nurhaliza",
+      created_at: "2024-01-10",
+      file_type: "Excel",
+      file_size: "1.8 MB",
+      is_favorite: false,
+      is_mandatory: true,
+      views: 156,
+      downloads: 67,
+      tags: ["keuangan", "laporan", "Q4"],
+      verification_status: "approved",
+      category: "Laporan",
+      priority: "high",
+    },
+    {
+      id: "3",
+      title: "SOP Verifikasi Mustahik",
+      description: "Standard Operating Procedure untuk verifikasi penerima bantuan",
+      department: "Penyaluran",
+      author: "Budi Santoso",
+      created_at: "2024-01-08",
+      file_type: "PDF",
+      file_size: "1.2 MB",
+      is_favorite: true,
+      is_mandatory: false,
+      views: 198,
+      downloads: 45,
+      tags: ["SOP", "verifikasi", "mustahik"],
+      verification_status: "pending",
+      category: "SOP",
+      priority: "medium",
+    },
+    {
+      id: "4",
+      title: "Proposal Program Kesehatan",
+      description: "Proposal program bantuan kesehatan untuk mustahik",
+      department: "Pendayagunaan",
+      author: "Fatimah Zahra",
+      created_at: "2024-01-05",
+      file_type: "Word",
+      file_size: "3.1 MB",
+      is_favorite: false,
+      is_mandatory: false,
+      views: 87,
+      downloads: 23,
+      tags: ["proposal", "kesehatan", "bantuan"],
+      verification_status: "rejected",
+      category: "Template",
+      priority: "low",
+    },
+];
+
 export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<Document[]>([])
-  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filterType, setFilterType] = useState<"all" | "favorites" | "mandatory">("all")
+  const [documents, setDocuments] = useState<Document[]>(mockDocuments);
+  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>(mockDocuments);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const { userRole } = useAuth();
   
-  // STEP 2: GET THE REAL USER AND ROLE FROM THE AUTH HOOK
-  const { user, userRole } = useAuth() 
+  const [activeFilters, setActiveFilters] = useState<DocumentFilterValues>({
+    searchQuery: "",
+    category: "Semua",
+    department: "Semua",
+    priority: "Semua",
+    time: "Semua",
+    showFavoritesOnly: false,
+    showMandatoryOnly: false,
+  });
 
-  // STEP 3: DELETE THE OLD MOCK USER STATE
-  // const [currentUser] = useState({ role: "admin" }) // <-- This line is deleted
-
+  const handleFilterChange = (filters: DocumentFilterValues) => {
+    setActiveFilters(filters);
+  };
+  
   useEffect(() => {
-    // This mock data is fine for now, we'll replace it with a database call later
-    const mockDocuments: Document[] = [
-      {
-        id: "1",
-        title: "Panduan Penyaluran Beasiswa 2024",
-        description: "Dokumen panduan lengkap untuk proses penyaluran beasiswa tahun 2024",
-        department: "Pendayagunaan",
-        author: "Ahmad Fauzi",
-        created_at: "2024-01-15",
-        file_type: "PDF",
-        file_size: "2.5 MB",
-        is_favorite: true,
-        is_mandatory: true,
-        views: 245,
-        downloads: 89,
-        tags: ["beasiswa", "panduan", "2024"],
-        verification_status: "approved",
-      },
-      {
-        id: "2",
-        title: "Laporan Keuangan Q4 2023",
-        description: "Laporan keuangan triwulan keempat tahun 2023",
-        department: "Keuangan",
-        author: "Siti Nurhaliza",
-        created_at: "2024-01-10",
-        file_type: "Excel",
-        file_size: "1.8 MB",
-        is_favorite: false,
-        is_mandatory: true,
-        views: 156,
-        downloads: 67,
-        tags: ["keuangan", "laporan", "Q4"],
-        verification_status: "approved",
-      },
-      {
-        id: "3",
-        title: "SOP Verifikasi Mustahik",
-        description: "Standard Operating Procedure untuk verifikasi penerima bantuan",
-        department: "Penyaluran",
-        author: "Budi Santoso",
-        created_at: "2024-01-08",
-        file_type: "PDF",
-        file_size: "1.2 MB",
-        is_favorite: true,
-        is_mandatory: false,
-        views: 198,
-        downloads: 45,
-        tags: ["SOP", "verifikasi", "mustahik"],
-        verification_status: "pending",
-      },
-      {
-        id: "4",
-        title: "Proposal Program Kesehatan",
-        description: "Proposal program bantuan kesehatan untuk mustahik",
-        department: "Pendayagunaan",
-        author: "Fatimah Zahra",
-        created_at: "2024-01-05",
-        file_type: "Word",
-        file_size: "3.1 MB",
-        is_favorite: false,
-        is_mandatory: false,
-        views: 87,
-        downloads: 23,
-        tags: ["proposal", "kesehatan", "bantuan"],
-        verification_status: "rejected",
-      },
-    ]
+    const { searchQuery, category, department, priority, showFavoritesOnly, showMandatoryOnly } = activeFilters;
+    
+    const newFiltered = documents.filter(doc => {
+      const matchesSearch =
+        searchQuery === "" ||
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesCategory = category === "Semua" || doc.category === category;
+      const matchesDepartment = department === "Semua" || doc.department === department;
+      const matchesPriority = priority === "Semua" || doc.priority === priority;
+      const matchesFavorites = !showFavoritesOnly || doc.is_favorite;
+      const matchesMandatory = !showMandatoryOnly || doc.is_mandatory;
 
-    setDocuments(mockDocuments)
-    setFilteredDocuments(mockDocuments)
-  }, [])
+      return matchesSearch && matchesCategory && matchesDepartment && matchesPriority && matchesFavorites && matchesMandatory;
+    });
 
-  useEffect(() => {
-    let filtered = documents
-
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (doc) =>
-          doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          doc.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())),
-      )
-    }
-
-    if (filterType === "favorites") {
-      filtered = filtered.filter((doc) => doc.is_favorite)
-    } else if (filterType === "mandatory") {
-      filtered = filtered.filter((doc) => doc.is_mandatory)
-    }
-
-    setFilteredDocuments(filtered)
-  }, [documents, searchQuery, filterType])
+    setFilteredDocuments(newFiltered);
+  }, [documents, activeFilters]);
 
   const toggleFavorite = (docId: string) => {
-    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_favorite: !doc.is_favorite } : doc)))
-  }
+    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_favorite: !doc.is_favorite } : doc)));
+  };
 
   const toggleMandatory = (docId: string) => {
-    // STEP 4: USE THE REAL userRole FROM THE HOOK
-    if (userRole !== "admin") return
-    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: !doc.is_mandatory } : doc)))
-  }
+    if (userRole !== "admin") return;
+    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: !doc.is_mandatory } : doc)));
+  };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
+    return new Date(dateString).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" });
+  };
   
   const getVerificationBadge = (status: Document["verification_status"]) => {
     switch (status) {
       case "approved":
-        return (
-          <Badge className="bg-green-100 text-green-700">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Terverifikasi
-          </Badge>
-        )
+        return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" />Terverifikasi</Badge>;
       case "pending":
-        return (
-          <Badge className="bg-yellow-100 text-yellow-700">
-            <Clock className="h-3 w-3 mr-1" />
-            Pending
-          </Badge>
-        )
+        return <Badge className="bg-yellow-100 text-yellow-700"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
       case "rejected":
-        return (
-          <Badge className="bg-red-100 text-red-700">
-            <XCircle className="h-3 w-3 mr-1" />
-            Ditolak
-          </Badge>
-        )
+        return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" />Ditolak</Badge>;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -5242,150 +5064,116 @@ export default function DocumentsPage() {
           <p className="text-muted-foreground">Kelola dan akses semua dokumen dalam sistem</p>
         </div>
         <Button asChild>
-          <Link href="/documents/add">
-            <Plus className="mr-2 h-4 w-4" />
-            Tambah Dokumen
-          </Link>
+          <Link href="/documents/add"><Plus className="mr-2 h-4 w-4" />Tambah Dokumen</Link>
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Cari dokumen..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Button variant={filterType === "all" ? "default" : "outline"} onClick={() => setFilterType("all")} size="sm">
-            <Filter className="mr-2 h-4 w-4" />
-            Semua
-          </Button>
-          <Button
-            variant={filterType === "favorites" ? "default" : "outline"}
-            onClick={() => setFilterType("favorites")}
-            size="sm"
-          >
-            <Heart className="mr-2 h-4 w-4" />
-            Favorit
-          </Button>
-          <Button
-            variant={filterType === "mandatory" ? "default" : "outline"}
-            onClick={() => setFilterType("mandatory")}
-            size="sm"
-          >
-            <Star className="mr-2 h-4 w-4" />
-            Wajib Saja
-          </Button>
-        </div>
-      </div>
+      <DocumentFilters
+        onFilterChange={handleFilterChange}
+        onViewChange={setViewMode}
+        visibleFilters={['category', 'department', 'favorites', 'mandatory']}
+        resultCount={filteredDocuments.length}
+      />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredDocuments.map((document) => (
-          <Card key={document.id} className="hover:shadow-lg transition-shadow flex flex-col">
-            <CardHeader className="pb-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-2">
-                  <FileText className="h-4 w-4 text-gray-500" />
-                  <Badge variant="outline" className="text-xs">{document.file_type}</Badge>
-                  {document.is_mandatory && (
-                    <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
-                      <Star className="w-3 h-3 mr-1 fill-current" />
-                      Wajib
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleFavorite(document.id)}
-                    className={`p-1 h-auto ${document.is_favorite ? "text-red-500" : "text-gray-400"}`}
-                  >
-                    <Heart className="w-4 h-4" fill={document.is_favorite ? "currentColor" : "none"} />
-                  </Button>
-                  
-                  {/* STEP 5: USE THE REAL userRole FROM THE HOOK */}
-                  {userRole === "admin" && (
-                    <Button variant="ghost" size="sm" onClick={() => toggleMandatory(document.id)} className="p-1 h-auto">
-                      <Star className={`h-4 w-4 transition-colors ${document.is_mandatory ? "fill-yellow-400 text-yellow-500" : "text-gray-400"}`} />
+      {viewMode === 'grid' ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredDocuments.map((document) => (
+            <Card key={document.id} className="hover:shadow-lg transition-shadow flex flex-col">
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-2">
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    <Badge variant="outline" className="text-xs">{document.file_type}</Badge>
+                    {document.is_mandatory && (
+                      <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
+                        <Star className="w-3 h-3 mr-1 fill-current" />
+                        Wajib
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Button variant="ghost" size="sm" onClick={() => toggleFavorite(document.id)} className={`p-1 h-auto ${document.is_favorite ? "text-red-500" : "text-gray-400"}`}>
+                      <Heart className="w-4 h-4" fill={document.is_favorite ? "currentColor" : "none"} />
                     </Button>
-                  )}
+                    {userRole === "admin" && (
+                      <Button variant="ghost" size="sm" onClick={() => toggleMandatory(document.id)} className="p-1 h-auto">
+                        <Star className={`h-4 w-4 transition-colors ${document.is_mandatory ? "fill-yellow-400 text-yellow-500" : "text-gray-400"}`} />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <CardTitle className="text-lg line-clamp-2 mt-2">{document.title}</CardTitle>
-              <CardDescription className="line-clamp-2 text-sm">{document.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
-              <div>
-                <div className="space-y-2 text-sm text-gray-500 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span>{document.department}</span>
-                    <div className="flex items-center space-x-1">
-                       <Calendar className="w-4 h-4" />
-                       <span>{formatDate(document.created_at)}</span>
+                <CardTitle className="text-lg line-clamp-2 mt-2">{document.title}</CardTitle>
+                <CardDescription className="line-clamp-2 text-sm">{document.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
+                <div>
+                  <div className="space-y-2 text-sm text-gray-500 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span>{document.department}</span>
+                      <div className="flex items-center space-x-1"><Calendar className="w-4 h-4" /><span>{formatDate(document.created_at)}</span></div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>{document.file_size}</span>
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-1"><Eye className="w-4 h-4" /><span>{document.views} views</span></div>
+                        <div className="flex items-center space-x-1"><Download className="w-4 h-4" /><span>{document.downloads} downloads</span></div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span>{document.file_size}</span>
-                     <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1">
-                          <Eye className="w-4 h-4" />
-                          <span>{document.views} views</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Download className="w-4 h-4" />
-                          <span>{document.downloads} downloads</span>
-                        </div>
-                      </div>
+                  <div className="flex flex-wrap gap-1">
+                    {document.tags.map((tag) => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {document.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
+                <div className="flex items-center justify-between pt-4 border-t mt-4">
+                  <div>{getVerificationBadge(document.verification_status)}</div>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" asChild><Link href={`/documents/${document.id}`}><Eye className="w-4 h-4" /></Link></Button>
+                    <Button variant="outline" size="sm"><Download className="w-4 h-4" /></Button>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center justify-between pt-4 border-t mt-4">
-                <div>
-                  {getVerificationBadge(document.verification_status)}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <div className="divide-y">
+              {filteredDocuments.map((document) => (
+                <div key={document.id} className="p-4 hover:bg-gray-50 flex items-center justify-between">
+                  <div className="flex items-center space-x-4 flex-1 min-w-0">
+                    <FileText className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Link href={`/documents/${document.id}`} className="font-medium text-gray-900 truncate hover:underline">{document.title}</Link>
+                        {document.is_mandatory && <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs"><Star className="w-3 h-3 mr-1 fill-current" />Wajib</Badge>}
+                      </div>
+                      <p className="text-sm text-gray-600 line-clamp-1 mb-2">{document.description}</p>
+                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <span>{document.author}</span>
+                        <span>{document.department}</span>
+                        <span>{formatDate(document.created_at)}</span>
+                        <span>{getVerificationBadge(document.verification_status)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 ml-4">
+                    <Button variant="ghost" size="sm" onClick={() => toggleFavorite(document.id)}><Heart className={`w-4 h-4 ${document.is_favorite ? 'text-red-500 fill-current' : 'text-gray-400'}`} /></Button>
+                    <Button variant="outline" size="sm"><Download className="w-4 h-4" /></Button>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/documents/${document.id}`}>
-                      <Eye className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Download className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
       {filteredDocuments.length === 0 && (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Tidak ada dokumen ditemukan</h3>
-            <p className="text-muted-foreground text-center mb-4">
-              {searchQuery ? `Tidak ada dokumen yang cocok dengan pencarian "${searchQuery}"` : "Belum ada dokumen yang tersedia"}
-            </p>
-            <Button asChild>
-              <Link href="/documents/add">
-                <Plus className="mr-2 h-4 w-4" />
-                Tambah Dokumen Pertama
-              </Link>
-            </Button>
+            <Search className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Tidak Ada Dokumen Ditemukan</h3>
+            <p className="text-muted-foreground text-center mb-4">Coba sesuaikan filter atau kata kunci pencarian Anda.</p>
           </CardContent>
         </Card>
       )}
@@ -5474,714 +5262,253 @@ export default function RecentDocumentsLoading() {
 ```tsx
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import {
-  List,
-  Grid3X3,
-  ChevronDown,
-  MoreHorizontal,
-  FileText,
-  FileSpreadsheet,
-  FileImage,
-  Video,
-  Download,
-  Share,
-  Star,
-  Trash2,
-  Eye,
-  Folder,
-  Info,
-} from "lucide-react"
-
-// Data dokumen terbaru sesuai gambar Google Drive
-const recentDocuments = {
-  "Awal minggu ini": [
-    {
-      id: 1,
-      name: "Log Aktivitas KP - Apis",
-      type: "excel",
-      size: "6 KB",
-      location: "KP",
-      owner: "saya",
-      ownerAvatar: "/placeholder.svg?height=32&width=32",
-      lastModified: "17 Jun",
-      action: "Diubah oleh saya",
-    },
-    {
-      id: 2,
-      name: "TA display",
-      type: "presentation",
-      size: "1,5 MB",
-      location: "Google AI Studio",
-      owner: "saya",
-      ownerAvatar: "/placeholder.svg?height=32&width=32",
-      lastModified: "16 Jun",
-      action: "Diubah oleh saya",
-    },
-    {
-      id: 3,
-      name: "Data Analytics.mp4",
-      type: "video",
-      size: "468,1 MB",
-      location: "Tugas Besar II4013 - ...",
-      owner: "saya",
-      ownerAvatar: "/placeholder.svg?height=32&width=32",
-      lastModified: "16 Jun",
-      action: "Diupload",
-      shared: true,
-    },
-  ],
-  "Minggu lalu": [
-    {
-      id: 4,
-      name: "Private Notebook - 18221167.ipynb",
-      type: "notebook",
-      size: "5,6 MB",
-      location: "Tugas Besar II4013 - ...",
-      owner: "saya",
-      ownerAvatar: "/placeholder.svg?height=32&width=32",
-      lastModified: "15 Jun",
-      action: "Diubah oleh saya",
-      shared: true,
-    },
-    {
-      id: 5,
-      name: "Laporan Tugas Besar II4013 (O...",
-      type: "document",
-      size: "3 MB",
-      location: "Tugas Besar II4013 - ...",
-      owner: "18221045 Ivan Aldy Gane...",
-      ownerAvatar: "/placeholder.svg?height=32&width=32",
-      lastModified: "15 Jun",
-      action: "Dibuka oleh saya",
-    },
-    {
-      id: 6,
-      name: "Private Notebook - 18221045.ipynb",
-      type: "notebook",
-      size: "1,6 MB",
-      location: "Tugas Besar II4013 - ...",
-      owner: "18221045 Ivan Aldy Gane...",
-      ownerAvatar: "/placeholder.svg?height=32&width=32",
-      lastModified: "15 Jun",
-      action: "Dibuka oleh saya",
-      shared: true,
-    },
-    {
-      id: 7,
-      name: "backend setting",
-      type: "presentation",
-      size: "310 KB",
-      location: "Google AI Studio",
-      owner: "saya",
-      ownerAvatar: "/placeholder.svg?height=32&width=32",
-      lastModified: "15 Jun",
-      action: "Diubah oleh saya",
-    },
-    {
-      id: 8,
-      name: "image.png",
-      type: "image",
-      size: "88 KB",
-      location: "Google AI Studio",
-      owner: "saya",
-      ownerAvatar: "/placeholder.svg?height=32&width=32",
-      lastModified: "15 Jun",
-      action: "Diupload",
-    },
-  ],
-}
-
-const getFileIcon = (type: string) => {
-  switch (type) {
-    case "excel":
-      return <FileSpreadsheet className="h-5 w-5 text-green-600" />
-    case "presentation":
-      return (
-        <div className="h-5 w-5 bg-purple-600 rounded flex items-center justify-center">
-          <span className="text-white text-xs font-bold">P</span>
-        </div>
-      )
-    case "video":
-      return <Video className="h-5 w-5 text-red-600" />
-    case "notebook":
-      return (
-        <div className="h-5 w-5 bg-orange-500 rounded flex items-center justify-center">
-          <span className="text-white text-xs font-bold">N</span>
-        </div>
-      )
-    case "document":
-      return <FileText className="h-5 w-5 text-blue-600" />
-    case "image":
-      return <FileImage className="h-5 w-5 text-red-500" />
-    default:
-      return <FileText className="h-5 w-5 text-gray-600" />
-  }
-}
-
-export default function RecentDocumentsPage() {
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list")
-  const [selectedType, setSelectedType] = useState("Jenis")
-  const [selectedPerson, setSelectedPerson] = useState("Orang")
-  const [selectedModified, setSelectedModified] = useState("Dimodifikasi")
-  const [selectedSource, setSelectedSource] = useState("Sumber")
-
-  return (
-    <div className="min-h-screen bg-white p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Terbaru</h1>
-        <div className="flex items-center space-x-2">
-          <Button variant={viewMode === "list" ? "default" : "outline"} size="sm" onClick={() => setViewMode("list")}>
-            <List className="h-4 w-4" />
-          </Button>
-          <Button variant={viewMode === "grid" ? "default" : "outline"} size="sm" onClick={() => setViewMode("grid")}>
-            <Grid3X3 className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="sm">
-            <Info className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="justify-between min-w-[100px]">
-              {selectedType}
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setSelectedType("Jenis")}>Jenis</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedType("PDF")}>PDF</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedType("Excel")}>Excel</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedType("Video")}>Video</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedType("Gambar")}>Gambar</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="justify-between min-w-[100px]">
-              {selectedPerson}
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setSelectedPerson("Orang")}>Orang</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedPerson("Saya")}>Saya</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedPerson("Tim")}>Tim</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="justify-between min-w-[120px]">
-              {selectedModified}
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setSelectedModified("Dimodifikasi")}>Dimodifikasi</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedModified("Hari ini")}>Hari ini</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedModified("Minggu ini")}>Minggu ini</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedModified("Bulan ini")}>Bulan ini</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="justify-between min-w-[100px]">
-              {selectedSource}
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setSelectedSource("Sumber")}>Sumber</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedSource("Upload")}>Upload</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedSource("Import")}>Import</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Documents List */}
-      <div className="space-y-4">
-        {/* Table Header */}
-        <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b">
-          <div className="col-span-5">Nama</div>
-          <div className="col-span-2">Pemilik</div>
-          <div className="col-span-2">Ukuran file</div>
-          <div className="col-span-2">Lokasi</div>
-          <div className="col-span-1"></div>
-        </div>
-
-        {Object.entries(recentDocuments).map(([timeGroup, documents]) => (
-          <div key={timeGroup} className="space-y-1">
-            {/* Time Group Header */}
-            <h3 className="text-sm font-medium text-gray-600 px-4 py-1">{timeGroup}</h3>
-
-            {/* Documents in this time group */}
-            {documents.map((doc) => (
-              <div
-                key={doc.id}
-                className="grid grid-cols-12 gap-4 px-4 py-2 hover:bg-gray-50 rounded-lg group cursor-pointer items-center"
-              >
-                {/* Name Column */}
-                <div className="col-span-5 flex items-center space-x-3">
-                  <div className="flex items-center space-x-2">
-                    {getFileIcon(doc.type)}
-                    {doc.shared && (
-                      <div className="flex items-center">
-                        <svg className="h-3 w-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{doc.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {doc.lastModified} • {doc.action}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Owner Column */}
-                <div className="col-span-2 flex items-center space-x-2">
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={doc.ownerAvatar || "/placeholder.svg"} />
-                    <AvatarFallback>{doc.owner.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm text-gray-700 truncate">{doc.owner}</span>
-                </div>
-
-                {/* File Size Column */}
-                <div className="col-span-2 flex items-center">
-                  <span className="text-sm text-gray-700">{doc.size}</span>
-                </div>
-
-                {/* Location Column */}
-                <div className="col-span-2 flex items-center space-x-1">
-                  <Folder className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-700 truncate">{doc.location}</span>
-                </div>
-
-                {/* Actions Column */}
-                <div className="col-span-1 flex items-center justify-end">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        Lihat
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Share className="mr-2 h-4 w-4" />
-                        Bagikan
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Star className="mr-2 h-4 w-4" />
-                        Tambah ke Favorit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Hapus
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-```
-
-# app\(dashboard)\documents\search\loading.tsx
-
-```tsx
-export default function Loading() {
-  return null
-}
-
-```
-
-# app\(dashboard)\documents\search\page.tsx
-
-```tsx
-"use client"
-
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, FileText, Download, Eye, Heart, Clock, Building2, Plus, ArrowLeft, Star, X } from "lucide-react"
-import { BreadcrumbNav } from "@/components/breadcrumb-nav"
+import { useAuth } from "@/hooks/use-auth"
+import { FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle, Search } from "lucide-react"
+import Link from "next/link"
 
-const documents = [
-  {
+// Interface and Mock Data remain the same as before
+interface Document {
+  id: number
+  title: string
+  description: string
+  category: string
+  department: string
+  author: string
+  date: string
+  uploadedAt: string
+  size: string
+  type: "PDF" | "XLSX" | "Word" | "PPTX"
+  downloads: number
+  views: number
+  tags: string[]
+  is_favorite: boolean
+  is_mandatory: boolean
+  verification_status: "approved" | "pending" | "rejected"
+  priority: "high" | "medium" | "low"
+  isNew: boolean
+}
+
+const recentDocuments: Document[] = [
+    {
     id: 1,
-    title: "Panduan Lengkap Ziswaf 2024",
-    description: "Panduan komprehensif untuk pengelolaan ziswaf",
+    title: "Panduan Penyaluran Beasiswa 2024",
+    description: "Dokumen panduan lengkap untuk proses penyaluran beasiswa tahun 2024",
+    category: "Panduan",
     department: "Pendayagunaan",
-    type: "PDF",
+    author: "Ahmad Fauzi",
+    date: "2024-12-17",
+    uploadedAt: new Date().toISOString(),
     size: "2.4 MB",
-    uploadDate: "2024-01-15",
-    views: 1234,
-    downloads: 456,
-    isFavorite: true,
-    isMandatory: true,
-    status: "verified",
-    tags: ["panduan", "ziswaf", "2024"],
+    type: "PDF",
+    downloads: 23,
+    views: 156,
+    tags: ["ziswaf", "panduan", "prosedur"],
+    is_favorite: true,
+    is_mandatory: true,
+    verification_status: "approved",
+    priority: "high",
+    isNew: true,
   },
   {
     id: 2,
-    title: "SOP Verifikasi Mustahik",
-    description: "Standard Operating Procedure untuk verifikasi penerima bantuan",
+    title: "Template Evaluasi Program Beasiswa Q4 2024",
+    description: "Template untuk evaluasi dan penilaian program beasiswa triwulan keempat",
+    category: "Template",
     department: "Pendayagunaan",
-    type: "DOC",
-    size: "1.8 MB",
-    uploadDate: "2024-01-12",
-    views: 892,
-    downloads: 234,
-    isFavorite: false,
-    isMandatory: true,
-    status: "verified",
-    tags: ["sop", "verifikasi", "mustahik"],
+    author: "Siti Nurhaliza",
+    date: "2024-12-16",
+    uploadedAt: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
+    size: "1.2 MB",
+    type: "XLSX",
+    downloads: 45,
+    views: 234,
+    tags: ["template", "evaluasi", "beasiswa"],
+    is_favorite: false,
+    is_mandatory: false,
+    verification_status: "approved",
+    priority: "medium",
+    isNew: true,
   },
   {
     id: 3,
-    title: "Template Laporan Bulanan",
-    description: "Template standar untuk laporan bulanan departemen",
-    department: "Keuangan",
-    type: "XLSX",
-    size: "856 KB",
-    uploadDate: "2024-01-10",
-    views: 567,
-    downloads: 123,
-    isFavorite: true,
-    isMandatory: false,
-    status: "pending",
-    tags: ["template", "laporan", "bulanan"],
+    title: "SOP Verifikasi Mustahik Terbaru",
+    description: "Standar operasional prosedur terbaru untuk verifikasi dan validasi penerima manfaat",
+    category: "SOP",
+    department: "Pendayagunaan",
+    author: "Budi Santoso",
+    date: "2024-12-15",
+    uploadedAt: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(),
+    size: "1.8 MB",
+    type: "PDF",
+    downloads: 67,
+    views: 345,
+    tags: ["sop", "verifikasi", "mustahik"],
+    is_favorite: true,
+    is_mandatory: true,
+    verification_status: "approved",
+    priority: "high",
+    isNew: true,
   },
   {
     id: 4,
-    title: "Daftar Mitra Strategis 2024",
-    description: "Database lengkap mitra strategis dan informasi kontak",
-    department: "Marketing",
+    title: "Laporan Analisis Dampak Program Sosial",
+    description: "Laporan komprehensif analisis dampak program sosial periode November 2024",
+    category: "Laporan",
+    department: "Pendayagunaan",
+    author: "Maya Sari",
+    date: "2024-12-14",
+    uploadedAt: new Date(new Date().setDate(new Date().getDate() - 3)).toISOString(),
+    size: "3.5 MB",
     type: "PDF",
-    size: "3.2 MB",
-    uploadDate: "2024-01-08",
-    views: 445,
     downloads: 89,
-    isFavorite: false,
-    isMandatory: false,
-    status: "verified",
-    tags: ["mitra", "strategis", "kontak"],
+    views: 456,
+    tags: ["laporan", "analisis", "dampak"],
+    is_favorite: false,
+    is_mandatory: false,
+    verification_status: "pending",
+    priority: "high",
+    isNew: false,
   },
-  {
-    id: 5,
-    title: "Kebijakan Keamanan Data",
-    description: "Panduan keamanan data dan privasi organisasi",
-    department: "IT",
-    type: "PDF",
-    size: "1.2 MB",
-    uploadDate: "2024-01-05",
-    views: 678,
-    downloads: 145,
-    isFavorite: false,
-    isMandatory: true,
-    status: "verified",
-    tags: ["keamanan", "data", "kebijakan"],
-  },
-]
+];
 
-const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing"]
-const documentTypes = ["Semua", "PDF", "DOC", "XLSX", "PPT"]
-// const sortOptions = ["Terbaru", "Terlama", "Nama A-Z", "Nama Z-A", "Paling Populer"]
-const statusOptions = ["Semua", "Terverifikasi", "Pending", "Ditolak"]
 
-export default function DocumentSearchPage() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedDepartment, setSelectedDepartment] = useState("Semua")
-  const [selectedType, setSelectedType] = useState("Semua") 
-  // const [sortBy, setSortBy] = useState("Terbaru")
-  const [selectedStatus, setSelectedStatus] = useState("Semua")
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
-  const [showMandatoryOnly, setShowMandatoryOnly] = useState(false)
-  const [showStarredOnly, setShowStarredOnly] = useState(false)
+export default function RecentDocumentsPage() {
+  const [documents, setDocuments] = useState<Document[]>(recentDocuments);
+  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>(recentDocuments);
+  const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
+  const { userRole } = useAuth();
 
-  const filteredDocuments = documents.filter((doc) => {
-    const matchesSearch =
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-    const matchesDepartment = selectedDepartment === "Semua" || doc.department === selectedDepartment
-    const matchesType = selectedType === "Semua" || doc.type === selectedType
-    const matchesFavorites = !showFavoritesOnly || doc.isFavorite
-    const matchesStatus =
-      selectedStatus === "Semua" ||
-      (selectedStatus === "Terverifikasi" && doc.status === "verified") ||
-      (selectedStatus === "Pending" && doc.status === "pending") ||
-      (selectedStatus === "Ditolak" && doc.status === "rejected")
+  useEffect(() => {
+    let newFiltered = documents.filter(doc => {
+      if (timeFilter === 'all') return true;
 
-    return matchesSearch && matchesDepartment && matchesType && matchesFavorites && matchesStatus
-  })
+      const now = new Date();
+      const uploadDate = new Date(doc.uploadedAt);
+      const diffTime = now.getTime() - uploadDate.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  const handleBackClick = () => {
-    router.push("/dashboard")
-  }
+      if (timeFilter === "today") return diffDays <= 1;
+      if (timeFilter === "week") return diffDays <= 7;
+      if (timeFilter === "month") return diffDays <= 30;
+
+      return true;
+    });
+    
+    setFilteredDocuments(newFiltered);
+  }, [documents, timeFilter]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" });
+  };
+  
+  const getVerificationBadge = (status: Document["verification_status"]) => {
+    switch (status) {
+      case "approved":
+        return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" />Terverifikasi</Badge>;
+      case "pending":
+        return <Badge className="bg-yellow-100 text-yellow-700"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
+      case "rejected":
+        return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" />Ditolak</Badge>;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Breadcrumb Navigation */}
-      <BreadcrumbNav />
-
-      {/* Header with Back Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={handleBackClick} className="flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Kembali
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Pencarian Dokumen</h1>
-            <p className="text-gray-600">Temukan dokumen yang Anda butuhkan dengan mudah</p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-col space-y-2">
+        <div className="flex items-center space-x-3">
+            <h1 className="text-3xl font-bold text-gray-900">Dokumen Terbaru</h1>
         </div>
-        <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-          <Link href="/documents/add">
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Dokumen
-          </Link>
-        </Button>
+        <div>
+            <p className="text-gray-600">Dokumen yang baru saja ditambahkan atau diperbarui</p>
+        </div>
       </div>
 
-      {/* Filter Button - hanya Favorit Saja */}
+      {/* NEW: Simple Filter Buttons */}
       <div className="flex items-center gap-2">
-        <Button
-          variant={showFavoritesOnly ? "default" : "outline"}
-          size="sm"
-          onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-          className={showFavoritesOnly ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}
-        >
-          <Heart className="w-4 h-4 mr-2" />
-          Favorit Saja
-        </Button>
-        {showFavoritesOnly && (
-          <span className="text-sm text-gray-600">
-            {documents.filter((doc) => doc.isFavorite).length} dokumen ditemukan
-          </span>
-        )}
+        <Button variant={timeFilter === 'all' ? 'default' : 'outline'} onClick={() => setTimeFilter('all')}>Semua</Button>
+        <Button variant={timeFilter === 'today' ? 'default' : 'outline'} onClick={() => setTimeFilter('today')}>Hari Ini</Button>
+        <Button variant={timeFilter === 'week' ? 'default' : 'outline'} onClick={() => setTimeFilter('week')}>Minggu Ini</Button>
+        <Button variant={timeFilter === 'month' ? 'default' : 'outline'} onClick={() => setTimeFilter('month')}>Bulan Ini</Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Cari dokumen, deskripsi, atau tag..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Semua" />
-                </SelectTrigger>
-                <SelectContent>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept} value={dept}>
-                      {dept}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Semua" />
-                </SelectTrigger>
-                <SelectContent>
-                  {documentTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="w-full sm:w-48">
-                  <SelectValue placeholder="Semua" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Results */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <p className="text-sm text-gray-600">
-              Menampilkan {filteredDocuments.length} dari {documents.length} dokumen
-            </p>
-            {showFavoritesOnly && (
-              <div className="flex items-center space-x-2">
-                <Badge variant="secondary" className="flex items-center space-x-1">
-                  <Heart className="w-3 h-3" />
-                  <span>Favorit</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto p-0 ml-1"
-                    onClick={() => setShowFavoritesOnly(false)}
-                  >
-                    <X className="w-3 h-3" />
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {filteredDocuments.map((document) => (
+          <Card key={document.id} className="hover:shadow-lg transition-shadow flex flex-col">
+             <CardHeader className="pb-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-2">
+                  <FileText className="h-4 w-4 text-gray-500" />
+                  <Badge variant="outline" className="text-xs">{document.type}</Badge>
+                  {document.is_mandatory && (
+                    <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
+                      <Star className="w-3 h-3 mr-1 fill-current" />
+                      Wajib
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Button variant="ghost" size="sm" className={`p-1 h-auto ${document.is_favorite ? "text-red-500" : "text-gray-400"}`}>
+                    <Heart className="w-4 h-4" fill={document.is_favorite ? "currentColor" : "none"} />
                   </Button>
-                </Badge>
+                  {userRole === "admin" && (
+                    <Button variant="ghost" size="sm" className="p-1 h-auto">
+                      <Star className={`h-4 w-4 transition-colors ${document.is_mandatory ? "fill-yellow-400 text-yellow-500" : "text-gray-400"}`} />
+                    </Button>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Document Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDocuments.map((doc) => (
-            <Card key={doc.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="w-5 h-5 text-blue-500" />
-                    <Badge variant="outline" className="text-xs">
-                      {doc.type}
-                    </Badge>
-                    {doc.isMandatory && (
-                      <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
-                        <Star className="w-3 h-3 mr-1 fill-current" />
-                        Wajib
-                      </Badge>
-                    )}
+              <CardTitle className="text-lg line-clamp-2 mt-2">{document.title}</CardTitle>
+              <CardDescription className="line-clamp-2 text-sm">{document.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
+              <div>
+                <div className="space-y-2 text-sm text-gray-500 mb-4">
+                  <div className="flex justify-between items-center">
+                    <span>{document.department}</span>
+                    <div className="flex items-center space-x-1"><Calendar className="w-4 h-4" /><span>{formatDate(document.date)}</span></div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    {doc.isMandatory && <Star className="w-4 h-4 text-orange-500 fill-current" />}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`p-1 ${doc.isFavorite ? "text-red-500" : "text-gray-400"}`}
-                    >
-                      <Heart className="w-4 h-4" fill={doc.isFavorite ? "currentColor" : "none"} />
-                    </Button>
+                  <div className="flex justify-between items-center">
+                    <span>{document.size}</span>
+                     <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-1"><Eye className="w-4 h-4" /><span>{document.views} views</span></div>
+                        <div className="flex items-center space-x-1"><Download className="w-4 h-4" /><span>{document.downloads} downloads</span></div>
+                      </div>
                   </div>
                 </div>
-                <CardTitle className="text-lg line-clamp-2">{doc.title}</CardTitle>
-                <CardDescription className="line-clamp-2">{doc.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <div className="flex items-center space-x-1">
-                    <Building2 className="w-4 h-4" />
-                    <span>{doc.department}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{doc.uploadDate}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-sm text-gray-500">
-                  <span>{doc.size}</span>
-                  <div className="flex items-center space-x-3">
-                    <span>{doc.views} views</span>
-                    <span>{doc.downloads} downloads</span>
-                  </div>
-                </div>
-
                 <div className="flex flex-wrap gap-1">
-                  {doc.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
+                  {document.tags.map((tag) => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
                 </div>
-
-                <div className="flex items-center justify-between pt-2">
-                  <Badge variant={doc.status === "verified" ? "default" : "secondary"} className="text-xs">
-                    {doc.status === "verified" ? "Terverifikasi" : "Pending"}
-                  </Badge>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/documents/${doc.id}/view`}>
-                        <Eye className="w-4 h-4" />
-                      </Link>
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Download className="w-4 h-4" />
-                    </Button>
-                  </div>
+              </div>
+              <div className="flex items-center justify-between pt-4 border-t mt-4">
+                <div>{getVerificationBadge(document.verification_status)}</div>
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm" asChild><Link href={`/documents/${document.id}`}><Eye className="w-4 h-4" /></Link></Button>
+                  <Button variant="outline" size="sm"><Download className="w-4 h-4" /></Button>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {filteredDocuments.length === 0 && (
-          <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada dokumen ditemukan</h3>
-            <p className="text-gray-600 mb-4">Coba ubah filter pencarian atau tambahkan dokumen baru</p>
-            <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-              <Link href="/documents/add">
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah Dokumen
-              </Link>
-            </Button>
-          </div>
-        )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+
+      {filteredDocuments.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak Ada Dokumen Terbaru</h3>
+            <p className="text-gray-600 mb-4">Tidak ada dokumen yang ditemukan untuk periode waktu yang dipilih.</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
-
 ```
 
 # app\(dashboard)\knowledge-requests\loading.tsx
@@ -6198,20 +5525,46 @@ export default function Loading() {
 ```tsx
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MessageSquare, Clock, User, Calendar, Plus, Eye, CheckCircle, AlertCircle, XCircle } from "lucide-react"
 import Link from "next/link"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// Mock data
-const knowledgeRequests = [
+// Define the type for a knowledge request for consistency
+interface KnowledgeRequest {
+  id: number;
+  title: string;
+  description: string;
+  requester: string;
+  department: string;
+  requestDate: string;
+  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  priority: 'high' | 'medium' | 'low';
+  responses: number;
+  category: string;
+}
+
+// Mock data for the page
+const initialKnowledgeRequests: KnowledgeRequest[] = [
   {
     id: 1,
     title: "Prosedur Penyaluran Bantuan Pendidikan",
-    description:
-      "Saya membutuhkan informasi detail tentang prosedur dan persyaratan penyaluran bantuan pendidikan untuk mahasiswa.",
+    description: "Saya membutuhkan informasi detail tentang prosedur dan persyaratan penyaluran bantuan pendidikan untuk mahasiswa.",
     requester: "Ahmad Fauzi",
     department: "Penyaluran",
     requestDate: "15 Desember 2024",
@@ -6223,8 +5576,7 @@ const knowledgeRequests = [
   {
     id: 2,
     title: "Template Laporan Keuangan Bulanan",
-    description:
-      "Apakah ada template standar untuk laporan keuangan bulanan yang harus digunakan oleh semua departemen?",
+    description: "Apakah ada template standar untuk laporan keuangan bulanan yang harus digunakan oleh semua departemen?",
     requester: "Siti Nurhaliza",
     department: "Keuangan",
     requestDate: "14 Desember 2024",
@@ -6245,83 +5597,98 @@ const knowledgeRequests = [
     responses: 5,
     category: "strategi",
   },
-]
+];
 
 export default function KnowledgeRequestsPage() {
+  const [knowledgeRequests, setKnowledgeRequests] = useState<KnowledgeRequest[]>(initialKnowledgeRequests);
+  const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
+  const [newRequest, setNewRequest] = useState({
+    title: '',
+    description: '',
+    department: '',
+    priority: 'medium'
+  });
+
+  const handleAddRequest = () => {
+    if (!newRequest.title || !newRequest.description || !newRequest.department) {
+      alert("Mohon lengkapi semua field yang wajib diisi.");
+      return;
+    }
+
+    const newRequestObject: KnowledgeRequest = {
+      id: knowledgeRequests.length + 1,
+      title: newRequest.title,
+      description: newRequest.description,
+      department: newRequest.department,
+      priority: newRequest.priority as 'high' | 'medium' | 'low',
+      requester: "User Saat Ini", // Replace with actual user data later
+      requestDate: new Date().toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' }),
+      status: 'open',
+      responses: 0,
+      category: 'lainnya',
+    };
+
+    setKnowledgeRequests(prev => [newRequestObject, ...prev]);
+    setNewRequest({ title: '', description: '', department: '', priority: 'medium' });
+    setIsAddRequestOpen(false);
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "open":
-        return "bg-blue-100 text-blue-800"
-      case "in_progress":
-        return "bg-yellow-100 text-yellow-800"
-      case "resolved":
-        return "bg-green-100 text-green-800"
-      case "closed":
-        return "bg-gray-100 text-gray-800"
-      default:
-        return "bg-gray-100 text-gray-800"
+      case "open": return "bg-blue-100 text-blue-800";
+      case "in_progress": return "bg-yellow-100 text-yellow-800";
+      case "resolved": return "bg-green-100 text-green-800";
+      case "closed": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   }
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "open":
-        return "Terbuka"
-      case "in_progress":
-        return "Dalam Proses"
-      case "resolved":
-        return "Terjawab"
-      case "closed":
-        return "Ditutup"
-      default:
-        return "Unknown"
+      case "open": return "Terbuka";
+      case "in_progress": return "Dalam Proses";
+      case "resolved": return "Terjawab";
+      case "closed": return "Ditutup";
+      default: return "Unknown";
     }
   }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "open":
-        return <AlertCircle className="h-4 w-4" />
-      case "in_progress":
-        return <Clock className="h-4 w-4" />
-      case "resolved":
-        return <CheckCircle className="h-4 w-4" />
-      case "closed":
-        return <XCircle className="h-4 w-4" />
-      default:
-        return <MessageSquare className="h-4 w-4" />
+      case "open": return <AlertCircle className="h-4 w-4" />;
+      case "in_progress": return <Clock className="h-4 w-4" />;
+      case "resolved": return <CheckCircle className="h-4 w-4" />;
+      case "closed": return <XCircle className="h-4 w-4" />;
+      default: return <MessageSquare className="h-4 w-4" />;
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800"
-      case "medium":
-        return "bg-yellow-100 text-yellow-800"
-      case "low":
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
+      case "high": return "bg-red-100 text-red-800";
+      case "medium": return "bg-yellow-100 text-yellow-800";
+      case "low": return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
     }
+  }
+
+  const filterRequests = (status: KnowledgeRequest['status']) => {
+    return knowledgeRequests.filter(req => req.status === status);
   }
 
   return (
     <div className="space-y-6">
-
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Permintaan Pengetahuan</h1>
           <p className="text-muted-foreground">Ajukan pertanyaan dan berbagi pengetahuan dengan tim</p>
         </div>
-        <Button>
+        <Button onClick={() => setIsAddRequestOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Ajukan Pertanyaan
+          Ajukan Pengetahuan
         </Button>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -6329,46 +5696,42 @@ export default function KnowledgeRequestsPage() {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">156</div>
+            <div className="text-2xl font-bold">{knowledgeRequests.length}</div>
             <p className="text-xs text-muted-foreground">+12% dari bulan lalu</p>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Terbuka</CardTitle>
             <AlertCircle className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
+            <div className="text-2xl font-bold">{filterRequests('open').length}</div>
             <p className="text-xs text-muted-foreground">Menunggu jawaban</p>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Dalam Proses</CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">15</div>
+            <div className="text-2xl font-bold">{filterRequests('in_progress').length}</div>
             <p className="text-xs text-muted-foreground">Sedang diproses</p>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Terjawab</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">118</div>
+            <div className="text-2xl font-bold">{filterRequests('resolved').length}</div>
             <p className="text-xs text-muted-foreground">Sudah terjawab</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Knowledge Requests List */}
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
           <TabsTrigger value="all">Semua Permintaan</TabsTrigger>
@@ -6384,52 +5747,32 @@ export default function KnowledgeRequestsPage() {
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <CardTitle className="text-lg">
-                      <Link href={`/knowledge-requests/${request.id}`} className="hover:underline">
-                        {request.title}
-                      </Link>
+                      <Link href={`/knowledge-requests/${request.id}`} className="hover:underline">{request.title}</Link>
                     </CardTitle>
                     <CardDescription>{request.description}</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge className={getPriorityColor(request.priority)}>{request.priority.toUpperCase()}</Badge>
                     <Badge className={getStatusColor(request.status)}>
-                      <div className="flex items-center gap-1">
-                        {getStatusIcon(request.status)}
-                        {getStatusText(request.status)}
-                      </div>
+                      <div className="flex items-center gap-1">{getStatusIcon(request.status)}{getStatusText(request.status)}</div>
                     </Badge>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* Request Details */}
                   <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      {request.requester}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {request.requestDate}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MessageSquare className="h-4 w-4" />
-                      {request.responses} respons
-                    </div>
+                    <div className="flex items-center gap-1"><User className="h-4 w-4" />{request.requester}</div>
+                    <div className="flex items-center gap-1"><Calendar className="h-4 w-4" />{request.requestDate}</div>
+                    <div className="flex items-center gap-1"><MessageSquare className="h-4 w-4" />{request.responses} respons</div>
                   </div>
-
-                  {/* Category and Actions */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <Badge variant="outline">{request.category}</Badge>
                       <span className="text-sm text-muted-foreground">Departemen {request.department}</span>
                     </div>
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/knowledge-requests/${request.id}`}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        Detail
-                      </Link>
+                      <Link href={`/knowledge-requests/${request.id}`}><Eye className="mr-2 h-4 w-4" />Detail</Link>
                     </Button>
                   </div>
                 </div>
@@ -6438,28 +5781,63 @@ export default function KnowledgeRequestsPage() {
           ))}
         </TabsContent>
 
-        <TabsContent value="open">
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Menampilkan permintaan yang masih terbuka</p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="in_progress">
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Menampilkan permintaan yang sedang diproses</p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="resolved">
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Menampilkan permintaan yang sudah terjawab</p>
-          </div>
-        </TabsContent>
+        <TabsContent value="open"><div className="text-center py-8"><p className="text-muted-foreground">Menampilkan permintaan yang masih terbuka</p></div></TabsContent>
+        <TabsContent value="in_progress"><div className="text-center py-8"><p className="text-muted-foreground">Menampilkan permintaan yang sedang diproses</p></div></TabsContent>
+        <TabsContent value="resolved"><div className="text-center py-8"><p className="text-muted-foreground">Menampilkan permintaan yang sudah terjawab</p></div></TabsContent>
       </Tabs>
+      
+      {/* The Dialog for adding a new request */}
+      <Dialog open={isAddRequestOpen} onOpenChange={setIsAddRequestOpen}>
+        <DialogContent className="sm:max-w-[625px]">
+          <DialogHeader>
+            <DialogTitle>Buat Permintaan Pengetahuan Baru</DialogTitle>
+            <DialogDescription>Jelaskan pertanyaan atau pengetahuan yang Anda butuhkan. Tim terkait akan diberitahu.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="req-title">Judul Permintaan *</Label>
+              <Input id="req-title" placeholder="Contoh: Prosedur Klaim Asuransi Kesehatan" value={newRequest.title} onChange={(e) => setNewRequest({...newRequest, title: e.target.value})} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="req-desc">Deskripsi Detail *</Label>
+              <Textarea id="req-desc" placeholder="Jelaskan secara detail apa yang Anda butuhkan..." value={newRequest.description} onChange={(e) => setNewRequest({...newRequest, description: e.target.value})} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="req-dept">Departemen Terkait *</Label>
+                <Select value={newRequest.department} onValueChange={(value) => setNewRequest({...newRequest, department: value})}>
+                  <SelectTrigger><SelectValue placeholder="Pilih Departemen" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Penyaluran">Penyaluran</SelectItem>
+                    <SelectItem value="Keuangan">Keuangan</SelectItem>
+                    <SelectItem value="Penghimpunan">Penghimpunan</SelectItem>
+                    <SelectItem value="SDM">SDM</SelectItem>
+                    <SelectItem value="IT">IT</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="req-priority">Prioritas</Label>
+                  <Select value={newRequest.priority} onValueChange={(value) => setNewRequest({...newRequest, priority: value})}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Rendah</SelectItem>
+                    <SelectItem value="medium">Sedang</SelectItem>
+                    <SelectItem value="high">Tinggi</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddRequestOpen(false)}>Batal</Button>
+            <Button onClick={handleAddRequest}>Ajukan Permintaan</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-
 ```
 
 # app\(dashboard)\layout.tsx
@@ -6672,10 +6050,10 @@ export default function NotificationsPage() {
               <SelectItem value="system">Sistem</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             <Settings className="w-4 h-4 mr-2" />
             Pengaturan
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -7063,317 +6441,6 @@ export default function PasswordPage() {
             Pertimbangkan menggunakan password manager untuk mengelola password Anda dengan aman.
           </AlertDescription>
         </Alert>
-      </div>
-    </div>
-  )
-}
-
-```
-
-# app\(dashboard)\profile\preferences\page.tsx
-
-```tsx
-"use client"
-
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Slider } from "@/components/ui/slider"
-import { Badge } from "@/components/ui/badge"
-import { Settings, Moon, Sun, Monitor, Bell, Globe, Palette, Volume2, Save, RotateCcw } from "lucide-react"
-
-export default function PreferencesPage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [theme, setTheme] = useState("system")
-  const [language, setLanguage] = useState("id")
-  const [timezone, setTimezone] = useState("Asia/Jakarta")
-  const [dateFormat, setDateFormat] = useState("dd/mm/yyyy")
-  const [soundVolume, setSoundVolume] = useState([75])
-
-  const handleSave = async () => {
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsLoading(false)
-  }
-
-  const handleReset = () => {
-    setTheme("system")
-    setLanguage("id")
-    setTimezone("Asia/Jakarta")
-    setDateFormat("dd/mm/yyyy")
-    setSoundVolume([75])
-  }
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Preferensi</h1>
-        <p className="text-muted-foreground">Sesuaikan pengalaman menggunakan aplikasi sesuai keinginan Anda</p>
-      </div>
-
-      <div className="grid gap-6">
-        {/* Appearance Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
-              Tampilan
-            </CardTitle>
-            <CardDescription>Atur tema dan tampilan aplikasi</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <Label>Tema</Label>
-              <RadioGroup value={theme} onValueChange={setTheme}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="light" id="light" />
-                  <Label htmlFor="light" className="flex items-center gap-2">
-                    <Sun className="h-4 w-4" />
-                    Terang
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="dark" id="dark" />
-                  <Label htmlFor="dark" className="flex items-center gap-2">
-                    <Moon className="h-4 w-4" />
-                    Gelap
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="system" id="system" />
-                  <Label htmlFor="system" className="flex items-center gap-2">
-                    <Monitor className="h-4 w-4" />
-                    Ikuti Sistem
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <Separator />
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Mode Kompak</Label>
-                <p className="text-sm text-muted-foreground">
-                  Tampilkan lebih banyak konten dalam ruang yang lebih kecil
-                </p>
-              </div>
-              <Switch />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Animasi</Label>
-                <p className="text-sm text-muted-foreground">Aktifkan animasi dan transisi</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Language & Region */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
-              Bahasa & Wilayah
-            </CardTitle>
-            <CardDescription>Atur bahasa, zona waktu, dan format tampilan</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label>Bahasa</Label>
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="id">Bahasa Indonesia</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="ar">العربية</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Zona Waktu</Label>
-                <Select value={timezone} onValueChange={setTimezone}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Asia/Jakarta">WIB (Jakarta)</SelectItem>
-                    <SelectItem value="Asia/Makassar">WITA (Makassar)</SelectItem>
-                    <SelectItem value="Asia/Jayapura">WIT (Jayapura)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Format Tanggal</Label>
-              <Select value={dateFormat} onValueChange={setDateFormat}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="dd/mm/yyyy">DD/MM/YYYY</SelectItem>
-                  <SelectItem value="mm/dd/yyyy">MM/DD/YYYY</SelectItem>
-                  <SelectItem value="yyyy-mm-dd">YYYY-MM-DD</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Notification Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              Notifikasi
-            </CardTitle>
-            <CardDescription>Atur bagaimana dan kapan Anda menerima notifikasi</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Notifikasi Desktop</Label>
-                <p className="text-sm text-muted-foreground">Tampilkan notifikasi di desktop</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Suara Notifikasi</Label>
-                <p className="text-sm text-muted-foreground">Putar suara saat ada notifikasi baru</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="flex items-center gap-2">
-                  <Volume2 className="h-4 w-4" />
-                  Volume Suara
-                </Label>
-                <Badge variant="outline">{soundVolume[0]}%</Badge>
-              </div>
-              <Slider value={soundVolume} onValueChange={setSoundVolume} max={100} step={5} className="w-full" />
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <Label className="text-base">Jenis Notifikasi</Label>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-sm font-normal">Dokumen Baru</Label>
-                    <p className="text-xs text-muted-foreground">Saat ada dokumen baru ditambahkan</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-sm font-normal">Permintaan Verifikasi</Label>
-                    <p className="text-xs text-muted-foreground">Saat dokumen memerlukan verifikasi</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-sm font-normal">Aktivitas Tim</Label>
-                    <p className="text-xs text-muted-foreground">Saat ada aktivitas dari anggota tim</p>
-                  </div>
-                  <Switch />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-sm font-normal">Laporan Sistem</Label>
-                    <p className="text-xs text-muted-foreground">Laporan otomatis dan pemeliharaan sistem</p>
-                  </div>
-                  <Switch />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* General Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Pengaturan Umum
-            </CardTitle>
-            <CardDescription>Pengaturan aplikasi dan perilaku sistem</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Auto-save</Label>
-                <p className="text-sm text-muted-foreground">Simpan perubahan secara otomatis</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Konfirmasi Sebelum Hapus</Label>
-                <p className="text-sm text-muted-foreground">Tampilkan konfirmasi sebelum menghapus item</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Sinkronisasi Otomatis</Label>
-                <p className="text-sm text-muted-foreground">Sinkronkan data secara otomatis</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Jumlah Item per Halaman</Label>
-              <Select defaultValue="20">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10 item</SelectItem>
-                  <SelectItem value="20">20 item</SelectItem>
-                  <SelectItem value="50">50 item</SelectItem>
-                  <SelectItem value="100">100 item</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Action Buttons */}
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={handleReset}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Reset ke Default
-          </Button>
-          <Button onClick={handleSave} disabled={isLoading}>
-            <Save className="mr-2 h-4 w-4" />
-            {isLoading ? "Menyimpan..." : "Simpan Preferensi"}
-          </Button>
-        </div>
       </div>
     </div>
   )
@@ -9100,26 +8167,18 @@ import {
   Shield,
   Users,
   CheckCircle,
-  // These were from the TeamSwitcher, keeping them for the data object
   GalleryVerticalEnd, 
 } from "lucide-react"
 
 import { useAuth } from "@/hooks/use-auth"
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher" // <-- Re-import TeamSwitcher
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
+// NavProjects is no longer needed
+// import { NavProjects } from "@/components/nav-projects" 
+import { TeamSwitcher } from "@/components/team-switcher"
+import { Sidebar, SidebarContent, SidebarHeader, SidebarRail, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
 
-function NavAdmin({
-  items,
-}: {
-  items: {
-    name: string
-    url: string
-    icon: React.ElementType
-  }[]
-}) {
+// ... (NavAdmin component remains the same) ...
+function NavAdmin({ items }: { items: { name: string, url: string, icon: React.ElementType }[] }) {
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel className="flex items-center">
@@ -9142,36 +8201,21 @@ function NavAdmin({
   )
 }
 
+
 const data = {
-  user: {
-    name: "Admin KMS",
-    email: "admin@ziswaf.com",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-  // Data for the TeamSwitcher
   teams: [
     {
       name: "KMS Ziswaf",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
-    // {
-    //   name: "Acme Corp.",
-    //   logo: AudioWaveform,
-    //   plan: "Startup",
-    // },
-    // {
-    //   name: "Evil Corp.",
-    //   logo: Command,
-    //   plan: "Free",
-    // },
   ],
+  // UPDATED: All main navigation items are now in this single array
   navMain: [
-    // {
+    // { 
     //   title: "Dashboard",
-    //   url: "/dashboard",
-    //   icon: SquareTerminal,
-    //   isActive: true,
+    //   url: "/dashboard", 
+    //   icon: SquareTerminal, 
     // },
     {
       title: "Dokumen",
@@ -9202,11 +8246,9 @@ const data = {
         { title: "Bantuan Sosial", url: "/programs/social-aid" },
       ],
     },
-  ],
-  projects: [
-    { name: "Aktivitas", url: "/activities", icon: Frame },
-    { name: "Permintaan Pengetahuan", url: "/knowledge-requests", icon: PieChart },
-    { name: "Notifikasi", url: "/notifications", icon: Map },
+    // { title: "Aktivitas", url: "/activities", icon: Frame },
+    { title: "Permintaan Pengetahuan", url: "/knowledge-requests", icon: PieChart },
+    { title: "Notifikasi", url: "/notifications", icon: Map },
   ],
   adminNav: [
     {
@@ -9223,77 +8265,25 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, userRole } = useAuth()
+  const { userRole } = useAuth()
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        {/* Add the TeamSwitcher back */}
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
+        {/* The single NavMain component now renders everything */}
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        
+        {/* The NavProjects component is now removed */}
         
         {userRole === 'admin' && <NavAdmin items={data.adminNav} />}
       </SidebarContent>
-      
-      {userRole !== 'admin' && user && (
-          <SidebarFooter>
-            <NavUser user={user} />
-          </SidebarFooter>
-      )}
-
       <SidebarRail />
     </Sidebar>
   )
 }
-```
-
-# components\back-button.tsx
-
-```tsx
-"use client"
-
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-
-interface BackButtonProps {
-  href?: string
-  label?: string
-  variant?: "default" | "outline" | "ghost"
-  size?: "default" | "sm" | "lg"
-  className?: string
-  onClick?: () => void
-}
-
-export function BackButton({
-  href = "/dashboard",
-  label = "Kembali",
-  variant = "outline",
-  size = "sm",
-  className = "",
-  onClick,
-}: BackButtonProps) {
-  const router = useRouter()
-
-  const handleClick = () => {
-    if (onClick) {
-      onClick()
-    } else {
-      router.push(href)
-    }
-  }
-
-  return (
-    <Button variant={variant} size={size} onClick={handleClick} className={`flex items-center gap-2 ${className}`}>
-      <ArrowLeft className="w-4 h-4" />
-      {label}
-    </Button>
-  )
-}
-
 ```
 
 # components\breadcrumb-nav.tsx
@@ -9428,6 +8418,164 @@ export function DashboardHeader({ showBreadcrumb = true }: { showBreadcrumb?: bo
       </div>
     </header>
   )
+}
+```
+
+# components\document-filters.tsx
+
+```tsx
+"use client"
+
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Search, Filter, Grid, List, Heart, Star, RotateCcw } from "lucide-react"
+
+// Define the shape of the filter values
+export interface DocumentFilterValues {
+  searchQuery: string;
+  category: string;
+  department: string;
+  // priority: string;
+  time: string;
+  showFavoritesOnly: boolean;
+  showMandatoryOnly: boolean;
+}
+
+// Define the props for our new component
+interface DocumentFiltersProps {
+  onFilterChange: (filters: DocumentFilterValues) => void;
+  onViewChange: (view: 'grid' | 'list') => void;
+  visibleFilters?: ('category' | 'department' | 'priority' | 'time' | 'favorites' | 'mandatory')[];
+  resultCount: number;
+}
+
+// Lists of options for the dropdowns
+const categories = ["Semua", "Panduan", "Template", "SOP", "Laporan", "Strategi", "Checklist"];
+const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "SDM", "IT", "Keuangan", "Marketing", "Audit"];
+// const priorities = ["Semua", "high", "medium", "low"];
+// const timeFilters = ["Semua", "today", "week", "month"];
+
+const initialFilters: DocumentFilterValues = {
+  searchQuery: "",
+  category: "Semua",
+  department: "Semua",
+  // priority: "Semua",
+  time: "Semua",
+  showFavoritesOnly: false,
+  showMandatoryOnly: false,
+};
+
+export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters = ['category', 'department', 'priority', 'favorites', 'mandatory'], resultCount }: DocumentFiltersProps) {
+  const [filters, setFilters] = useState<DocumentFilterValues>(initialFilters);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  const handleFilterChange = (key: keyof DocumentFilterValues, value: string | boolean) => {
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+  
+  const handleViewChange = (view: 'grid' | 'list') => {
+      setViewMode(view);
+      onViewChange(view);
+  }
+
+  const handleReset = () => {
+    setFilters(initialFilters);
+    onFilterChange(initialFilters);
+  }
+
+  const isFilterVisible = (filterName: string) => visibleFilters.includes(filterName as any);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+                <Filter className="w-5 h-5" />
+                <span>Filter & Pencarian</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleReset}>
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Reset Filter
+            </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            placeholder="Cari dokumen..."
+            value={filters.searchQuery}
+            onChange={(e) => handleFilterChange('searchQuery', e.target.value)}
+            className="pl-10 h-11"
+          />
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {/* --- START OF FIX --- */}
+          {/* This div contains the dropdowns and will be rendered conditionally */}
+          <div className="flex flex-wrap gap-4">
+            {isFilterVisible('category') && (
+                <Select value={filters.category} onValueChange={(value) => handleFilterChange('category', value)}>
+                <SelectTrigger className="w-full sm:w-auto flex-1"><SelectValue placeholder="Kategori" /></SelectTrigger>
+                <SelectContent>{categories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}</SelectContent>
+                </Select>
+            )}
+            {isFilterVisible('department') && (
+                <Select value={filters.department} onValueChange={(value) => handleFilterChange('department', value)}>
+                <SelectTrigger className="w-full sm:w-auto flex-1"><SelectValue placeholder="Departemen" /></SelectTrigger>
+                <SelectContent>{departments.map(dept => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent>
+                </Select>
+            )}
+            {/* {isFilterVisible('priority') && (
+                <Select value={filters.priority} onValueChange={(value) => handleFilterChange('priority', value)}>
+                <SelectTrigger className="w-full sm:w-auto flex-1"><SelectValue placeholder="Prioritas" /></SelectTrigger>
+                <SelectContent>{priorities.map(p => <SelectItem key={p} value={p}>{p === "Semua" ? "Semua" : p.charAt(0).toUpperCase() + p.slice(1)}</SelectItem>)}</SelectContent>
+                </Select>
+            )} */}
+            {isFilterVisible('time') && (
+                <Select value={filters.time} onValueChange={(value) => handleFilterChange('time', value)}>
+                <SelectTrigger className="w-full sm:w-auto flex-1"><SelectValue placeholder="Waktu" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Semua">Semua Waktu</SelectItem>
+                  <SelectItem value="today">Hari Ini</SelectItem>
+                  <SelectItem value="week">Minggu Ini</SelectItem>
+                  <SelectItem value="month">Bulan Ini</SelectItem>
+                </SelectContent>
+                </Select>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              {isFilterVisible('favorites') && (
+                <Button variant={filters.showFavoritesOnly ? "secondary" : "outline"} size="sm" onClick={() => handleFilterChange('showFavoritesOnly', !filters.showFavoritesOnly)}>
+                  <Heart className={`w-4 h-4 mr-2 ${filters.showFavoritesOnly ? 'text-red-500 fill-current' : ''}`} />
+                  Favorit
+                </Button>
+              )}
+              {isFilterVisible('mandatory') && (
+                <Button variant={filters.showMandatoryOnly ? "secondary" : "outline"} size="sm" onClick={() => handleFilterChange('showMandatoryOnly', !filters.showMandatoryOnly)}>
+                  <Star className={`w-4 h-4 mr-2 ${filters.showMandatoryOnly ? 'text-yellow-500 fill-current' : ''}`} />
+                  Wajib Saja
+                </Button>
+              )}
+              <Badge variant="outline">{resultCount} dokumen</Badge>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant={viewMode === 'grid' ? 'default' : 'outline'} size="sm" onClick={() => handleViewChange('grid')}><Grid className="w-4 h-4" /></Button>
+              <Button variant={viewMode === 'list' ? 'default' : 'outline'} size="sm" onClick={() => handleViewChange('list')}><List className="w-4 h-4" /></Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 ```
 
@@ -10091,7 +9239,6 @@ export function DocumentViewer({ document }: DocumentViewerProps) {
 "use client"
 
 import { ChevronRight, type LucideIcon } from "lucide-react"
-
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   SidebarGroup,
@@ -10122,41 +9269,53 @@ export function NavMain({
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
+        {items.map((item) => {
+          // If an item has a sub-menu, render it as a Collapsible
+          if (item.items && item.items.length > 0) {
+            return (
+              <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip={item.title}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {item.items.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton asChild>
+                            <a href={subItem.url}>
+                              <span>{subItem.title}</span>
+                            </a>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+            )
+          }
+
+          // Otherwise, render a simple link
+          return (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton href={item.url} asChild>
+                <a href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                  {item.items && (
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  )}
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              {item.items && (
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </a>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              )}
+                </a>
+              </SidebarMenuButton>
             </SidebarMenuItem>
-          </Collapsible>
-        ))}
+          )
+        })}
       </SidebarMenu>
     </SidebarGroup>
   )
 }
-
 ```
 
 # components\nav-projects.tsx
@@ -10249,59 +9408,6 @@ export function NavProjects({
     </SidebarGroup>
   )
 }
-```
-
-# components\nav-secondary.tsx
-
-```tsx
-"use client"
-
-import type React from "react"
-
-import type { LucideIcon } from "lucide-react"
-
-import {
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
-
-export function NavSecondary({
-  items,
-  ...props
-}: {
-  items: {
-    title: string
-    url: string
-    icon: LucideIcon
-    items?: {
-      title: string
-      url: string
-    }[]
-  }[]
-} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
-  return (
-    <SidebarGroup {...props}>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  )
-}
-
 ```
 
 # components\nav-user.tsx
@@ -10418,115 +9524,6 @@ export function NavUser({
   )
 }
 
-```
-
-# components\notification-dropdown.tsx
-
-```tsx
-"use client"
-
-import { Bell, Check, X, FileText, Users, AlertCircle, Calendar } from "lucide-react"
-import { useNotifications } from "@/hooks/use-notifications" // <-- Use our new hook
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-
-const getNotificationIcon = (type: string) => {
-  // ... (this function remains the same)
-  switch (type) {
-    case "document":
-      return <FileText className="h-4 w-4 text-blue-500" />
-    case "user":
-      return <Users className="h-4 w-4 text-green-500" />
-    case "system":
-      return <AlertCircle className="h-4 w-4 text-orange-500" />
-    case "activity":
-      return <Calendar className="h-4 w-4 text-purple-500" />
-    default:
-      return <Bell className="h-4 w-4" />
-  }
-}
-
-export function NotificationDropdown() {
-  // Get all data and functions from the context
-  const { notifications, unreadCount, markAsRead, removeNotification, markAllAsRead } = useNotifications()
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-            >
-              {unreadCount}
-            </Badge>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80" align="end" forceMount>
-        <div className="flex items-center justify-between p-4 border-b">
-          <div className="font-semibold">Notifikasi</div>
-          {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs">
-              Tandai semua dibaca
-            </Button>
-          )}
-        </div>
-        <ScrollArea className="h-[400px]">
-          {notifications.length === 0 ? (
-            <div className="p-4 text-center text-muted-foreground">Tidak ada notifikasi</div>
-          ) : (
-            <div className="p-2">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors ${
-                    !notification.read ? "bg-muted/30" : ""
-                  }`}
-                >
-                  <div className="flex-shrink-0 mt-1">{getNotificationIcon(notification.type)}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-medium text-sm">{notification.title}</p>
-                        <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                        <p className="text-xs text-muted-foreground mt-2">{notification.time}</p>
-                      </div>
-                      <div className="flex gap-1">
-                        {!notification.read && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => markAsRead(notification.id)}
-                          >
-                            <Check className="h-3 w-3" />
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => removeNotification(notification.id)}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
 ```
 
 # components\quick-data-input.tsx
@@ -11028,18 +10025,7 @@ export function QuickDataInput() {
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 
 export function TeamSwitcher({
   teams,
@@ -11050,58 +10036,31 @@ export function TeamSwitcher({
     plan: string
   }[]
 }) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  // If there are no teams, render nothing.
+  if (!teams || teams.length === 0) {
+    return null
+  }
+
+  // Use the first team as the display.
+  const activeTeam = teams[0];
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeTeam.logo className="size-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
-              </div>
-              <ChevronsUpDown className="ml-auto" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            align="start"
-            side={isMobile ? "bottom" : "right"}
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">Teams</DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem key={team.name} onClick={() => setActiveTeam(team)} className="gap-2 p-2">
-                <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <team.logo className="size-4 shrink-0" />
-                </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                <Plus className="size-4" />
-              </div>
-              <div className="font-medium text-muted-foreground">Add team</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* This is no longer a dropdown trigger, just a static button-like element */}
+        <SidebarMenuButton size="lg" className="cursor-default hover:bg-transparent">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+            <activeTeam.logo className="size-4" />
+          </div>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold">{activeTeam.name}</span>
+            <span className="truncate text-xs">{activeTeam.plan}</span>
+          </div>
+        </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
   )
 }
-
 ```
 
 # components\ui\alert.tsx
@@ -15165,6 +14124,242 @@ CREATE INDEX IF NOT EXISTS idx_document_revisions_document_id ON document_revisi
 -- Update existing documents to have pending status
 UPDATE documents SET verification_status = 'pending' WHERE verification_status IS NULL;
 
+```
+
+# scripts\all-script.sql
+
+```sql
+-- =================================================================
+--  Unified Database Initialization Script for Ziswaf KMS
+-- =================================================================
+
+-- Drop existing tables in reverse order of dependency to ensure a clean slate if needed
+-- (Use with caution in production)
+-- DROP TABLE IF EXISTS document_request_updates, document_request_attachments, document_requests, document_request_templates, knowledge_segments CASCADE;
+-- DROP TABLE IF EXISTS scholarship_recipients, scholarship_programs CASCADE;
+-- DROP TABLE IF EXISTS activity_milestones, activity_discussions, activity_meetings, activity_documents, activity_participants, activities CASCADE;
+-- DROP TABLE IF EXISTS notification_actions, notification_preferences, notifications CASCADE;
+-- DROP TABLE IF EXISTS document_versions, document_comments, document_favorites, document_downloads, document_views, document_locations, document_categories, documents CASCADE;
+-- DROP TABLE IF EXISTS ziswaf_reports, users CASCADE;
+
+-- =================================================================
+--  1. USERS TABLE
+-- =================================================================
+
+CREATE TABLE IF NOT EXISTS users (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  department VARCHAR(100) NOT NULL,
+  role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('admin', 'user')),
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('active', 'pending', 'inactive')),
+  avatar_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  last_login TIMESTAMP WITH TIME ZONE
+);
+
+-- =================================================================
+--  2. DOCUMENTS AND RELATED TABLES
+-- =================================================================
+
+CREATE TABLE IF NOT EXISTS documents (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title VARCHAR(500) NOT NULL,
+  description TEXT,
+  document_type VARCHAR(10) DEFAULT 'file' CHECK (document_type IN ('file', 'link')),
+  file_url TEXT,
+  external_url TEXT,
+  platform VARCHAR(50),
+  file_type VARCHAR(10),
+  file_size BIGINT,
+  category VARCHAR(100) NOT NULL,
+  department VARCHAR(100) NOT NULL,
+  author VARCHAR(255),
+  tags TEXT[],
+  uploaded_by UUID REFERENCES users(id),
+  is_mandatory BOOLEAN DEFAULT FALSE,
+  is_starred BOOLEAN DEFAULT FALSE,
+  version VARCHAR(20) DEFAULT '1.0',
+  location VARCHAR(500),
+  priority VARCHAR(50) DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'critical')),
+  access_level VARCHAR(50) DEFAULT 'departmental' CHECK (access_level IN ('departmental', 'organizational', 'public')),
+  language VARCHAR(10) DEFAULT 'id',
+  expiry_date DATE,
+  related_documents TEXT,
+  verification_status VARCHAR(50) DEFAULT 'pending' CHECK (verification_status IN ('pending', 'approved', 'rejected', 'revision_requested')),
+  verified_by UUID REFERENCES users(id),
+  verified_at TIMESTAMP WITH TIME ZONE,
+  verification_requested_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  CONSTRAINT check_document_url CHECK (
+    (document_type = 'file' AND file_url IS NOT NULL) OR
+    (document_type = 'link' AND external_url IS NOT NULL)
+  )
+);
+
+CREATE TABLE IF NOT EXISTS document_views (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  viewed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(document_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS document_downloads (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  downloaded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS document_favorites (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(document_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS document_comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id),
+  comment TEXT NOT NULL,
+  comment_type VARCHAR(50) DEFAULT 'feedback' CHECK (comment_type IN ('feedback', 'revision_request', 'approval_note')),
+  is_internal BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- =================================================================
+--  3. ACTIVITIES AND RELATED TABLES
+-- =================================================================
+
+CREATE TABLE IF NOT EXISTS activities (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  status VARCHAR(50) DEFAULT 'planning' CHECK (status IN ('planning', 'active', 'completed', 'cancelled')),
+  priority VARCHAR(50) DEFAULT 'medium' CHECK (priority IN ('high', 'medium', 'low')),
+  start_date DATE,
+  end_date DATE,
+  progress INTEGER DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
+  budget BIGINT DEFAULT 0,
+  target_beneficiaries INTEGER DEFAULT 0,
+  current_beneficiaries INTEGER DEFAULT 0,
+  tags TEXT[],
+  departments TEXT[],
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS activity_participants (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  activity_id UUID REFERENCES activities(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  role VARCHAR(100),
+  joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(activity_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS activity_milestones (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  activity_id UUID REFERENCES activities(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  target_date DATE NOT NULL,
+  completion_date DATE,
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'completed', 'cancelled')),
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+
+-- =================================================================
+--  4. PROGRAMS (SCHOLARSHIPS) AND KNOWLEDGE REQUESTS
+-- =================================================================
+
+CREATE TABLE IF NOT EXISTS scholarship_programs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  status VARCHAR(50) DEFAULT 'planning' CHECK (status IN ('planning', 'active', 'completed', 'cancelled')),
+  budget BIGINT NOT NULL DEFAULT 0,
+  recipients INTEGER DEFAULT 0,
+  target_recipients INTEGER NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  department VARCHAR(100) NOT NULL,
+  coordinator_id UUID REFERENCES users(id),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS document_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  program_id UUID REFERENCES scholarship_programs(id) ON DELETE CASCADE,
+  title VARCHAR(500) NOT NULL,
+  description TEXT NOT NULL,
+  requested_by UUID REFERENCES users(id),
+  assigned_to VARCHAR(100),
+  priority VARCHAR(20) DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
+  due_date DATE NOT NULL,
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'cancelled')),
+  data_requirements TEXT[] NOT NULL,
+  deliverables TEXT[] NOT NULL,
+  template_type VARCHAR(100),
+  progress INTEGER DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+
+-- =================================================================
+--  5. NOTIFICATIONS
+-- =================================================================
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    type VARCHAR(50) NOT NULL CHECK (type IN ('document_verification', 'read_request', 'read_confirmation', 'document_status')),
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+    from_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    to_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    is_read BOOLEAN DEFAULT FALSE,
+    requires_action BOOLEAN DEFAULT FALSE,
+    action_type VARCHAR(50) CHECK (action_type IN ('mark_as_read', 'verify_document', 'respond')),
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+
+-- =================================================================
+--  6. SEED DATA (INITIAL DATA)
+-- =================================================================
+
+-- Insert sample users
+INSERT INTO users (email, name, department, role, status, last_login) VALUES
+('admin@ziswaf.com', 'Admin System', 'IT', 'admin', 'active', NOW() - INTERVAL '1 hours'),
+('user@ziswaf.com', 'Ahmad Fauzi', 'Pendayagunaan', 'user', 'active', NOW() - INTERVAL '2 hours'),
+('siti.nurhaliza@ziswaf.com', 'Siti Nurhaliza', 'Penghimpunan', 'user', 'active', NOW() - INTERVAL '5 hours'),
+('budi.santoso@ziswaf.com', 'Budi Santoso', 'Keuangan', 'user', 'active', NOW() - INTERVAL '1 day'),
+('maya.sari@ziswaf.com', 'Maya Sari', 'Marketing', 'user', 'pending', NULL),
+('rizki.pratama@ziswaf.com', 'Rizki Pratama', 'IT', 'user', 'inactive', NOW() - INTERVAL '25 days')
+ON CONFLICT (email) DO NOTHING;
+
+-- Insert sample documents
+INSERT INTO documents (title, description, document_type, file_url, file_type, file_size, category, department, tags, uploaded_by, is_mandatory, is_starred, verification_status, author) VALUES
+('Panduan Penyaluran Beasiswa 2024', 'Dokumen panduan lengkap untuk proses penyaluran beasiswa tahun 2024', 'file', '/documents/panduan-beasiswa-2024.pdf', 'PDF', 2516582, 'Panduan', 'Pendayagunaan', ARRAY['beasiswa', 'panduan', '2024'], (SELECT id FROM users WHERE email = 'user@ziswaf.com'), TRUE, TRUE, 'approved', 'Ahmad Fauzi'),
+('Laporan Keuangan Q4 2023', 'Laporan keuangan triwulan keempat tahun 2023', 'file', '/documents/laporan-keuangan-q4-2023.xlsx', 'Excel', 1887436, 'Laporan', 'Keuangan', ARRAY['keuangan', 'laporan', 'Q4'], (SELECT id FROM users WHERE email = 'siti.nurhaliza@ziswaf.com'), TRUE, TRUE, 'approved', 'Siti Nurhaliza'),
+('SOP Verifikasi Mustahik', 'Standar operasional prosedur untuk verifikasi penerima bantuan', 'file', '/documents/sop-verifikasi-mustahik.pdf', 'PDF', 1258291, 'SOP', 'Penyaluran', ARRAY['SOP', 'verifikasi', 'mustahik'], (SELECT id FROM users WHERE email = 'budi.santoso@ziswaf.com'), FALSE, FALSE, 'pending', 'Budi Santoso'),
+('Proposal Program Kesehatan', 'Proposal program bantuan kesehatan untuk mustahik', 'file', '/documents/proposal-kesehatan.docx', 'Word', 3251200, 'Proposal', 'Pendayagunaan', ARRAY['proposal', 'kesehatan', 'bantuan'], (SELECT id FROM users WHERE email = 'user@ziswaf.com'), FALSE, FALSE, 'rejected', 'Ahmad Fauzi')
+ON CONFLICT (title) DO NOTHING;
 ```
 
 # scripts\create-knowledge-requests-tables.sql

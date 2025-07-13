@@ -447,7 +447,7 @@ export default function ActivitiesPage() {
             </Button>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+                <CardContent className="space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
@@ -458,60 +458,65 @@ export default function ActivitiesPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-              <SelectTrigger>
-                <SelectValue placeholder="Departemen" />
-              </SelectTrigger>
-              <SelectContent>
-                {departments.map((dept) => (
-                  <SelectItem key={dept} value={dept}>
-                    {dept}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* --- START OF FIX --- */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            {/* This div wraps the dropdowns and makes them grow */}
+            <div className="flex flex-1 flex-col sm:flex-row gap-4 w-full">
+              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Departemen" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept} value={dept}>
+                      {dept}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {statuses.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status === "Semua"
-                      ? "Semua Status"
-                      : status === "planning"
-                        ? "Perencanaan"
-                        : status === "active"
-                          ? "Aktif"
-                          : status === "completed"
-                            ? "Selesai"
-                            : "Dibatalkan"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statuses.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status === "Semua"
+                        ? "Semua Status"
+                        : status === "planning"
+                          ? "Perencanaan"
+                          : status === "active"
+                            ? "Aktif"
+                            : status === "completed"
+                              ? "Selesai"
+                              : "Dibatalkan"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-              <SelectTrigger>
-                <SelectValue placeholder="Prioritas" />
-              </SelectTrigger>
-              <SelectContent>
-                {priorities.map((priority) => (
-                  <SelectItem key={priority} value={priority}>
-                    {priority === "Semua"
-                      ? "Semua Prioritas"
-                      : priority === "high"
-                        ? "Tinggi"
-                        : priority === "medium"
-                          ? "Sedang"
-                          : "Rendah"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
+              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Prioritas" />
+                </SelectTrigger>
+                <SelectContent>
+                  {priorities.map((priority) => (
+                    <SelectItem key={priority} value={priority}>
+                      {priority === "Semua"
+                        ? "Semua Prioritas"
+                        : priority === "high"
+                          ? "Tinggi"
+                          : priority === "medium"
+                            ? "Sedang"
+                            : "Rendah"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* This div wraps the view controls */}
             <div className="flex items-center space-x-2">
               <Button
                 variant={viewMode === "grid" ? "default" : "outline"}

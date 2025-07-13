@@ -12,26 +12,18 @@ import {
   Shield,
   Users,
   CheckCircle,
-  // These were from the TeamSwitcher, keeping them for the data object
   GalleryVerticalEnd, 
 } from "lucide-react"
 
 import { useAuth } from "@/hooks/use-auth"
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher" // <-- Re-import TeamSwitcher
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
+// NavProjects is no longer needed
+// import { NavProjects } from "@/components/nav-projects" 
+import { TeamSwitcher } from "@/components/team-switcher"
+import { Sidebar, SidebarContent, SidebarHeader, SidebarRail, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
 
-function NavAdmin({
-  items,
-}: {
-  items: {
-    name: string
-    url: string
-    icon: React.ElementType
-  }[]
-}) {
+// ... (NavAdmin component remains the same) ...
+function NavAdmin({ items }: { items: { name: string, url: string, icon: React.ElementType }[] }) {
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel className="flex items-center">
@@ -54,36 +46,21 @@ function NavAdmin({
   )
 }
 
+
 const data = {
-  user: {
-    name: "Admin KMS",
-    email: "admin@ziswaf.com",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-  // Data for the TeamSwitcher
   teams: [
     {
       name: "KMS Ziswaf",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
-    // {
-    //   name: "Acme Corp.",
-    //   logo: AudioWaveform,
-    //   plan: "Startup",
-    // },
-    // {
-    //   name: "Evil Corp.",
-    //   logo: Command,
-    //   plan: "Free",
-    // },
   ],
+  // UPDATED: All main navigation items are now in this single array
   navMain: [
-    // {
+    // { 
     //   title: "Dashboard",
-    //   url: "/dashboard",
-    //   icon: SquareTerminal,
-    //   isActive: true,
+    //   url: "/dashboard", 
+    //   icon: SquareTerminal, 
     // },
     {
       title: "Dokumen",
@@ -114,11 +91,9 @@ const data = {
         { title: "Bantuan Sosial", url: "/programs/social-aid" },
       ],
     },
-  ],
-  projects: [
-    { name: "Aktivitas", url: "/activities", icon: Frame },
-    { name: "Permintaan Pengetahuan", url: "/knowledge-requests", icon: PieChart },
-    { name: "Notifikasi", url: "/notifications", icon: Map },
+    // { title: "Aktivitas", url: "/activities", icon: Frame },
+    { title: "Permintaan Pengetahuan", url: "/knowledge-requests", icon: PieChart },
+    { title: "Notifikasi", url: "/notifications", icon: Map },
   ],
   adminNav: [
     {
@@ -135,27 +110,21 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, userRole } = useAuth()
+  const { userRole } = useAuth()
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        {/* Add the TeamSwitcher back */}
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
+        {/* The single NavMain component now renders everything */}
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        
+        {/* The NavProjects component is now removed */}
         
         {userRole === 'admin' && <NavAdmin items={data.adminNav} />}
       </SidebarContent>
-      
-      {userRole !== 'admin' && user && (
-          <SidebarFooter>
-            <NavUser user={user} />
-          </SidebarFooter>
-      )}
-
       <SidebarRail />
     </Sidebar>
   )

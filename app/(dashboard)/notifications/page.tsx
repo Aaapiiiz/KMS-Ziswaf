@@ -173,10 +173,10 @@ export default function NotificationsPage() {
               <SelectItem value="system">Sistem</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             <Settings className="w-4 h-4 mr-2" />
             Pengaturan
-          </Button>
+          </Button> */}
         </div>
       </div>
 
