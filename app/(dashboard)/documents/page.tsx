@@ -1,13 +1,14 @@
-// app/(dashboard)/documents/page.tsx (FINAL, CORRECTED VERSION)
+// app/(dashboard)/documents/page.tsx (FINAL, COMPLETE VERSION)
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers"; // <<< THIS WAS THE MISSING LINE
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import type { Document } from "@/lib/supabase";
 import { DocumentList } from "./_components/document-list";
 
+// This type definition helps TypeScript understand the shape of our joined data.
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null;
 };
@@ -16,11 +17,12 @@ export default async function DocumentsPage() {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
-  // Use the direct query method. The RLS policies we set up will allow this to work.
-  const { data: documents, error } = await supabase
-    .from("documents")
-    .select(`*, uploaded_by ( name, email )`)
-    .order("created_at", { ascending: false });
+  // Use the direct query method. The new, correct RLS policies will allow this to work.
+  // Correct code for app/(dashboard)/documents/page.tsx
+const { data: documents, error } = await supabase
+  .from("documents")
+  .select(`*, uploaded_by ( name, email )`)
+  .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching documents:", error);

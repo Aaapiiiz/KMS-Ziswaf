@@ -1,15 +1,18 @@
+// app/(dashboard)/notifications/_components/notification-client.tsx (FINAL, COMPLETE VERSION)
+
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Check, Clock, FileText, Users, AlertCircle, CheckCircle, Loader2, Trash2 } from "lucide-react";
+import { Bell, Check, Clock, FileText, Users, Settings, Trash2, Loader2, AlertCircle } from "lucide-react";
 
+// This interface must match the shape of the data we fetch
 export interface Notification {
   id: string;
   type: string;
@@ -18,8 +21,11 @@ export interface Notification {
   is_read: boolean;
   requires_action: boolean;
   created_at: string;
-  sender_name: string | null;
-  sender_avatar: string | null;
+  // This is how the JOIN result will be structured
+  sender: {
+    name: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 export function NotificationClient() {
@@ -27,16 +33,31 @@ export function NotificationClient() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [filterType, setFilterType] = useState("all");
-  
-  // This useEffect hook will run on the client-side after the component mounts.
+
   useEffect(() => {
     const fetchNotifications = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase.rpc('get_user_notifications');
+        // Use a direct query, NOT RPC, and perform the JOIN here.
+        // Supabase is smart enough to fetch the related user via the foreign key.
+        const { data, error } = await supabase
+          .from('notifications')
+          .select(`
+            id,
+            type,
+            title,
+            message,
+            is_read,
+            requires_action,
+            created_at,
+            sender:from_user_id ( name, avatar_url )
+          `)
+          .order('created_at', { descending: true });
+
         if (error) {
           throw error;
         }
+
         setNotifications((data as Notification[]) || []);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
@@ -89,13 +110,77 @@ export function NotificationClient() {
   const unreadCount = useMemo(() => notifications.filter(n => !n.is_read).length, [notifications]);
   const actionRequiredCount = useMemo(() => notifications.filter(n => n.requires_action && !n.is_read).length, [notifications]);
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
-  }
-
   return (
     <div className="p-6 space-y-6">
-      {/* ... The rest of the JSX is the same as before ... */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+            <h1 className="text-2xl font-bold text-gray-900">Notifikasi</h1>
+            <p className="text-gray-600">Kelola dan pantau semua notifikasi sistem</p>
+            </div>
+            <div className="flex items-center gap-2">
+            <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-48"><SelectValue placeholder="Filter Tipe" /></SelectTrigger>
+                <SelectContent>
+                <SelectItem value="all">Semua Tipe</SelectItem>
+                <SelectItem value="document_verification">Verifikasi Dokumen</SelectItem>
+                <SelectItem value="activity_update">Update Aktivitas</SelectItem>
+                <SelectItem value="knowledge_request">Knowledge Request</SelectItem>
+                <SelectItem value="system">Sistem</SelectItem>
+                </SelectContent>
+            </Select>
+            </div>
+        </div>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle>Daftar Notifikasi</CardTitle>
+                <CardDescription>Kelola notifikasi berdasarkan kategori</CardDescription>
+            </CardHeader>
+            <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="all">Semua ({notifications.length})</TabsTrigger>
+                    <TabsTrigger value="unread">Belum Dibaca ({unreadCount})</TabsTrigger>
+                    <TabsTrigger value="action_required">Perlu Tindakan ({actionRequiredCount})</TabsTrigger>
+                </TabsList>
+                <TabsContent value={activeTab} className="space-y-4 mt-6">
+                {loading ? (
+                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+                ) : filteredNotifications.length > 0 ? (
+                    filteredNotifications.map((notification) => (
+                    <div key={notification.id} className={`p-4 border rounded-lg transition-colors ${!notification.is_read ? "bg-blue-50 border-blue-200" : "bg-white"}`}>
+                        <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-3 flex-1">
+                            <div className="flex-shrink-0 mt-1">{getNotificationIcon(notification.type)}</div>
+                            <div className="flex-1">
+                            <h4 className={`font-medium ${!notification.is_read ? "text-gray-900" : "text-gray-700"}`}>{notification.title}</h4>
+                            <p className="text-gray-600 mb-2">{notification.message}</p>
+                            <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <div className="flex items-center space-x-2">
+                                <Avatar className="w-5 h-5">
+                                    <AvatarImage src={notification.sender?.avatar_url || "/placeholder.svg"} alt={notification.sender?.name || 'System'} />
+                                    <AvatarFallback className="text-xs">S</AvatarFallback>
+                                </Avatar>
+                                <span>{notification.sender?.name || 'System'}</span>
+                                </div>
+                                <span>{formatTimestamp(notification.created_at)}</span>
+                            </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-4">
+                            {!notification.is_read && <Button variant="ghost" size="sm" onClick={() => markAsRead(notification.id)} className="text-blue-600 hover:text-blue-700"><Check className="w-4 h-4" /></Button>}
+                            <Button variant="ghost" size="sm" onClick={() => deleteNotification(notification.id)} className="text-red-600 hover:text-red-700"><Trash2 className="w-4 h-4" /></Button>
+                        </div>
+                        </div>
+                    </div>
+                    ))
+                ) : (
+                    <div className="text-center py-12"><Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" /><h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada notifikasi</h3><p className="text-gray-600">Semua notifikasi telah dibaca atau tidak ada yang sesuai filter</p></div>
+                )}
+                </TabsContent>
+            </Tabs>
+            </CardContent>
+        </Card>
     </div>
   );
 }

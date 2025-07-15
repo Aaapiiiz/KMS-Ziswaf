@@ -11,10 +11,14 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuGroup,
+  // DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, User, Lock, Settings } from "lucide-react"
+import { LogOut,
+  // User, 
+  // Lock, 
+  // Settings 
+} from "lucide-react"
 import { useAuth } from "@/hooks/use-auth" // Import the useAuth hook
 
 export function UserNav() {
@@ -52,7 +56,7 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+        {/* <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link href="/profile/settings">
               <User className="mr-2 h-4 w-4" />
@@ -72,7 +76,7 @@ export function UserNav() {
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator /> */}
         <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
