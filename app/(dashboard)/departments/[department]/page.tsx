@@ -17,10 +17,12 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-// This defines the correct type for the page's props
-interface DepartmentPageProps {
+// --- THIS IS THE DEFINITIVE FIX ---
+// This is the standard way to type props for dynamic pages in Next.js
+type DepartmentPageProps = {
   params: { department: string };
-}
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
 export default async function DepartmentDetailPage({ params }: DepartmentPageProps) {
   const departmentSlug = params.department.toLowerCase();
@@ -35,7 +37,6 @@ export default async function DepartmentDetailPage({ params }: DepartmentPagePro
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
-  // Fetch documents for the specific department
   const { data: documents, error } = await supabase
     .from("documents")
     .select('*')
@@ -44,7 +45,6 @@ export default async function DepartmentDetailPage({ params }: DepartmentPagePro
 
   if (error) {
     console.error(`Error fetching documents for ${departmentNameForDB}:`, error);
-    // Even if there's an error, we can still render the page with an empty list
   }
 
   return (
