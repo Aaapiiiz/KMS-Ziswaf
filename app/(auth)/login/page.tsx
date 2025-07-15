@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,15 +13,45 @@ import {
   EyeOff,
   BookOpen,
   Users,
-  FileText,
+  // FileText,
   Shield,
   Zap,
   TrendingUp,
   Sparkles,
-  Star,
+  // Star,
   CheckCircle,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
+
+// FIX: Component for client-side only rendering to prevent hydration mismatch
+const FloatingParticles = () => {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
+
+  return (
+    <div className="absolute inset-0">
+      {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${3 + Math.random() * 4}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -40,6 +70,8 @@ export default function LoginPage() {
       await login(email, password)
       window.location.href = "/dashboard"
     } catch (err) {
+      // --- FIX IS HERE ---
+      console.error("Login failed:", err) // Log the actual error for debugging
       setError("Email atau password tidak valid")
     } finally {
       setIsLoading(false)
@@ -56,23 +88,10 @@ export default function LoginPage() {
         <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
 
         {/* Floating particles */}
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`,
-              }}
-            />
-          ))}
-        </div>
+        <FloatingParticles />
 
         {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fillRule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%239C92AC&quot; fillOpacity=&quot;0.1&quot;%3E%3Ccircle cx=&quot;30&quot; cy=&quot;30&quot; r=&quot;1&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+        <div className="absolute inset-0 grid-pattern-overlay opacity-40"></div>
       </div>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
@@ -94,20 +113,20 @@ export default function LoginPage() {
                     Ziswaf KMS
                   </h1>
                   <p className="text-xl text-cyan-200 font-medium">Knowledge Management System</p>
-                  <div className="flex items-center space-x-2 mt-2">
+                  {/* <div className="flex items-center space-x-2 mt-2">
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <span className="text-sm text-gray-300 ml-2">Trusted by 500+ users</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
               <div className="space-y-4">
                 <p className="text-lg text-gray-200 leading-relaxed">
-                  Platform revolusioner untuk mengelola pengetahuan ziswaf dengan teknologi AI terdepan dan interface
+                  Platform revolusioner untuk mengelola pengetahuan ziswaf dengan interface
                   yang memukau.
                 </p>
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -132,7 +151,7 @@ export default function LoginPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-6">
-              <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
+              {/* <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
                 <div className="flex items-start space-x-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
                     <FileText className="w-8 h-8 text-white" />
@@ -144,7 +163,7 @@ export default function LoginPage() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
                 <div className="flex items-start space-x-6">
@@ -280,7 +299,7 @@ export default function LoginPage() {
                     ) : (
                       <div className="flex items-center space-x-2">
                         <span>Masuk ke Dashboard</span>
-                        <Sparkles className="w-4 h-4" />
+                        {/* <Sparkles className="w-4 h-4" /> */}
                       </div>
                     )}
                   </Button>
@@ -302,20 +321,44 @@ export default function LoginPage() {
       </div>
 
       <style jsx>{`
+        .grid-pattern-overlay {
+          background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
         @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
         }
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
         }
-        .animate-blob { animation: blob 7s infinite; }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
       `}</style>
     </div>
   )

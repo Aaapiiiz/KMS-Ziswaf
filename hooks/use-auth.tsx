@@ -1,91 +1,116 @@
-"use client"
+// hooks/use-auth.tsx (Final Diagnostic Version)
+"use client";
 
-import type React from "react"
+import type React from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
+import type { User as AppUser } from "@/lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 
-import { createContext, useContext, useEffect, useState } from "react"
-
-interface User {
-  id: string
-  name: string
-  email: string
-  avatar_url?: string
-  department?: string
+interface AuthState {
+  user: AppUser | null;
+  userRole: "admin" | "user" | null;
+  loading: boolean;
 }
 
-interface AuthContextType {
-  user: User | null
-  userRole: "admin" | "user" | null
-  login: (email: string, password: string) => Promise<void>
-  logout: () => void
-  loading: boolean
+interface AuthContextType extends AuthState {
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [userRole, setUserRole] = useState<"admin" | "user" | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    userRole: null,
+    loading: true,
+  });
 
-  useEffect(() => {
-    // Check if user is logged in from localStorage
-    const storedUser = localStorage.getItem("user")
-    const storedRole = localStorage.getItem("userRole")
-
-    if (storedUser && storedRole) {
-      setUser(JSON.parse(storedUser))
-      setUserRole(storedRole as "admin" | "user")
+  const processSession = useCallback(async (session: Session | null) => {
+    if (!session?.user) {
+      setAuthState({ user: null, userRole: null, loading: false });
+      return;
     }
 
-    setLoading(false)
-  }, [])
+    const roleFromToken = session.user.app_metadata?.user_role as "admin" | "user" | null;
+    const userId = session.user.id;
+
+    try {
+      console.log(`FINAL DIAGNOSTIC: Attempting to fetch profile for user ID: ${userId}`);
+      
+      // Perform the query WITHOUT .single() to see the raw result.
+      const { data: userArray, error: dbError } = await supabase
+        .from("users")
+        .select(`*`)
+        .eq("id", userId);
+
+      // This is now the most important log message.
+      console.log("FINAL DIAGNOSTIC: Raw query result:", { data: userArray, error: dbError });
+
+      if (dbError) {
+          console.error("FINAL DIAGNOSTIC: The database returned a direct error.");
+          throw dbError;
+      }
+
+      if (!userArray || userArray.length === 0) {
+        console.error("FINAL DIAGNOSTIC: Query succeeded but returned 0 rows. This means RLS is blocking the SELECT or the user row does not exist.");
+        throw new Error("No profile found for this user ID.");
+      }
+
+      const profile = userArray[0];
+      console.log("FINAL DIAGNOSTIC: Profile fetched successfully.");
+      setAuthState({
+        user: profile as AppUser,
+        userRole: roleFromToken || (profile.role as "admin" | "user"),
+        loading: false,
+      });
+
+    } catch (e: any) {
+      console.error("CRITICAL: Failed to fetch user profile from DB.");
+      console.error("FINAL DIAGNOSTIC: Full error object:", e);
+
+      // As a last resort, sign out to prevent an invalid state.
+      await supabase.auth.signOut();
+      setAuthState({ user: null, userRole: null, loading: false });
+    }
+  }, []);
+
+  // The rest of the component is unchanged.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      processSession(session);
+    });
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      processSession(session);
+    });
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, [processSession]);
 
   const login = async (email: string, password: string) => {
-    // Mock login logic - replace with actual API call
-    if (email === "admin@ziswaf.com" && password === "admin123") {
-      const adminUser = {
-        id: "admin-1",
-        name: "Admin System",
-        email: "admin@ziswaf.com",
-        avatar_url: "/placeholder.svg?height=32&width=32",
-        department: "IT",
-      }
-      setUser(adminUser)
-      setUserRole("admin")
-      localStorage.setItem("user", JSON.stringify(adminUser))
-      localStorage.setItem("userRole", "admin")
-    } else if (email === "user@ziswaf.com" && password === "user123") {
-      const regularUser = {
-        id: "user-1",
-        name: "Ahmad Fauzi",
-        email: "user@ziswaf.com",
-        avatar_url: "/placeholder.svg?height=32&width=32",
-        department: "Pendayagunaan",
-      }
-      setUser(regularUser)
-      setUserRole("user")
-      localStorage.setItem("user", JSON.stringify(regularUser))
-      localStorage.setItem("userRole", "user")
-    } else {
-      throw new Error("Invalid credentials")
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      console.error("Supabase login error:", error);
+      throw error;
     }
-  }
+  };
 
-  const logout = () => {
-    setUser(null)
-    setUserRole(null)
-    localStorage.removeItem("user")
-    localStorage.removeItem("userRole")
-    window.location.href = "/login"
-  }
+  const logout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  };
 
-  return <AuthContext.Provider value={{ user, userRole, login, logout, loading }}>{children}</AuthContext.Provider>
+  const value = { ...authState, login, logout };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
+  return context;
 }

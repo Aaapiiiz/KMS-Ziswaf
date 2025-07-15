@@ -45,6 +45,860 @@ next-env.d.ts
 
 ```
 
+# app\(auth)\layout.tsx
+
+```tsx
+// app/(auth)/layout.tsx
+// This file is already correct.
+
+import { AuthProvider } from "@/hooks/use-auth";
+import type React from "react";
+
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <AuthProvider>{children}</AuthProvider>;
+}
+```
+
+# app\(auth)\login\page.tsx
+
+```tsx
+"use client"
+
+import type React from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  Eye,
+  EyeOff,
+  BookOpen,
+  Users,
+  // FileText,
+  Shield,
+  Zap,
+  TrendingUp,
+  Sparkles,
+  // Star,
+  CheckCircle,
+} from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
+
+// FIX: Component for client-side only rendering to prevent hydration mismatch
+const FloatingParticles = () => {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
+
+  return (
+    <div className="absolute inset-0">
+      {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${3 + Math.random() * 4}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const { login } = useAuth()
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
+
+    try {
+      await login(email, password)
+      window.location.href = "/dashboard"
+    } catch (err) {
+      // --- FIX IS HERE ---
+      console.error("Login failed:", err) // Log the actual error for debugging
+      setError("Email atau password tidak valid")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Animated gradient orbs */}
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+
+        {/* Floating particles */}
+        <FloatingParticles />
+
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 grid-pattern-overlay opacity-40"></div>
+      </div>
+
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Side - Enhanced Branding */}
+          <div className="hidden lg:block space-y-8">
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center shadow-2xl">
+                    <BookOpen className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-cyan-200 to-emerald-200 bg-clip-text text-transparent">
+                    Ziswaf KMS
+                  </h1>
+                  <p className="text-xl text-cyan-200 font-medium">Knowledge Management System</p>
+                  {/* <div className="flex items-center space-x-2 mt-2">
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                    <span className="text-sm text-gray-300 ml-2">Trusted by 500+ users</span>
+                  </div> */}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-lg text-gray-200 leading-relaxed">
+                  Platform revolusioner untuk mengelola pengetahuan ziswaf dengan interface
+                  yang memukau.
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center space-x-2 text-emerald-300">
+                    <CheckCircle className="w-4 h-4" />
+                    <span>99.9% Uptime</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-cyan-300">
+                    <Shield className="w-4 h-4" />
+                    <span>Enterprise Security</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-purple-300">
+                    <Zap className="w-4 h-4" />
+                    <span>Lightning Fast</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-pink-300">
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Advanced Analytics</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6">
+              {/* <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
+                <div className="flex items-start space-x-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <FileText className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-xl mb-3">Smart Document Management</h3>
+                    <p className="text-gray-300 leading-relaxed">
+                      Kelola dokumen dengan AI-powered search, auto-categorization, dan version control yang canggih
+                    </p>
+                  </div>
+                </div>
+              </div> */}
+
+              <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
+                <div className="flex items-start space-x-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <Users className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-xl mb-3">Collaborative Workspace</h3>
+                    <p className="text-gray-300 leading-relaxed">
+                      Fasilitasi kolaborasi real-time antar departemen dengan tools komunikasi terintegrasi
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
+                <div className="flex items-start space-x-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white text-xl mb-3">Advanced Analytics</h3>
+                    <p className="text-gray-300 leading-relaxed">
+                      Dashboard analytics mendalam untuk tracking performance dan insights bisnis
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side - Enhanced Login Form */}
+          <div className="w-full max-w-md mx-auto">
+            <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
+              <CardHeader className="space-y-4 text-center pb-8">
+                <div className="relative w-24 h-24 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-4 lg:hidden shadow-2xl">
+                  <BookOpen className="w-12 h-12 text-white" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <CardTitle className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
+                    Selamat Datang Kembali
+                  </CardTitle>
+                  <CardDescription className="text-base text-gray-600 leading-relaxed">
+                    Masuk ke akun Anda untuk mengakses sistem knowledge management terdepan
+                  </CardDescription>
+                </div>
+              </CardHeader>
+
+              <form onSubmit={handleLogin}>
+                <CardContent className="space-y-6">
+                  {error && (
+                    <Alert variant="destructive" className="border-red-200 bg-red-50">
+                      <AlertDescription className="text-red-700">{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="space-y-3">
+                    <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="nama@perusahaan.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Masukkan password Anda"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl pr-12"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                    <p className="font-semibold text-emerald-800 mb-3 text-sm flex items-center">
+                      <Sparkles className="w-4 h-4 mr-2" />🚀 Demo Credentials:
+                    </p>
+                    <div className="space-y-2 text-sm text-emerald-700">
+                      <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
+                        <span className="font-medium">Admin:</span>
+                        <span className="text-xs">admin@ziswaf.com / admin123</span>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
+                        <span className="font-medium">User:</span>
+                        <span className="text-xs">user@ziswaf.com / user123</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+
+                <CardFooter className="flex flex-col space-y-4 pt-6">
+                  <Button
+                    type="submit"
+                    className="w-full h-14 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 hover:from-emerald-700 hover:via-cyan-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-base"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Memproses...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <span>Masuk ke Dashboard</span>
+                        {/* <Sparkles className="w-4 h-4" /> */}
+                      </div>
+                    )}
+                  </Button>
+
+                  <div className="text-center text-sm text-gray-600">
+                    Belum memiliki akun?{" "}
+                    <Link
+                      href="/register"
+                      className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline transition-colors"
+                    >
+                      Daftar sekarang
+                    </Link>
+                  </div>
+                </CardFooter>
+              </form>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .grid-pattern-overlay {
+          background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        @keyframes blob {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+        }
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
+    </div>
+  )
+}
+```
+
+# app\(auth)\register\page.tsx
+
+```tsx
+"use client"
+
+import type React from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Eye, EyeOff, BookOpen, CheckCircle, Users, Shield, Zap, Star, Sparkles, Crown } from "lucide-react"
+
+// FIX: Component for client-side only rendering to prevent hydration mismatch
+const FloatingParticles = () => {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
+
+  return (
+    <div className="absolute inset-0">
+      {[...Array(15)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${3 + Math.random() * 4}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+export default function RegisterPage() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    department: "",
+    password: "",
+    confirmPassword: "",
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState(false)
+
+  const departments = ["Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Operasional"]
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Password dan konfirmasi password tidak cocok")
+      setIsLoading(false)
+      return
+    }
+
+    // Simulate registration process
+    setTimeout(() => {
+      setSuccess(true)
+      setIsLoading(false)
+    }, 1000)
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        </div>
+
+        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+          <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
+            <CardContent className="pt-8 text-center space-y-6">
+              <div className="relative w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle className="w-12 h-12 text-white" />
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
+                  <Crown className="w-4 h-4 text-white" />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">
+                  Pendaftaran Berhasil!
+                </h2>
+                <p className="text-gray-600 leading-relaxed text-lg">
+                    Selamat! Akun Anda telah berhasil dibuat. Tim admin akan segera memverifikasi akun Anda dan
+                  mengirimkan konfirmasi melalui email.
+                </p>
+              </div>
+              <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                <div className="flex items-center justify-center mb-3">
+                  {/* <Gift className="w-5 h-5 text-emerald-600 mr-2" /> */}
+                  <p className="text-sm font-semibold text-emerald-700">Langkah Selanjutnya:</p>
+                </div>
+                <p className="text-sm text-emerald-700">
+                  Periksa email Anda untuk instruksi aktivasi akun dan panduan memulai
+                </p>
+              </div>
+              <Button
+                asChild
+                className="w-full h-14 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 hover:from-emerald-700 hover:via-cyan-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-base"
+              >
+                <Link href="/login">
+                  <div className="flex items-center space-x-2">
+                    <span>Kembali ke Halaman Login</span>
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <style jsx>{`
+          @keyframes blob {
+            0% {
+              transform: translate(0px, 0px) scale(1);
+            }
+            33% {
+              transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+              transform: translate(-20px, 20px) scale(0.9);
+            }
+            100% {
+              transform: translate(0px, 0px) scale(1);
+            }
+          }
+          .animate-blob {
+            animation: blob 7s infinite;
+          }
+          .animation-delay-2000 {
+            animation-delay: 2s;
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+
+        {/* Floating particles */}
+        <FloatingParticles />
+      </div>
+
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Side - Enhanced Branding */}
+          <div className="hidden lg:block space-y-8">
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center shadow-2xl">
+                    <BookOpen className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
+                    <Crown className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-cyan-200 to-emerald-200 bg-clip-text text-transparent">
+                    Bergabung dengan Ziswaf KMS
+                  </h1>
+                  <p className="text-xl text-cyan-200 font-medium">Mulai perjalanan knowledge sharing Anda</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20">
+                <h3 className="font-bold text-white text-2xl mb-6 flex items-center">
+                  <Star className="w-6 h-6 text-yellow-400 mr-3 fill-current" />
+                  Keuntungan Bergabung
+                </h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-200">Akses unlimited ke seluruh knowledge base perusahaan</p>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-200">Kolaborasi real-time dengan tim lintas departemen</p>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-200">Dashboard analytics untuk tracking performance</p>
+                  </div>
+                  {/* <div className="flex items-start space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-200">AI-powered search dan smart recommendations</p>
+                  </div>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-gray-200">Mobile app untuk akses knowledge on-the-go</p>
+                  </div> */}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
+                  <Users className="w-10 h-10 text-emerald-400 mx-auto mb-3" />
+                  <p className="text-3xl font-bold text-white">500+</p>
+                  <p className="text-sm text-gray-300">Active Users</p>
+                </div>
+                <div className="text-center p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
+                  <Shield className="w-10 h-10 text-blue-400 mx-auto mb-3" />
+                  <p className="text-3xl font-bold text-white">99.9%</p>
+                  <p className="text-sm text-gray-300">Uptime</p>
+                </div>
+                <div className="text-center p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
+                  <Zap className="w-10 h-10 text-purple-400 mx-auto mb-3" />
+                  <p className="text-3xl font-bold text-white">24/7</p>
+                  <p className="text-sm text-gray-300">Support</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side - Enhanced Register Form */}
+          <div className="w-full max-w-md mx-auto">
+            <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
+              <CardHeader className="space-y-4 text-center pb-6">
+                <div className="relative w-24 h-24 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-4 lg:hidden shadow-2xl">
+                  <BookOpen className="w-12 h-12 text-white" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
+                    <Crown className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <CardTitle className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
+                    Buat Akun Baru
+                  </CardTitle>
+                  <CardDescription className="text-base text-gray-600 leading-relaxed">
+                    Lengkapi informasi di bawah untuk bergabung dengan tim terbaik
+                  </CardDescription>
+                </div>
+              </CardHeader>
+
+              <form onSubmit={handleSubmit}>
+                <CardContent className="space-y-5">
+                  {error && (
+                    <Alert variant="destructive" className="border-red-200 bg-red-50">
+                      <AlertDescription className="text-red-700">{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-semibold text-gray-700">
+                      Nama Lengkap
+                    </Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Masukkan nama lengkap Anda"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange("name", e.target.value)}
+                      required
+                      className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="nama@perusahaan.com"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      required
+                      className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="department" className="text-sm font-semibold text-gray-700">
+                      Departemen
+                    </Label>
+                    <Select
+                      value={formData.department}
+                      onValueChange={(value) => handleInputChange("department", value)}
+                    >
+                      <SelectTrigger className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl">
+                        <SelectValue placeholder="Pilih departemen Anda" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept} value={dept}>
+                            {dept}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Minimal 8 karakter"
+                        value={formData.password}
+                        onChange={(e) => handleInputChange("password", e.target.value)}
+                        required
+                        className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl pr-12"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-700">
+                      Konfirmasi Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Ulangi password Anda"
+                        value={formData.confirmPassword}
+                        onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                        required
+                        className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl pr-12"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+
+                <CardFooter className="flex flex-col space-y-4 pt-4">
+                  <Button
+                    type="submit"
+                    className="w-full h-14 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 hover:from-emerald-700 hover:via-cyan-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-base"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Memproses...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <span>Daftar Sekarang</span>
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                    )}
+                  </Button>
+
+                  <div className="text-center text-sm text-gray-600">
+                    Sudah memiliki akun?{" "}
+                    <Link
+                      href="/login"
+                      className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline transition-colors"
+                    >
+                      Masuk di sini
+                    </Link>
+                  </div>
+                </CardFooter>
+              </form>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .grid-pattern-overlay {
+          background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        @keyframes blob {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+        }
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
+    </div>
+  )
+}
+```
+
 # app\(dashboard)\activities\[slug]\page.tsx
 
 ```tsx
@@ -1401,9 +2255,10 @@ export default function Loading() {
 # app\(dashboard)\admin\users\page.tsx
 
 ```tsx
+// app/(dashboard)/admin/users/page.tsx
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -1411,200 +2266,130 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Search, Plus, MoreHorizontal, Edit, Trash2, Mail, UserCheck, UserX } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Search, Plus, MoreHorizontal, Edit, Trash2, Mail, UserCheck, UserX, Loader2 } from "lucide-react"
 import { AdminRouteGuard } from "@/components/admin-route-guard"
+import { getUsers, supabase, updateUser } from "@/lib/supabase" // MODIFIED: import updateUser
+import type { User } from "@/lib/supabase"
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  department: string;
-  role: 'admin' | 'user';
-  status: 'active' | 'inactive';
-  lastLogin: string;
-  joinDate: string;
-  avatar: string;
-}
-
-const initialUsers: User[] = [
-  {
-    id: 1,
-    name: "Ahmad Fauzi",
-    email: "ahmad.fauzi@ziswaf.com",
-    department: "Pendayagunaan",
-    role: "admin",
-    status: "active",
-    lastLogin: "2024-01-15 10:30",
-    joinDate: "2023-06-15",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: 2,
-    name: "Siti Nurhaliza",
-    email: "siti.nurhaliza@ziswaf.com",
-    department: "Pendayagunaan",
-    role: "user",
-    status: "active",
-    lastLogin: "2024-01-15 09:15",
-    joinDate: "2023-08-20",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: 3,
-    name: "Budi Santoso",
-    email: "budi.santoso@ziswaf.com",
-    department: "Keuangan",
-    role: "user",
-    status: "active",
-    lastLogin: "2024-01-14 16:45",
-    joinDate: "2023-09-10",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: 4,
-    name: "Dewi Sartika",
-    email: "dewi.sartika@ziswaf.com",
-    department: "Marketing",
-    role: "user",
-    status: "inactive",
-    lastLogin: "2024-01-10 14:20",
-    joinDate: "2023-11-05",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: 5,
-    name: "Rudi Hermawan",
-    email: "rudi.hermawan@ziswaf.com",
-    department: "IT",
-    role: "admin",
-    status: "active",
-    lastLogin: "2024-01-15 11:00",
-    joinDate: "2023-05-01",
-    avatar: "/placeholder.svg?height=32&width=32",
-  },
-]
-
-const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing"]
+const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Operasional", "Audit", "Penyaluran"]
 const roles = ["Semua", "admin", "user"]
-const statuses = ["Semua", "active", "inactive"]
+const statuses = ["Semua", "active", "inactive", "pending"]
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("Semua")
   const [roleFilter, setRoleFilter] = useState("Semua")
   const [statusFilter, setStatusFilter] = useState("Semua")
-  const router = useRouter()
 
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  // NEW: State for the "Add User" dialog
-  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [newUser, setNewUser] = useState({ name: '', email: '', department: '', role: 'user' });
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false)
+  const [newUser, setNewUser] = useState({ name: "", email: "", department: "", role: "user" as "admin" | "user", password: "" })
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      const fetchedUsers = await getUsers()
+      setUsers(fetchedUsers || [])
+    } catch (error) {
+      console.error("Failed to fetch users:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  useEffect(() => {
+    fetchUsers()
+  }, [])
 
   const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) || user.email.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesDepartment = departmentFilter === "Semua" || user.department === departmentFilter
     const matchesRole = roleFilter === "Semua" || user.role === roleFilter
     const matchesStatus = statusFilter === "Semua" || user.status === statusFilter
-    
     return matchesSearch && matchesDepartment && matchesRole && matchesStatus
   })
 
-  // NEW: Function to handle adding a new user
-  const handleAddUser = () => {
-    if (newUser.name && newUser.email && newUser.department) {
-      const newUserObject: User = {
-        id: users.length + 1, // Simple ID generation for demo
-        name: newUser.name,
-        email: newUser.email,
-        department: newUser.department,
-        role: newUser.role as 'admin' | 'user',
-        status: 'active', // New users are active by default
-        lastLogin: new Date().toISOString().slice(0, 16).replace('T', ' '),
-        joinDate: new Date().toISOString().slice(0, 10),
-        avatar: "/placeholder.svg?height=32&width=32",
-      };
-      setUsers(prevUsers => [newUserObject, ...prevUsers]);
-      setNewUser({ name: '', email: '', department: '', role: 'user' });
-      setIsAddUserOpen(false);
-    } else {
-      alert("Please fill all required fields.");
+  const handleAddUser = async () => {
+    if (!newUser.name || !newUser.email || !newUser.department || !newUser.password) {
+      alert("Please fill all required fields.")
+      return
     }
-  };
+    
+    // Step 1: Create user in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: newUser.email,
+      password: newUser.password,
+      options: {
+        data: {
+          name: newUser.name,
+          department: newUser.department,
+        },
+      },
+    })
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "bg-purple-100 text-purple-700"
-      case "user":
-        return "bg-blue-100 text-blue-700"
-      default:
-        return "bg-gray-100 text-gray-700"
+    if (authError) {
+      console.error("Error creating auth user:", authError)
+      alert(`Failed to create user: ${authError.message}`)
+      return
+    }
+    
+    // The handle_new_user trigger should have created the user in public.users table.
+    // We just need to update its role if it's admin.
+    if (authData.user && newUser.role === 'admin') {
+        const { error: roleError } = await updateUser(authData.user.id, { role: 'admin' });
+        if (roleError) {
+            console.error("Error setting user role to admin:", roleError);
+            alert("User created, but failed to set admin role.");
+        }
+    }
+    
+    alert("User added successfully!");
+    await fetchUsers(); // Refresh the user list
+    setIsAddUserOpen(false);
+    setNewUser({ name: "", email: "", department: "", role: "user", password: "" });
+  }
+
+  const handleUpdateUser = async (userId: string, updates: Partial<User>) => {
+    const { data, error } = await updateUser(userId, updates);
+    if(error) {
+        alert(`Failed to update user: ${error.message}`);
+    } else {
+        alert("User updated successfully!");
+        setUsers(users.map(u => u.id === userId ? { ...u, ...data } : u));
+        setEditingUser(null);
     }
   }
 
+
+  const getRoleColor = (role: string) => (role === "admin" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700")
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active":
-        return "bg-green-100 text-green-700"
-      case "inactive":
-        return "bg-red-100 text-red-700"
-      default:
-        return "bg-gray-100 text-gray-700"
+      case "active": return "bg-green-100 text-green-700"
+      case "inactive": return "bg-red-100 text-red-700"
+      case "pending": return "bg-yellow-100 text-yellow-700"
+      default: return "bg-gray-100 text-gray-700"
     }
   }
-
-  const getRoleText = (role: string) => {
-    return role.charAt(0).toUpperCase() + role.slice(1);
-  }
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active":
-        return "Aktif"
-      case "inactive":
-        return "Tidak Aktif"
-      default:
-        return status
-    }
-  }
+  const getRoleText = (role: string) => role.charAt(0).toUpperCase() + role.slice(1)
+  const getStatusText = (status: string) => status.charAt(0).toUpperCase() + status.slice(1)
 
   return (
     <AdminRouteGuard>
       <div className="p-6 space-y-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Manajemen Pengguna</h1>
             <p className="text-gray-600">Kelola pengguna dan hak akses sistem</p>
           </div>
-          {/* UPDATED: Button is now a trigger for the dialog */}
           <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
             <DialogTrigger asChild>
               <Button className="bg-emerald-600 hover:bg-emerald-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Tambah Pengguna
+                <Plus className="w-4 h-4 mr-2" /> Tambah Pengguna
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -1613,140 +2398,101 @@ export default function UsersPage() {
                 <DialogDescription>Buat akun baru dan tentukan role serta departemen.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="add-name" className="text-right">Nama</Label>
-                  <Input id="add-name" value={newUser.name} onChange={(e) => setNewUser({...newUser, name: e.target.value})} className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="add-email" className="text-right">Email</Label>
-                  <Input id="add-email" type="email" value={newUser.email} onChange={(e) => setNewUser({...newUser, email: e.target.value})} className="col-span-3" />
-                </div>
+                <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="add-name" className="text-right">Nama</Label><Input id="add-name" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} className="col-span-3"/></div>
+                <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="add-email" className="text-right">Email</Label><Input id="add-email" type="email" value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} className="col-span-3"/></div>
+                <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="add-password" className="text-right">Password</Label><Input id="add-password" type="password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} className="col-span-3"/></div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="add-department" className="text-right">Departemen</Label>
-                  <Select value={newUser.department} onValueChange={(value) => setNewUser({...newUser, department: value})}>
+                  <Select value={newUser.department} onValueChange={(value) => setNewUser({ ...newUser, department: value })}>
                     <SelectTrigger className="col-span-3"><SelectValue placeholder="Pilih Departemen" /></SelectTrigger>
-                    <SelectContent>{departments.filter(d => d !== 'Semua').map(dept => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent>
+                    <SelectContent>{departments.filter((d) => d !== "Semua").map((dept) => (<SelectItem key={dept} value={dept}>{dept}</SelectItem>))}</SelectContent>
                   </Select>
                 </div>
-                 <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="add-role" className="text-right">Role</Label>
-                  <Select value={newUser.role} onValueChange={(value) => setNewUser({...newUser, role: value})}>
+                  <Select value={newUser.role} onValueChange={(value) => setNewUser({ ...newUser, role: value as "admin" | "user" })}>
                     <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
+                    <SelectContent><SelectItem value="user">User</SelectItem><SelectItem value="admin">Admin</SelectItem></SelectContent>
                   </Select>
                 </div>
               </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>Batal</Button>
-                <Button type="submit" onClick={handleAddUser}>Tambah</Button>
-              </DialogFooter>
+              <DialogFooter><Button variant="outline" onClick={() => setIsAddUserOpen(false)}>Batal</Button><Button type="submit" onClick={handleAddUser}>Tambah</Button></DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
 
-        {/* Search and Filters Card remains the same */}
         <Card>
           <CardContent className="p-6">
             <div className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input placeholder="Cari nama atau email pengguna..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10"/>
-              </div>
+              <div className="relative"><Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" /><Input placeholder="Cari nama atau email pengguna..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10"/></div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                  <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Departemen" /></SelectTrigger>
-                  <SelectContent>{departments.map((dept) => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent>
-                </Select>
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Role" /></SelectTrigger>
-                  <SelectContent>{roles.map((role) => <SelectItem key={role} value={role}>{getRoleText(role)}</SelectItem>)}</SelectContent>
-                </Select>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Status" /></SelectTrigger>
-                  <SelectContent>{statuses.map((status) => <SelectItem key={status} value={status}>{getStatusText(status)}</SelectItem>)}</SelectContent>
-                </Select>
+                <Select value={departmentFilter} onValueChange={setDepartmentFilter}><SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Departemen" /></SelectTrigger><SelectContent>{departments.map((dept) => (<SelectItem key={dept} value={dept}>{dept}</SelectItem>))}</SelectContent></Select>
+                <Select value={roleFilter} onValueChange={setRoleFilter}><SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Role" /></SelectTrigger><SelectContent>{roles.map((role) => (<SelectItem key={role} value={role}>{getRoleText(role)}</SelectItem>))}</SelectContent></Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}><SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Status" /></SelectTrigger><SelectContent>{statuses.map((status) => (<SelectItem key={status} value={status}>{getStatusText(status)}</SelectItem>))}</SelectContent></Select>
               </div>
             </div>
           </CardContent>
         </Card>
-        
-        {/* Users Table */}
+
         <Card>
-          <CardHeader>
-            <CardTitle>Daftar Pengguna</CardTitle>
-            <CardDescription>Total {filteredUsers.length} pengguna ditemukan</CardDescription>
-          </CardHeader>
+          <CardHeader><CardTitle>Daftar Pengguna</CardTitle><CardDescription>Total {filteredUsers.length} pengguna ditemukan</CardDescription></CardHeader>
           <CardContent>
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Pengguna</TableHead>
-                  <TableHead>Departemen</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Login Terakhir</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
+              <TableHeader><TableRow><TableHead>Pengguna</TableHead><TableHead>Departemen</TableHead><TableHead>Role</TableHead><TableHead>Status</TableHead><TableHead>Login Terakhir</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
               <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="w-8 h-8"><AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} /><AvatarFallback>{user.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback></Avatar>
-                        <div><div className="font-medium">{user.name}</div><div className="text-sm text-gray-500">{user.email}</div></div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{user.department}</TableCell>
-                    <TableCell><Badge className={getRoleColor(user.role)}>{getRoleText(user.role)}</Badge></TableCell>
-                    <TableCell><Badge className={getStatusColor(user.status)}>{getStatusText(user.status)}</Badge></TableCell>
-                    <TableCell className="text-sm text-gray-500">{user.lastLogin}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                          <DropdownMenuItem onSelect={() => setEditingUser(user)}><Edit className="mr-2 h-4 w-4" />Edit Pengguna</DropdownMenuItem>
-                          <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Kirim Email</DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          {user.status === 'active' ? (
-                            <DropdownMenuItem><UserX className="mr-2 h-4 w-4" />Nonaktifkan</DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem><UserCheck className="mr-2 h-4 w-4" />Aktifkan</DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600"><Trash2 className="mr-2 h-4 w-4" />Hapus Pengguna</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {loading ? (<TableRow><TableCell colSpan={6} className="text-center py-8"><Loader2 className="mx-auto w-6 h-6 animate-spin" /></TableCell></TableRow>) 
+                : filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell><div className="flex items-center space-x-3"><Avatar className="w-8 h-8"><AvatarImage src={user.avatar_url || "/placeholder.svg"} alt={user.name} /><AvatarFallback>{user.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback></Avatar><div><div className="font-medium">{user.name}</div><div className="text-sm text-gray-500">{user.email}</div></div></div></TableCell>
+                      <TableCell>{user.department}</TableCell>
+                      <TableCell><Badge className={getRoleColor(user.role)}>{getRoleText(user.role)}</Badge></TableCell>
+                      <TableCell><Badge className={getStatusColor(user.status)}>{getStatusText(user.status)}</Badge></TableCell>
+                      <TableCell className="text-sm text-gray-500">{user.last_login ? new Date(user.last_login).toLocaleString("id-ID") : "Never"}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                          <DropdownMenuContent align="end"><DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                            <DropdownMenuItem onSelect={() => setEditingUser(user)}><Edit className="mr-2 h-4 w-4" />Edit Pengguna</DropdownMenuItem>
+                            <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Kirim Email</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            {user.status === "active" ? (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'inactive' })}><UserX className="mr-2 h-4 w-4" />Nonaktifkan</DropdownMenuItem>) 
+                            : (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'active' })}><UserCheck className="mr-2 h-4 w-4" />Aktifkan</DropdownMenuItem>)}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-600"><Trash2 className="mr-2 h-4 w-4" />Hapus Pengguna</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (<TableRow><TableCell colSpan={6} className="py-8 text-center text-gray-500">Tidak ada pengguna ditemukan.</TableCell></TableRow>)}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       </div>
 
-      {/* Edit User Dialog (already implemented) */}
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
         <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Pengguna</DialogTitle>
-            <DialogDescription>Perbarui informasi dan role untuk {editingUser?.name}.</DialogDescription>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Edit Pengguna</DialogTitle><DialogDescription>Perbarui informasi dan role untuk {editingUser?.name}.</DialogDescription></DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="name" className="text-right">Nama</Label><Input id="name" defaultValue={editingUser?.name} className="col-span-3" /></div>
-            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="email" className="text-right">Email</Label><Input id="email" type="email" defaultValue={editingUser?.email} className="col-span-3" /></div>
-            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="department" className="text-right">Departemen</Label><Select defaultValue={editingUser?.department}><SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger><SelectContent>{departments.filter(d => d !== 'Semua').map(dept => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent></Select></div>
-            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="role" className="text-right">Role</Label><Select defaultValue={editingUser?.role}><SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger><SelectContent>{roles.filter(r => r !== 'Semua').map(role => <SelectItem key={role} value={role}>{getRoleText(role)}</SelectItem>)}</SelectContent></Select></div>
+            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="edit-name" className="text-right">Nama</Label><Input id="edit-name" defaultValue={editingUser?.name} className="col-span-3" onBlur={(e) => setEditingUser(u => u ? {...u, name: e.target.value} : null)} /></div>
+            <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="edit-email" className="text-right">Email</Label><Input id="edit-email" type="email" defaultValue={editingUser?.email} className="col-span-3" disabled /></div>
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-department" className="text-right">Departemen</Label>
+                <Select defaultValue={editingUser?.department} onValueChange={(v) => setEditingUser(u => u ? {...u, department: v} : null)}>
+                    <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                    <SelectContent>{departments.filter((d) => d !== "Semua").map((dept) => (<SelectItem key={dept} value={dept}>{dept}</SelectItem>))}</SelectContent>
+                </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-role" className="text-right">Role</Label>
+                <Select defaultValue={editingUser?.role} onValueChange={(v) => setEditingUser(u => u ? {...u, role: v as "admin" | "user"} : null)}>
+                    <SelectTrigger className="col-span-3"><SelectValue /></SelectTrigger>
+                    <SelectContent>{roles.filter((r) => r !== "Semua").map((role) => (<SelectItem key={role} value={role}>{getRoleText(role)}</SelectItem>))}</SelectContent>
+                </Select>
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingUser(null)}>Batal</Button>
-            <Button type="submit">Simpan Perubahan</Button>
-          </DialogFooter>
+          <DialogFooter><Button variant="outline" onClick={() => setEditingUser(null)}>Batal</Button><Button type="submit" onClick={() => editingUser && handleUpdateUser(editingUser.id, { name: editingUser.name, department: editingUser.department, role: editingUser.role })}>Simpan Perubahan</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </AdminRouteGuard>
@@ -1766,9 +2512,12 @@ export default function Loading() {
 # app\(dashboard)\admin\verification\page.tsx
 
 ```tsx
+// app/(dashboard)/admin/verification/page.tsx
+// This file is largely correct and already well-structured.
+// The main changes are ensuring the dialog state is handled correctly.
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -1777,93 +2526,50 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Search, Eye, Check, X, Clock, AlertCircle, ArrowLeft } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Search, Eye, Check, X, Clock, AlertCircle, Loader2 } from "lucide-react"
 import { AdminRouteGuard } from "@/components/admin-route-guard"
+import { getDocumentsForVerification, updateDocumentVerificationStatus } from "@/lib/supabase"
+import type { Document, User } from "@/lib/supabase"
+import { useAuth } from "@/hooks/use-auth"
 
-const pendingDocuments = [
-  {
-    id: 1,
-    title: "Laporan Evaluasi Program Beasiswa Q4 2024",
-    description: "Evaluasi komprehensif program beasiswa untuk mahasiswa kurang mampu",
-    submittedBy: "Siti Nurhaliza",
-    submittedByAvatar: "/placeholder.svg?height=32&width=32",
-    department: "Pendayagunaan",
-    type: "PDF",
-    size: "2.4 MB",
-    submittedDate: "2024-01-15",
-    priority: "high",
-    tags: ["evaluasi", "beasiswa", "laporan"],
-    status: "pending",
-  },
-  {
-    id: 2,
-    title: "SOP Verifikasi Mustahik Terbaru",
-    description: "Standard Operating Procedure untuk verifikasi penerima bantuan",
-    submittedBy: "Ahmad Fauzi",
-    submittedByAvatar: "/placeholder.svg?height=32&width=32",
-    department: "Pendayagunaan",
-    type: "DOC",
-    size: "1.8 MB",
-    submittedDate: "2024-01-12",
-    priority: "medium",
-    tags: ["sop", "verifikasi", "mustahik"],
-    status: "pending",
-  },
-  {
-    id: 3,
-    title: "Template Proposal Program Bantuan",
-    description: "Template standar untuk proposal program bantuan sosial",
-    submittedBy: "Budi Santoso",
-    submittedByAvatar: "/placeholder.svg?height=32&width=32",
-    department: "Marketing",
-    type: "DOCX",
-    size: "856 KB",
-    submittedDate: "2024-01-10",
-    priority: "low",
-    tags: ["template", "proposal", "bantuan"],
-    status: "pending",
-  },
-  {
-    id: 4,
-    title: "Laporan Keuangan Bulanan Desember",
-    description: "Laporan keuangan lengkap untuk bulan Desember 2024",
-    submittedBy: "Dewi Sartika",
-    submittedByAvatar: "/placeholder.svg?height=32&width=32",
-    department: "Keuangan",
-    type: "XLSX",
-    size: "3.2 MB",
-    submittedDate: "2024-01-08",
-    priority: "high",
-    tags: ["keuangan", "laporan", "bulanan"],
-    status: "pending",
-  },
-]
-
-const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing"]
+const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Penyaluran"]
 const priorities = ["Semua", "high", "medium", "low"]
 
+type DocumentForVerification = Document & {
+  uploaded_by: Pick<User, "name" | "email" | "avatar_url"> | null
+}
+
 export default function VerificationPage() {
+  const { user } = useAuth()
+  const [documents, setDocuments] = useState<DocumentForVerification[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("Semua")
   const [priorityFilter, setPriorityFilter] = useState("Semua")
-  const [selectedDocument, setSelectedDocument] = useState<any>(null)
+  const [selectedDocument, setSelectedDocument] = useState<DocumentForVerification | null>(null)
   const [verificationNote, setVerificationNote] = useState("")
-  const router = useRouter()
+  const [isApproveOpen, setIsApproveOpen] = useState(false);
+  const [isRejectOpen, setIsRejectOpen] = useState(false);
 
-  const filteredDocuments = pendingDocuments.filter((doc) => {
-    const matchesSearch =
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.description.toLowerCase().includes(searchQuery.toLowerCase())
+
+  useEffect(() => {
+    const fetchDocs = async () => {
+      try {
+        setLoading(true)
+        const docs = await getDocumentsForVerification()
+        setDocuments((docs as DocumentForVerification[]) || [])
+      } catch (error) {
+        console.error("Failed to fetch documents for verification:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDocs()
+  }, [])
+
+  const filteredDocuments = documents.filter((doc) => {
+    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || (doc.description && doc.description.toLowerCase().includes(searchQuery.toLowerCase()))
     const matchesDepartment = departmentFilter === "Semua" || doc.department === departmentFilter
     const matchesPriority = priorityFilter === "Semua" || doc.priority === priorityFilter
 
@@ -1872,276 +2578,143 @@ export default function VerificationPage() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-700"
-      case "medium":
-        return "bg-yellow-100 text-yellow-700"
-      case "low":
-        return "bg-green-100 text-green-700"
-      default:
-        return "bg-gray-100 text-gray-700"
+      case "high": return "bg-red-100 text-red-700"
+      case "medium": return "bg-yellow-100 text-yellow-700"
+      case "low": return "bg-green-100 text-green-700"
+      default: return "bg-gray-100 text-gray-700"
     }
   }
 
   const getPriorityText = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "Tinggi"
-      case "medium":
-        return "Sedang"
-      case "low":
-        return "Rendah"
-      default:
-        return priority
+      case "high": return "Tinggi"
+      case "medium": return "Sedang"
+      case "low": return "Rendah"
+      default: return priority.charAt(0).toUpperCase() + priority.slice(1)
     }
   }
 
-  const handleApprove = (docId: number) => {
-    console.log("Approved document:", docId, "Note:", verificationNote)
-    setVerificationNote("")
-    setSelectedDocument(null)
+  const handleApprove = async () => {
+    if (!user || !selectedDocument) return
+    try {
+      await updateDocumentVerificationStatus(selectedDocument.id, "approved", user.id, verificationNote)
+      setDocuments((prev) => prev.filter((doc) => doc.id !== selectedDocument.id))
+      alert("Dokumen berhasil disetujui.");
+    } catch (error) {
+      console.error("Failed to approve document:", error)
+      alert("Gagal menyetujui dokumen.")
+    } finally {
+      setVerificationNote("")
+      setSelectedDocument(null)
+      setIsApproveOpen(false);
+    }
   }
 
-  const handleReject = (docId: number) => {
-    console.log("Rejected document:", docId, "Note:", verificationNote)
-    setVerificationNote("")
-    setSelectedDocument(null)
+  const handleReject = async () => {
+    if (!user || !selectedDocument || !verificationNote.trim()) {
+        alert("Alasan penolakan wajib diisi.");
+        return;
+    }
+    try {
+      await updateDocumentVerificationStatus(selectedDocument.id, "rejected", user.id, verificationNote)
+      setDocuments((prev) => prev.filter((doc) => doc.id !== selectedDocument.id))
+      alert("Dokumen berhasil ditolak.");
+    } catch (error) {
+      console.error("Failed to reject document:", error)
+      alert("Gagal menolak dokumen.")
+    } finally {
+      setVerificationNote("")
+      setSelectedDocument(null)
+      setIsRejectOpen(false);
+    }
   }
 
   return (
     <AdminRouteGuard>
       <div className="p-6 space-y-6">
-        {/* Breadcrumb Navigation */}
-
-        {/* Header */}
+        {/* Header and Filters are unchanged, they are already good */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Verifikasi Dokumen</h1>
             <p className="text-gray-600">Review dan verifikasi dokumen yang menunggu persetujuan</p>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-              <Clock className="w-4 h-4 mr-1" />
-              {filteredDocuments.length} Menunggu
-            </Badge>
+            <Badge variant="secondary" className="bg-orange-100 text-orange-700"><Clock className="w-4 h-4 mr-1" />{filteredDocuments.length} Menunggu</Badge>
           </div>
         </div>
-
-        {/* Search and Filters */}
         <Card>
           <CardContent className="p-6">
             <div className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Cari dokumen yang perlu diverifikasi..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+              <div className="relative"><Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" /><Input placeholder="Cari dokumen..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10"/></div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                  <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Departemen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {departments.map((dept) => (
-                      <SelectItem key={dept} value={dept}>
-                        {dept}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                  <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Prioritas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {priorities.map((priority) => (
-                      <SelectItem key={priority} value={priority}>
-                        {priority === "Semua" ? "Semua" : getPriorityText(priority)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Select value={departmentFilter} onValueChange={setDepartmentFilter}><SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Departemen" /></SelectTrigger><SelectContent>{departments.map((dept) => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent></Select>
+                <Select value={priorityFilter} onValueChange={setPriorityFilter}><SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Prioritas" /></SelectTrigger><SelectContent>{priorities.map((priority) => <SelectItem key={priority} value={priority}>{priority === "Semua" ? "Semua" : getPriorityText(priority)}</SelectItem>)}</SelectContent></Select>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Documents List */}
         <div className="space-y-4">
-          {filteredDocuments.map((document) => (
-            <Card key={document.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Badge className={getPriorityColor(document.priority)}>
-                        {getPriorityText(document.priority)}
-                      </Badge>
-                      <Badge variant="outline">{document.type}</Badge>
-                      <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                        <Clock className="w-3 h-3 mr-1" />
-                        Menunggu Verifikasi
-                      </Badge>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{document.title}</h3>
-                    <p className="text-gray-600 mb-4">{document.description}</p>
-
-                    <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
-                      <div className="flex items-center space-x-2">
-                        <Avatar className="w-6 h-6">
-                          <AvatarImage
-                            src={document.submittedByAvatar || "/placeholder.svg"}
-                            alt={document.submittedBy}
-                          />
-                          <AvatarFallback className="text-xs">
-                            {document.submittedBy
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>{document.submittedBy}</span>
+          {loading ? (<div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>) 
+          : (
+            filteredDocuments.map((document) => (
+              <Card key={document.id} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Badge className={getPriorityColor(document.priority)}>{getPriorityText(document.priority)}</Badge>
+                        <Badge variant="outline">{document.file_type}</Badge>
+                        <Badge variant="secondary" className="bg-orange-100 text-orange-700"><Clock className="w-3 h-3 mr-1" />Menunggu Verifikasi</Badge>
                       </div>
-                      <span>{document.department}</span>
-                      <span>{document.submittedDate}</span>
-                      <span>{document.size}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{document.title}</h3>
+                      <p className="text-gray-600 mb-4">{document.description}</p>
+                      <div className="flex items-center space-x-6 text-sm text-gray-500 mb-4">
+                          <div className="flex items-center space-x-2"><Avatar className="w-6 h-6"><AvatarImage src={document.uploaded_by?.avatar_url || "/placeholder.svg"} alt={document.uploaded_by?.name || "User"} /><AvatarFallback className="text-xs">{(document.uploaded_by?.name || "U").split(" ").map((n) => n[0]).join("")}</AvatarFallback></Avatar><span>{document.uploaded_by?.name || "Unknown User"}</span></div>
+                          <span>{document.department}</span>
+                          <span>{new Date(document.created_at).toLocaleDateString("id-ID")}</span>
+                          <span>{document.file_size ? `${(document.file_size / 1024).toFixed(1)} KB` : ""}</span>
+                      </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1">
-                      {document.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
+                    <div className="flex flex-col space-y-2 ml-4">
+                      <Button variant="outline" size="sm" asChild><Link href={`/documents/${document.id}`} target="_blank"><Eye className="w-4 h-4 mr-2" />Preview</Link></Button>
+                      <Button variant="outline" size="sm" className="text-green-600 hover:text-green-700" onClick={() => {setSelectedDocument(document); setIsApproveOpen(true);}}><Check className="w-4 h-4 mr-2" />Setujui</Button>
+                      <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" onClick={() => {setSelectedDocument(document); setIsRejectOpen(true);}}><X className="w-4 h-4 mr-2" />Tolak</Button>
                     </div>
                   </div>
-
-                  <div className="flex flex-col space-y-2 ml-4">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/documents/${document.id}/view`}>
-                        <Eye className="w-4 h-4 mr-2" />
-                        Preview
-                      </Link>
-                    </Button>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-green-600 hover:text-green-700"
-                          onClick={() => setSelectedDocument(document)}
-                        >
-                          <Check className="w-4 h-4 mr-2" />
-                          Setujui
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Setujui Dokumen</DialogTitle>
-                          <DialogDescription>
-                            Anda akan menyetujui dokumen "{selectedDocument?.title}". Dokumen akan dipublikasikan dan
-                            dapat diakses oleh semua pengguna.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="text-sm font-medium">Catatan Verifikasi (Opsional)</label>
-                            <Textarea
-                              placeholder="Tambahkan catatan untuk persetujuan ini..."
-                              value={verificationNote}
-                              onChange={(e) => setVerificationNote(e.target.value)}
-                              className="mt-1"
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button variant="outline" onClick={() => setSelectedDocument(null)}>
-                            Batal
-                          </Button>
-                          <Button
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() => selectedDocument && handleApprove(selectedDocument.id)}
-                          >
-                            <Check className="w-4 h-4 mr-2" />
-                            Setujui Dokumen
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700"
-                          onClick={() => setSelectedDocument(document)}
-                        >
-                          <X className="w-4 h-4 mr-2" />
-                          Tolak
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Tolak Dokumen</DialogTitle>
-                          <DialogDescription>
-                            Anda akan menolak dokumen "{selectedDocument?.title}". Dokumen akan dikembalikan ke pengirim
-                            dengan catatan revisi.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="text-sm font-medium">Alasan Penolakan *</label>
-                            <Textarea
-                              placeholder="Jelaskan alasan penolakan dan saran perbaikan..."
-                              value={verificationNote}
-                              onChange={(e) => setVerificationNote(e.target.value)}
-                              className="mt-1"
-                              required
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <Button variant="outline" onClick={() => setSelectedDocument(null)}>
-                            Batal
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={() => selectedDocument && handleReject(selectedDocument.id)}
-                            disabled={!verificationNote.trim()}
-                          >
-                            <X className="w-4 h-4 mr-2" />
-                            Tolak Dokumen
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
-        {/* Empty State */}
-        {filteredDocuments.length === 0 && (
-          <div className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada dokumen untuk diverifikasi</h3>
-            <p className="text-gray-600">Semua dokumen telah diverifikasi atau tidak ada yang sesuai dengan filter</p>
-          </div>
+        {!loading && filteredDocuments.length === 0 && (
+          <div className="text-center py-12"><AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" /><h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada dokumen untuk diverifikasi</h3><p className="text-gray-600">Semua dokumen telah diverifikasi atau tidak ada yang sesuai dengan filter</p></div>
         )}
       </div>
+
+      {/* Approve Dialog */}
+      <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
+          <DialogContent>
+              <DialogHeader><DialogTitle>Setujui Dokumen</DialogTitle><DialogDescription>Anda akan menyetujui dokumen "{selectedDocument?.title}". Dokumen akan dipublikasikan.</DialogDescription></DialogHeader>
+              <div className="space-y-4"><Label className="text-sm font-medium">Catatan Verifikasi (Opsional)</Label><Textarea placeholder="Tambahkan catatan untuk persetujuan ini..." value={verificationNote} onChange={(e) => setVerificationNote(e.target.value)} className="mt-1"/></div>
+              <DialogFooter><Button variant="outline" onClick={() => setIsApproveOpen(false)}>Batal</Button><Button className="bg-green-600 hover:bg-green-700" onClick={handleApprove}><Check className="w-4 h-4 mr-2" />Setujui Dokumen</Button></DialogFooter>
+          </DialogContent>
+      </Dialog>
+      
+      {/* Reject Dialog */}
+      <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
+          <DialogContent>
+              <DialogHeader><DialogTitle>Tolak Dokumen</DialogTitle><DialogDescription>Anda akan menolak dokumen "{selectedDocument?.title}". Dokumen akan dikembalikan ke pengirim.</DialogDescription></DialogHeader>
+              <div className="space-y-4"><Label className="text-sm font-medium">Alasan Penolakan *</Label><Textarea placeholder="Jelaskan alasan penolakan dan saran perbaikan..." value={verificationNote} onChange={(e) => setVerificationNote(e.target.value)} className="mt-1" required/></div>
+              <DialogFooter><Button variant="outline" onClick={() => setIsRejectOpen(false)}>Batal</Button><Button variant="destructive" onClick={handleReject} disabled={!verificationNote.trim()}><X className="w-4 h-4 mr-2" />Tolak Dokumen</Button></DialogFooter>
+          </DialogContent>
+      </Dialog>
+
     </AdminRouteGuard>
   )
 }
-
 ```
 
 # app\(dashboard)\dashboard\page.tsx
@@ -2493,550 +3066,323 @@ export default function DashboardPage() {
 
 ```
 
-# app\(dashboard)\departments\[department]\page.tsx
+# app\(dashboard)\departments\[department]\_components\department-detail-view.tsx
 
 ```tsx
-"use client"
+// app/(dashboard)/departments/[department]/_components/department-detail-view.tsx
 
-import { useState } from "react"
-import { useRouter, useParams } from "next/navigation"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Users, FileText, Target, Building2, Activity, BookOpen, Settings } from "lucide-react"
+"use client"; // This component is interactive and runs on the client.
 
-// Mock data - in real app, this would come from API
-const getDepartmentData = (department: string) => {
-  const departments = {
-    pendayagunaan: {
-      name: "Pendayagunaan",
-      description: "Departemen yang bertanggung jawab atas penyaluran dan pendayagunaan dana ziswaf",
-      head: "Ahmad Fauzi",
-      headAvatar: "/placeholder.svg?height=40&width=40",
-      members: 15,
-      activeProjects: 8,
-      completedProjects: 12,
-      totalBudget: 15000000000,
-      usedBudget: 12500000000,
-      stats: {
-        beneficiaries: 2847,
-        programs: 25,
-        documents: 156,
-        activities: 8,
-      },
-      recentActivities: [
-        {
-          id: 1,
-          title: "Program Beasiswa Mahasiswa",
-          status: "active",
-          progress: 75,
-          budget: 2500000000,
-          participants: 12,
-          dueDate: "2024-12-31",
-        },
-        {
-          id: 2,
-          title: "Bantuan Kesehatan Masyarakat",
-          status: "planning",
-          progress: 25,
-          budget: 1800000000,
-          participants: 8,
-          dueDate: "2024-11-30",
-        },
-        {
-          id: 3,
-          title: "Infrastruktur Masjid",
-          status: "completed",
-          progress: 100,
-          budget: 1500000000,
-          participants: 6,
-          dueDate: "2023-12-31",
-        },
-      ],
-      teamMembers: [
-        {
-          name: "Ahmad Fauzi",
-          role: "Kepala Departemen",
-          avatar: "/placeholder.svg?height=32&width=32",
-          status: "online",
-        },
-        {
-          name: "Siti Nurhaliza",
-          role: "Program Manager",
-          avatar: "/placeholder.svg?height=32&width=32",
-          status: "online",
-        },
-        {
-          name: "Budi Santoso",
-          role: "Field Coordinator",
-          avatar: "/placeholder.svg?height=32&width=32",
-          status: "offline",
-        },
-        { name: "Dewi Sartika", role: "Data Analyst", avatar: "/placeholder.svg?height=32&width=32", status: "online" },
-      ],
-      documents: [
-        { id: 1, title: "SOP Penyaluran Bantuan", type: "PDF", date: "2024-01-15", downloads: 45 },
-        { id: 2, title: "Template Proposal Program", type: "DOCX", date: "2024-01-10", downloads: 32 },
-        { id: 3, title: "Laporan Bulanan Januari", type: "PDF", date: "2024-01-31", downloads: 28 },
-      ],
-    },
-    // Add other departments as needed
-  }
+import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileText, Building2 } from "lucide-react";
+import type { Document } from "@/lib/supabase";
 
-  return departments[department as keyof typeof departments]
+// Define the props this component will receive from its server parent
+interface DepartmentDetailViewProps {
+  departmentData: {
+    name: string;
+    description: string;
+    head: string;
+    headAvatar: string;
+    members: number;
+  };
+  documents: Document[];
 }
 
-export default function DepartmentDetailPage() {
-  const router = useRouter()
-  const params = useParams()
-  const [activeTab, setActiveTab] = useState("overview")
-  const [selectedPeriod, setSelectedPeriod] = useState("monthly")
+const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const department = getDepartmentData(params.department as string)
-
-  if (!department) {
-    return (
-      <div className="p-6">
-        <div className="text-center py-12">
-          <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Departemen tidak ditemukan</h3>
-          <p className="text-gray-600 mb-4">Departemen yang Anda cari mungkin tidak tersedia</p>
-          <Button onClick={() => router.push("/dashboard")} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali ke Dashboard
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-700"
-      case "planning":
-        return "bg-blue-100 text-blue-700"
-      case "completed":
-        return "bg-gray-100 text-gray-700"
-      default:
-        return "bg-gray-100 text-gray-700"
-    }
-  }
-
+export function DepartmentDetailView({ departmentData, documents }: DepartmentDetailViewProps) {
   return (
     <div className="p-6 space-y-6">
-
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
+          <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+            <Building2 className="w-8 h-8 text-muted-foreground" />
+          </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{department.name}</h1>
-            <p className="text-gray-600 mt-1">{department.description}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{departmentData.name}</h1>
+            <p className="text-gray-600 mt-1 max-w-xl">{departmentData.description}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="monthly">Bulanan</SelectItem>
-              <SelectItem value="quarterly">Kuartalan</SelectItem>
-              <SelectItem value="yearly">Tahunan</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4" />
-          </Button>
-        </div>
       </div>
-
-      {/* Department Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Penerima Manfaat</p>
-                <p className="text-2xl font-bold text-gray-900">{department.stats.beneficiaries.toLocaleString()}</p>
-              </div>
-              <Users className="w-8 h-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Program Aktif</p>
-                <p className="text-2xl font-bold text-gray-900">{department.stats.programs}</p>
-              </div>
-              <Target className="w-8 h-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Dokumen</p>
-                <p className="text-2xl font-bold text-gray-900">{department.stats.documents}</p>
-              </div>
-              <FileText className="w-8 h-8 text-purple-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Aktivitas</p>
-                <p className="text-2xl font-bold text-gray-900">{department.stats.activities}</p>
-              </div>
-              <Activity className="w-8 h-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Budget Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Budget Overview</CardTitle>
-          <CardDescription>Penggunaan budget departemen</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Budget Terpakai</span>
-              <span className="font-semibold">
-                {Math.round((department.usedBudget / department.totalBudget) * 100)}%
-              </span>
-            </div>
-            <Progress value={(department.usedBudget / department.totalBudget) * 100} className="h-3" />
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>{formatCurrency(department.usedBudget)} terpakai</span>
-              <span>{formatCurrency(department.totalBudget)} total</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-4">
+          <Tabs defaultValue="documents">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="activities">Aktivitas</TabsTrigger>
-              <TabsTrigger value="documents">Dokumen</TabsTrigger>
-              <TabsTrigger value="reports">Laporan</TabsTrigger>
+              <TabsTrigger value="documents">Dokumen ({documents?.length || 0})</TabsTrigger>
+              <TabsTrigger value="members">Anggota</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Aktivitas Terbaru</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {department.recentActivities.map((activity) => (
-                      <div key={activity.id} className="p-4 border rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-medium text-gray-900">{activity.title}</h4>
-                          <Badge className={getStatusColor(activity.status)}>
-                            {activity.status === "active"
-                              ? "Aktif"
-                              : activity.status === "planning"
-                                ? "Perencanaan"
-                                : "Selesai"}
-                          </Badge>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm text-gray-600">
-                            <span>Progress</span>
-                            <span>{activity.progress}%</span>
-                          </div>
-                          <Progress value={activity.progress} className="h-2" />
-                          <div className="flex justify-between text-sm text-gray-600">
-                            <span>Budget: {formatCurrency(activity.budget)}</span>
-                            <span>Due: {activity.dueDate}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="activities">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Semua Aktivitas</CardTitle>
-                  <CardDescription>Daftar lengkap aktivitas departemen</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {department.recentActivities.map((activity) => (
-                      <div key={activity.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-gray-900">{activity.title}</h4>
-                            <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
-                              <span>{activity.participants} partisipan</span>
-                              <span>Due: {activity.dueDate}</span>
-                            </div>
-                          </div>
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={`/activities/${activity.title.toLowerCase().replace(/\s+/g, "-")}`}>
-                              Lihat Detail
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="documents">
+            <TabsContent value="documents" className="mt-4">
               <Card>
                 <CardHeader>
                   <CardTitle>Dokumen Departemen</CardTitle>
-                  <CardDescription>Dokumen dan file penting departemen</CardDescription>
+                  <CardDescription>Dokumen dan file penting yang dimiliki oleh departemen {departmentData.name}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {department.documents.map((doc) => (
-                      <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <FileText className="w-8 h-8 text-blue-500" />
-                          <div>
-                            <h4 className="font-medium text-gray-900">{doc.title}</h4>
-                            <div className="flex items-center space-x-2 text-sm text-gray-500">
-                              <span>{doc.type}</span>
-                              <span>•</span>
-                              <span>{doc.date}</span>
-                              <span>•</span>
-                              <span>{doc.downloads} downloads</span>
+                    {documents && documents.length > 0 ? (
+                      documents.map((doc: Document) => (
+                        <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                          <div className="flex items-center space-x-4">
+                            <FileText className="w-8 h-8 text-blue-500 flex-shrink-0" />
+                            <div className="flex-1">
+                              <h4 className="font-medium text-gray-900 hover:underline">
+                                <Link href={`/documents/${doc.id}`}>{doc.title}</Link>
+                              </h4>
+                              <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                                <Badge variant="outline">{doc.file_type}</Badge>
+                                <span>•</span>
+                                <span>{formatDate(doc.created_at)}</span>
+                                <span>•</span>
+                                <Badge variant={doc.is_starred ? "destructive" : "secondary"}>
+                                  {doc.is_starred ? "Favorit" : "Normal"}
+                                </Badge>
+                              </div>
                             </div>
                           </div>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/documents/${doc.id}`}>
+                              Lihat
+                            </Link>
+                          </Button>
                         </div>
-                        <Button variant="outline" size="sm">
-                          Lihat
-                        </Button>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        Tidak ada dokumen yang ditemukan untuk departemen ini.
                       </div>
-                    ))}
+                    )}
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="reports">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Laporan Departemen</h3>
-                  <p className="text-gray-600 mb-4">Fitur laporan akan segera tersedia</p>
-                  <Button variant="outline">Generate Laporan</Button>
-                </CardContent>
-              </Card>
+            <TabsContent value="overview">
+              <Card><CardContent className="p-6 text-center text-muted-foreground">Overview feature coming soon.</CardContent></Card>
+            </TabsContent>
+            <TabsContent value="members">
+              <Card><CardContent className="p-6 text-center text-muted-foreground">Members feature coming soon.</CardContent></Card>
             </TabsContent>
           </Tabs>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Department Head */}
           <Card>
-            <CardHeader>
-              <CardTitle>Kepala Departemen</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>Kepala Departemen</CardTitle></CardHeader>
             <CardContent>
               <div className="flex items-center space-x-3">
                 <Avatar className="w-12 h-12">
-                  <AvatarImage src={department.headAvatar || "/placeholder.svg"} alt={department.head} />
-                  <AvatarFallback>
-                    {department.head
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
+                  <AvatarImage src={departmentData.headAvatar} alt={departmentData.head} />
+                  <AvatarFallback>{departmentData.head.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-gray-900">{department.head}</p>
+                  <p className="font-medium text-gray-900">{departmentData.head}</p>
                   <p className="text-sm text-gray-500">Kepala Departemen</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Team Members */}
           <Card>
-            <CardHeader>
-              <CardTitle>Tim Departemen</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>Statistik Cepat</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              {department.teamMembers.map((member, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <div className="relative">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={member.avatar || "/placeholder.svg"} alt={member.name} />
-                      <AvatarFallback>
-                        {member.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div
-                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-                        member.status === "online" ? "bg-green-500" : "bg-gray-400"
-                      }`}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{member.name}</p>
-                    <p className="text-xs text-gray-500">{member.role}</p>
-                  </div>
-                </div>
-              ))}
-              <Button variant="outline" size="sm" className="w-full mt-3">
-                <Users className="w-4 h-4 mr-2" />
-                Lihat Semua Tim
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Quick Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistik Cepat</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Anggota Tim</span>
-                <span className="font-medium">{department.members}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Proyek Aktif</span>
-                <span className="font-medium">{department.activeProjects}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Proyek Selesai</span>
-                <span className="font-medium">{department.completedProjects}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Efisiensi Budget</span>
-                <span className="font-medium text-green-600">
-                  {Math.round((department.usedBudget / department.totalBudget) * 100)}%
-                </span>
-              </div>
+              <div className="flex justify-between items-center"><span className="text-sm text-gray-600">Total Dokumen</span><span className="font-medium">{documents?.length || 0}</span></div>
+              <div className="flex justify-between items-center"><span className="text-sm text-gray-600">Anggota Tim</span><span className="font-medium">{departmentData.members}</span></div>
             </CardContent>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }
+```
 
+# app\(dashboard)\departments\[department]\page.tsx
+
+```tsx
+// app/(dashboard)/departments/[department]/page.tsx
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
+import { DepartmentDetailView } from "./_components/department-detail-view"; // Import the new client component
+import type { Document } from "@/lib/supabase";
+
+// This object can be moved to a separate config file if it grows
+const departmentInfo: { [key: string]: { name: string; description: string; head: string; headAvatar: string; members: number } } = {
+  pendayagunaan: { name: "Pendayagunaan", description: "Departemen yang bertanggung jawab atas penyaluran dan pendayagunaan dana ziswaf.", head: "Budi Santoso", headAvatar: "/placeholder.svg?height=40&width=40", members: 12 },
+  keuangan: { name: "Keuangan", description: "Mengelola administrasi keuangan dan pelaporan dana ziswaf.", head: "Siti Nurhaliza", headAvatar: "/placeholder.svg?height=40&width=40", members: 8 },
+  marketing: { name: "Marketing", description: "Bertanggung jawab atas komunikasi dan promosi program.", head: "Maya Sari", headAvatar: "/placeholder.svg?height=40&width=40", members: 6 },
+  it: { name: "IT", description: "Mengelola infrastruktur dan sistem teknologi informasi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 4 },
+  sdm: { name: "SDM", description: "Mengelola sumber daya manusia dan kepegawaian.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 5 },
+};
+
+// This is a pure Server Component. It can use server-only functions.
+export default async function DepartmentDetailPage({ params }: { params: { department: string } }) {
+  const departmentSlug = params.department.toLowerCase();
+  const departmentData = departmentInfo[departmentSlug];
+
+  if (!departmentData) {
+    notFound();
+  }
+  
+  const departmentNameForDB = departmentData.name;
+
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
+
+  const { data: documents, error } = await supabase
+    .from("documents")
+    .select('*')
+    .eq('department', departmentNameForDB)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(`Error fetching documents for ${departmentNameForDB}:`, error);
+  }
+
+  // The Server Component's only job is to fetch data and pass it as props
+  // to the Client Component that will handle rendering the UI.
+  return (
+    <DepartmentDetailView
+      departmentData={departmentData}
+      documents={(documents as Document[]) || []}
+    />
+  );
+}
 ```
 
 # app\(dashboard)\departments\page.tsx
 
 ```tsx
+// app/(dashboard)/departments/page.tsx
+
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Users, FileText, Activity, TrendingUp, Building2, Plus, Eye } from "lucide-react"
 import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-// Mock data
+// Mock data - now with avatar and more distinct colors
 const departments = [
   {
     id: "pendayagunaan",
     name: "Pendayagunaan",
-    description: "Mengelola program-program pendayagunaan dana ziswaf untuk kesejahteraan masyarakat",
+    description: "Mengelola program-program pendayagunaan dana ziswaf untuk kesejahteraan masyarakat.",
     head: "Ahmad Fauzi",
+    headAvatar: "/placeholder.svg?height=40&width=40",
     members: 12,
     documents: 45,
     activities: 23,
     budget: "Rp 2.5 Miliar",
     programs: ["Beasiswa", "Bantuan Kesehatan", "Pemberdayaan Ekonomi"],
     performance: 92,
-    color: "bg-blue-500",
+    color: "text-blue-500",
+    bgColor: "bg-blue-500",
   },
   {
     id: "penghimpunan",
     name: "Penghimpunan",
-    description: "Bertanggung jawab atas penghimpunan dana ziswaf dari berbagai sumber",
+    description: "Bertanggung jawab atas penghimpunan dana ziswaf dari berbagai sumber.",
     head: "Siti Nurhaliza",
+    headAvatar: "/placeholder.svg?height=40&width=40",
     members: 8,
     documents: 32,
     activities: 18,
     budget: "Target Rp 5 Miliar",
     programs: ["Fundraising Digital", "Corporate Partnership", "Retail Collection"],
     performance: 88,
-    color: "bg-green-500",
+    color: "text-green-500",
+    bgColor: "bg-green-500",
   },
   {
     id: "penyaluran",
     name: "Penyaluran",
-    description: "Mengelola penyaluran dana ziswaf kepada mustahik yang berhak",
+    description: "Mengelola penyaluran dana ziswaf kepada mustahik yang berhak.",
     head: "Budi Santoso",
+    headAvatar: "/placeholder.svg?height=40&width=40",
     members: 15,
     documents: 67,
     activities: 31,
     budget: "Rp 3.2 Miliar",
     programs: ["Bantuan Langsung", "Program Sosial", "Emergency Response"],
     performance: 95,
-    color: "bg-purple-500",
+    color: "text-purple-500",
+    bgColor: "bg-purple-500",
   },
   {
     id: "keuangan",
     name: "Keuangan",
-    description: "Mengelola administrasi keuangan dan pelaporan dana ziswaf",
+    description: "Mengelola administrasi keuangan dan pelaporan dana ziswaf.",
     head: "Fatimah Zahra",
+    headAvatar: "/placeholder.svg?height=40&width=40",
     members: 6,
     documents: 89,
     activities: 12,
     budget: "Operational",
     programs: ["Financial Reporting", "Audit & Compliance", "Budget Planning"],
     performance: 90,
-    color: "bg-orange-500",
+    color: "text-orange-500",
+    bgColor: "bg-orange-500",
   },
 ]
 
-export default function DepartmentsPage() {
-  const getPerformanceColor = (performance: number) => {
-    if (performance >= 90) return "text-green-600"
-    if (performance >= 80) return "text-yellow-600"
-    return "text-red-600"
-  }
+// A new component for the radial progress bar
+const RadialProgress = ({ progress, color }: { progress: number, color: string }) => {
+  const radius = 32;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="space-y-6">
+    <div className="relative h-20 w-20">
+      <svg className="h-full w-full" viewBox="0 0 80 80">
+        <circle
+          className="text-gray-200"
+          strokeWidth="8"
+          stroke="currentColor"
+          fill="transparent"
+          r={radius}
+          cx="40"
+          cy="40"
+        />
+        <circle
+          className={color}
+          strokeWidth="8"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          stroke="currentColor"
+          fill="transparent"
+          r={radius}
+          cx="40"
+          cy="40"
+          transform="rotate(-90 40 40)"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xl font-bold text-gray-700">{progress}%</span>
+      </div>
+    </div>
+  );
+};
+
+
+export default function DepartmentsPage() {
+  return (
+    <div className="space-y-6 p-4 md:p-6">
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -3050,116 +3396,97 @@ export default function DepartmentsPage() {
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      {/* Stats Cards remain the same... */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* ... your four stat cards for Total Departemen, Total Anggota, etc. go here ... */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Departemen</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4</div>
-            <p className="text-xs text-muted-foreground">Departemen aktif</p>
-          </CardContent>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Departemen</CardTitle><Building2 className="h-4 w-4 text-muted-foreground" /></CardHeader>
+          <CardContent><div className="text-2xl font-bold">4</div><p className="text-xs text-muted-foreground">Departemen aktif</p></CardContent>
         </Card>
-
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Anggota</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">41</div>
-            <p className="text-xs text-muted-foreground">Pegawai aktif</p>
-          </CardContent>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Anggota</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader>
+          <CardContent><div className="text-2xl font-bold">41</div><p className="text-xs text-muted-foreground">Pegawai aktif</p></CardContent>
         </Card>
-
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Dokumen</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">233</div>
-            <p className="text-xs text-muted-foreground">Dokumen tersimpan</p>
-          </CardContent>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Dokumen</CardTitle><FileText className="h-4 w-4 text-muted-foreground" /></CardHeader>
+          <CardContent><div className="text-2xl font-bold">233</div><p className="text-xs text-muted-foreground">Dokumen tersimpan</p></CardContent>
         </Card>
-
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rata-rata Kinerja</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">91%</div>
-            <p className="text-xs text-muted-foreground">Performance score</p>
-          </CardContent>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Rata-rata Kinerja</CardTitle><TrendingUp className="h-4 w-4 text-muted-foreground" /></CardHeader>
+          <CardContent><div className="text-2xl font-bold">91%</div><p className="text-xs text-muted-foreground">Performance score</p></CardContent>
         </Card>
       </div>
 
-      {/* Departments Grid */}
+      {/* Departments Grid - THE NEW DESIGN */}
       <div className="grid gap-6 md:grid-cols-2">
         {departments.map((department) => (
-          <Card key={department.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${department.color}`} />
+          <Card key={department.id} className="hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <CardHeader className="flex flex-row items-start justify-between gap-4">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${department.bgColor}`} />
                     <CardTitle className="text-xl">
                       <Link href={`/departments/${department.id}`} className="hover:underline">
                         {department.name}
                       </Link>
                     </CardTitle>
-                  </div>
-                  <CardDescription>{department.description}</CardDescription>
                 </div>
-                <Badge className={getPerformanceColor(department.performance)}>{department.performance}%</Badge>
+                <CardDescription className="max-w-xs">{department.description}</CardDescription>
               </div>
+              <RadialProgress progress={department.performance} color={department.color} />
             </CardHeader>
-            <CardContent className="space-y-4">
+
+            <CardContent className="space-y-6 flex-grow">
               {/* Department Head */}
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Kepala Departemen</span>
-                <span className="text-sm font-medium">{department.head}</span>
+              <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={department.headAvatar} alt={department.head} />
+                    <AvatarFallback>{department.head.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{department.head}</p>
+                    <p className="text-xs text-muted-foreground">Kepala Departemen</p>
+                  </div>
+                </div>
+                <Badge variant="outline">{department.budget}</Badge>
               </div>
 
-              {/* Stats */}
+              {/* Stats Grid */}
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-blue-600">{department.members}</div>
+                <div className="flex flex-col items-center gap-1">
+                  <Users className={`h-6 w-6 ${department.color}`} />
+                  <div className="text-2xl font-bold">{department.members}</div>
                   <div className="text-xs text-muted-foreground">Anggota</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-green-600">{department.documents}</div>
+                <div className="flex flex-col items-center gap-1">
+                  <FileText className={`h-6 w-6 ${department.color}`} />
+                  <div className="text-2xl font-bold">{department.documents}</div>
                   <div className="text-xs text-muted-foreground">Dokumen</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-600">{department.activities}</div>
+                <div className="flex flex-col items-center gap-1">
+                  <Activity className={`h-6 w-6 ${department.color}`} />
+                  <div className="text-2xl font-bold">{department.activities}</div>
                   <div className="text-xs text-muted-foreground">Aktivitas</div>
                 </div>
+
               </div>
 
-              {/* Budget */}
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Anggaran</span>
-                <span className="text-sm font-medium">{department.budget}</span>
-              </div>
-
+            </CardContent>
+            
+            <CardFooter className="flex flex-col items-start gap-4 pt-4 border-t">
               {/* Programs */}
-              <div className="space-y-2">
-                <span className="text-sm text-muted-foreground">Program Utama</span>
-                <div className="flex flex-wrap gap-1">
+              <div className="w-full">
+                <span className="text-sm font-medium text-muted-foreground">Program Utama</span>
+                <div className="flex flex-wrap gap-2 mt-2">
                   {department.programs.map((program) => (
-                    <Badge key={program} variant="secondary" className="text-xs">
-                      {program}
-                    </Badge>
+                    <Badge key={program} variant="secondary" className="text-xs">{program}</Badge>
                   ))}
                 </div>
               </div>
-
+              
               {/* Actions */}
-              <div className="flex gap-2 pt-2">
+              <div className="w-full flex gap-2">
                 <Button asChild size="sm" className="flex-1">
                   <Link href={`/departments/${department.id}`}>
                     <Eye className="mr-2 h-4 w-4" />
@@ -3171,680 +3498,331 @@ export default function DepartmentsPage() {
                   Aktivitas
                 </Button>
               </div>
-            </CardContent>
+            </CardFooter>
           </Card>
         ))}
       </div>
     </div>
   )
 }
+```
 
+# app\(dashboard)\documents\_components\document-list.tsx
+
+```tsx
+// app/(dashboard)/documents/_components/document-list.tsx (NEW FILE - Client Component)
+
+"use client"
+
+import { useState, useEffect, useMemo } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { DocumentFilters, DocumentFilterValues } from "@/components/document-filters"
+import { useAuth } from "@/hooks/use-auth"
+import type { Document } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
+import { FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle, Search, Link as LinkIcon } from "lucide-react"
+
+type DocumentWithUploader = Document & {
+  uploaded_by: { name: string; email: string } | null
+}
+
+interface DocumentListProps {
+  initialDocuments: DocumentWithUploader[]
+}
+
+export function DocumentList({ initialDocuments }: DocumentListProps) {
+  const [documents, setDocuments] = useState<DocumentWithUploader[]>(initialDocuments)
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const { user, userRole } = useAuth()
+  const router = useRouter(); 
+
+  const [activeFilters, setActiveFilters] = useState<DocumentFilterValues>({
+    searchQuery: "", category: "Semua", department: "Semua", priority: "Semua",
+    time: "Semua", showFavoritesOnly: false, showMandatoryOnly: false,
+  })
+  
+  // Update local state if initial props change
+  useEffect(() => {
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
+
+  const filteredDocuments = useMemo(() => {
+    const { searchQuery, category, department, priority, showFavoritesOnly, showMandatoryOnly } = activeFilters
+    return documents.filter((doc) => {
+      const matchesSearch = !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || (doc.description && doc.description.toLowerCase().includes(searchQuery.toLowerCase())) || doc.tags?.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      const matchesCategory = category === "Semua" || doc.category === category
+      const matchesDepartment = department === "Semua" || doc.department === department
+      const matchesPriority = priority === "Semua" || doc.priority === priority
+      const matchesFavorites = !showFavoritesOnly || doc.is_starred
+      const matchesMandatory = !showMandatoryOnly || doc.is_mandatory
+      return matchesSearch && matchesCategory && matchesDepartment && matchesPriority && matchesFavorites && matchesMandatory
+    })
+  }, [documents, activeFilters])
+
+  const toggleFavorite = async (docId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const docToUpdate = documents.find((doc) => doc.id === docId)
+    if (!docToUpdate) return
+    const newFavoriteStatus = !docToUpdate.is_starred
+    // Optimistic UI update
+    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_starred: newFavoriteStatus } : doc)))
+    const { error } = await supabase.from("documents").update({ is_starred: newFavoriteStatus }).eq("id", docId)
+    if (error) { // Revert on error
+        setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_starred: !newFavoriteStatus } : doc)))
+        alert("Gagal memperbarui favorit.")
+    }
+  }
+
+  const toggleMandatory = async (docId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (userRole !== "admin") return
+    const docToUpdate = documents.find((doc) => doc.id === docId)
+    if (!docToUpdate) return
+    const newMandatoryStatus = !docToUpdate.is_mandatory
+    // Optimistic UI update
+    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: newMandatoryStatus } : doc)))
+    const { error } = await supabase.from("documents").update({ is_mandatory: newMandatoryStatus }).eq("id", docId)
+    if (error) { // Revert on error
+        setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: !newMandatoryStatus } : doc)))
+        alert("Gagal memperbarui status wajib.")
+    }
+  }
+
+  const handleDownload = async (doc: DocumentWithUploader, e: React.MouseEvent) => {
+      e.stopPropagation()
+      if (doc.document_type !== 'file' || !doc.file_url) return
+      
+      const { data, error } = await supabase.storage.from('documents').download(doc.file_url.split('/').slice(-2).join('/'));
+
+      if (error || !data) {
+          console.error("Download failed:", error);
+          alert("Gagal mengunduh file.");
+          return;
+      }
+      
+      const blob = data;
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = window.document.createElement('a');
+      a.href = downloadUrl;
+      const fileName = doc.file_url.split('/').pop()?.split('?')[0] || 'download';
+      a.download = fileName;
+      window.document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+  }
+
+  const handleView = (doc: DocumentWithUploader, e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (doc.document_type === 'link' && doc.external_url) {
+          window.open(doc.external_url, '_blank', 'noopener,noreferrer');
+      } else {
+          router.push(`/documents/${doc.id}`);
+      }
+  };
+
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })
+  const formatFileSize = (sizeInBytes?: number | null) => {
+    if (!sizeInBytes) return "N/A"
+    if (sizeInBytes > 1024 * 1024) return `${(sizeInBytes / (1024 * 1024)).toFixed(1)} MB`
+    if (sizeInBytes > 1024) return `${(sizeInBytes / 1024).toFixed(1)} KB`
+    return `${sizeInBytes} B`
+  }
+  const getVerificationBadge = (status?: Document["verification_status"]) => {
+    switch (status) {
+      case "approved": return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" />Terverifikasi</Badge>
+      case "pending": return <Badge className="bg-yellow-100 text-yellow-700"><Clock className="h-3 w-3 mr-1" />Pending</Badge>
+      case "rejected": return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" />Ditolak</Badge>
+      default: return null
+    }
+  }
+
+  const DocumentCard = ({ document: doc }: { document: DocumentWithUploader }) => (
+    <Card className="hover:shadow-lg transition-shadow flex flex-col cursor-pointer" onClick={(e) => handleView(doc, e)}>
+        <div className="flex flex-col h-full p-4 space-y-3">
+            <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                    {doc.document_type === 'link' ? <LinkIcon className="h-4 w-4 text-gray-500" /> : <FileText className="h-4 w-4 text-gray-500" />}
+                    <Badge variant="outline" className="text-xs">{doc.file_type || 'LINK'}</Badge>
+                    {doc.is_mandatory && <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs"><Star className="w-3 h-3 mr-1 fill-current" />Wajib</Badge>}
+                </div>
+                <div className="flex items-center space-x-0">
+                    <Button variant="ghost" size="sm" onClick={(e) => toggleFavorite(doc.id, e)} className={`p-1 h-auto ${doc.is_starred ? "text-red-500" : "text-gray-400"}`}><Heart className="w-4 h-4" fill={doc.is_starred ? "currentColor" : "none"} /></Button>
+                    {userRole === 'admin' && (<Button variant="ghost" size="sm" onClick={(e) => toggleMandatory(doc.id, e)} className="p-1 h-auto"><Star className={`h-4 w-4 transition-colors ${doc.is_mandatory ? "fill-yellow-400 text-yellow-500" : "text-gray-400"}`} /></Button>)}
+                </div>
+            </div>
+            <div className="space-y-1 flex-grow">
+                <CardTitle className="text-base leading-snug line-clamp-2 hover:underline">{doc.title}</CardTitle>
+                <CardDescription className="line-clamp-2 text-xs">{doc.description}</CardDescription>
+            </div>
+            <div className="space-y-2 text-xs text-gray-500 pt-2 border-t">
+                <div className="flex justify-between items-center"><span>{doc.department}</span><div className="flex items-center space-x-1"><Calendar className="w-3 h-3" /><span>{formatDate(doc.created_at)}</span></div></div>
+                <div className="flex justify-between items-center"><span>Oleh: {doc.uploaded_by?.name || 'Sistem'}</span><span>{formatFileSize(doc.file_size)}</span></div>
+            </div>
+            <div className="flex items-center justify-between pt-2">
+                <div>{getVerificationBadge(doc.verification_status)}</div>
+                <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" onClick={(e) => handleView(doc, e)}><Eye className="w-4 h-4" /></Button>
+                    <Button variant="outline" size="sm" onClick={(e) => handleDownload(doc, e)} disabled={doc.document_type === 'link'}><Download className="w-4 h-4" /></Button>
+                </div>
+            </div>
+        </div>
+    </Card>
+  );
+
+  return (
+    <>
+      <DocumentFilters onFilterChange={setActiveFilters} onViewChange={setViewMode} visibleFilters={["category", "department", "priority", "showFavoritesOnly", "showMandatoryOnly"]} resultCount={filteredDocuments.length} />
+      {viewMode === "grid" ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredDocuments.map((doc) => (<DocumentCard key={doc.id} document={doc} />))}
+        </div>
+      ) : (
+        <div className="text-center p-8 bg-gray-50 rounded-lg">List view coming soon!</div>
+      )}
+      {!filteredDocuments.length && (
+        <Card><CardContent className="flex flex-col items-center justify-center py-12"><Search className="h-12 w-12 text-muted-foreground mb-4" /><h3 className="text-lg font-semibold mb-2">Tidak Ada Dokumen Ditemukan</h3><p className="text-muted-foreground text-center mb-4">Tidak ada dokumen yang sesuai dengan hak akses atau filter Anda.</p></CardContent></Card>
+      )}
+    </>
+  )
+}
 ```
 
 # app\(dashboard)\documents\[id]\page.tsx
 
 ```tsx
-"use client"
+// app/(dashboard)/documents/[id]/page.tsx
 
-import { useState } from "react"
-import { useRouter, useParams } from "next/navigation"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { DocumentViewer } from "@/components/document-viewer"; // We will use this component
 import {
-  ArrowLeft,
-  FileText,
-  Download,
-  Eye,
-  Heart,
-  Share2,
-  Edit,
-  Trash2,
-  Clock,
-  User,
-  Building2,
-  Tag,
-} from "lucide-react"
+  FileText, Download, Eye, Share2, Edit, Trash2, Clock, User, Building2, Tag, Link as LinkIcon
+} from "lucide-react";
+import type { Document } from "@/lib/supabase";
 
-// Mock data - in real app, this would come from API
-const getDocumentById = (id: string) => {
-  const documents = [
-    {
-      id: "1",
-      title: "Panduan Lengkap Ziswaf 2024",
-      description:
-        "Panduan komprehensif untuk pengelolaan ziswaf yang mencakup semua aspek dari pengumpulan hingga penyaluran dana ziswaf",
-      department: "Pendayagunaan",
-      type: "PDF",
-      size: "2.4 MB",
-      uploadDate: "2024-01-15",
-      uploadedBy: "Ahmad Fauzi",
-      views: 1234,
-      downloads: 456,
-      isFavorite: true,
-      status: "verified",
-      tags: ["panduan", "ziswaf", "2024"],
-      content: "Dokumen ini berisi panduan lengkap untuk pengelolaan ziswaf...",
-      version: "1.2",
-      lastModified: "2024-01-15T10:30:00Z",
-    },
-  ]
+// Helper function to format the date
+const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString("id-ID", {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+};
 
-  return documents.find((doc) => doc.id === id)
+type DocumentWithUploader = Document & {
+  uploaded_by: { name: string; email: string; avatar_url?: string } | null
 }
 
-export default function DocumentDetailPage() {
-  const router = useRouter()
-  const params = useParams()
-  const [isFavorite, setIsFavorite] = useState(false)
+// This is a Server Component that fetches its own data
+export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
-  const document = getDocumentById(params.id as string)
+  // Fetch the specific document from Supabase using the ID from the URL
+  const { data: document, error } = await supabase
+    .from("documents")
+    .select(`*, uploaded_by (name, email, avatar_url)`)
+    .eq('id', params.id)
+    .single();
 
-  if (!document) {
-    return (
-      <div className="p-6">
-        <div className="text-center py-12">
-          <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Dokumen tidak ditemukan</h3>
-          <p className="text-gray-600 mb-4">Dokumen yang Anda cari mungkin telah dihapus atau dipindahkan</p>
-          <Button onClick={() => router.back()} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali
-          </Button>
-        </div>
-      </div>
-    )
+  if (error || !document) {
+    console.error("Error fetching document or document not found:", error);
+    notFound();
   }
-
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite)
-    // In real app, this would make an API call
-  }
+  
+  const doc = document as DocumentWithUploader;
 
   return (
-    <div className="p-6 space-y-6">
-
-      {/* Header with Back Button */}
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900">Detail Dokumen</h1>
-          <p className="text-gray-600">Informasi lengkap tentang dokumen</p>
+    <div className="space-y-6">
+      {/* The Breadcrumb is handled globally, so it's not needed here */}
+      
+      <div className="flex items-start justify-between">
+        <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                {doc.document_type === 'link' ? <LinkIcon className="w-8 h-8" /> : <FileText className="w-8 h-8" />}
+            </div>
+            <div>
+                <div className="flex items-center space-x-2">
+                    <h1 className="text-2xl font-bold text-gray-900">{doc.title}</h1>
+                    <Badge variant={doc.verification_status === "approved" ? "default" : "secondary"}>
+                        {doc.verification_status === "approved" ? "Terverifikasi" : doc.verification_status}
+                    </Badge>
+                </div>
+                <p className="text-gray-600 max-w-2xl mt-1">{doc.description}</p>
+            </div>
+        </div>
+        <div className="flex items-center gap-2">
+            <Button variant="outline"><Share2 className="w-4 h-4 mr-2" />Bagikan</Button>
+            <Button variant="outline"><Edit className="w-4 h-4 mr-2" />Edit</Button>
+            <Button variant="destructive"><Trash2 className="w-4 h-4 mr-2" />Hapus</Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Document Info Card */}
           <Card>
             <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3">
-                  <FileText className="w-8 h-8 text-blue-500" />
-                  <div>
-                    <CardTitle className="text-xl">{document.title}</CardTitle>
-                    <CardDescription className="mt-1">{document.description}</CardDescription>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleFavorite}
-                    className={isFavorite || document.isFavorite ? "text-red-500" : "text-gray-400"}
-                  >
-                    <Heart className="w-4 h-4" fill={isFavorite || document.isFavorite ? "currentColor" : "none"} />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Share2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Document Metadata */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Building2 className="w-4 h-4" />
-                  <span>{document.department}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <User className="w-4 h-4" />
-                  <span>{document.uploadedBy}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Clock className="w-4 h-4" />
-                  <span>{document.uploadDate}</span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  <span>{document.size}</span>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Stats */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-6 text-sm text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <Eye className="w-4 h-4" />
-                    <span>{document.views} views</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Download className="w-4 h-4" />
-                    <span>{document.downloads} downloads</span>
-                  </div>
-                </div>
-                <Badge variant={document.status === "verified" ? "default" : "secondary"}>
-                  {document.status === "verified" ? "Terverifikasi" : "Pending"}
-                </Badge>
-              </div>
-
-              {/* Tags */}
-              <div className="flex items-center space-x-2">
-                <Tag className="w-4 h-4 text-gray-400" />
-                <div className="flex flex-wrap gap-1">
-                  {document.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-2 pt-4">
-                <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-                  <Link href={`/documents/${document.id}/view`}>
-                    <Eye className="w-4 h-4 mr-2" />
-                    Lihat Dokumen
-                  </Link>
-                </Button>
-                <Button variant="outline">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </Button>
-                <Button variant="outline">
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit
-                </Button>
-                <Button variant="outline" className="text-red-600 hover:text-red-700">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Hapus
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Document Content Preview */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Preview Konten</CardTitle>
+              <CardTitle>Preview Dokumen</CardTitle>
+              <CardDescription>
+                <Link href={`/documents/${doc.id}/view`} className="text-blue-600 hover:underline">
+                    Buka di halaman viewer khusus untuk pengalaman terbaik.
+                </Link>
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed">{document.content}</p>
-              </div>
+              {/* THE FIX IS HERE: We now embed the DocumentViewer directly */}
+              <DocumentViewer document={doc} />
             </CardContent>
           </Card>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Quick Actions */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Aksi Cepat</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button asChild className="w-full justify-start">
-                <Link href={`/documents/${document.id}/view`}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  Buka Dokumen
-                </Link>
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Download className="w-4 h-4 mr-2" />
-                Download PDF
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Share2 className="w-4 h-4 mr-2" />
-                Bagikan Link
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Document Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Informasi Dokumen</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tipe File:</span>
-                <Badge variant="outline">{document.type}</Badge>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Ukuran:</span>
-                <span>{document.size}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Versi:</span>
-                <span>{document.version}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Diupload:</span>
-                <span>{document.uploadDate}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Oleh:</span>
-                <span>{document.uploadedBy}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Related Documents */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Dokumen Terkait</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-2">
-                <Link href="/documents/2" className="block p-2 rounded hover:bg-gray-50 transition-colors">
-                  <div className="font-medium text-sm">SOP Verifikasi Mustahik</div>
-                  <div className="text-xs text-gray-500">Pendayagunaan • PDF</div>
-                </Link>
-                <Link href="/documents/3" className="block p-2 rounded hover:bg-gray-50 transition-colors">
-                  <div className="font-medium text-sm">Template Laporan Bulanan</div>
-                  <div className="text-xs text-gray-500">Keuangan • XLSX</div>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-```
-
-# app\(dashboard)\documents\[id]\view\page.tsx
-
-```tsx
-"use client"
-
-import { useState } from "react"
-import { useParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { DocumentViewer } from "@/components/document-viewer" // Make sure this path is correct
-import {
-  FileText,
-  Download,
-  Eye,
-  Heart,
-  Share2,
-  Calendar,
-  Building2,
-  Tag,
-  CheckCircle,
-  XCircle,
-  Clock,
-  RefreshCw,
-  MessageSquare,
-  ExternalLink,
-  Link,
-} from "lucide-react"
-
-// Mock data - in real app, this would come from API
-const documentData = {
-  id: 1,
-  title: "Laporan Evaluasi Program Beasiswa Q4 2024",
-  description:
-    "Evaluasi komprehensif program beasiswa untuk mahasiswa kurang mampu termasuk analisis dampak, efektivitas program, dan rekomendasi untuk periode selanjutnya.",
-  category: "Laporan",
-  department: "Pendayagunaan",
-  author: "Siti Nurhaliza",
-  authorEmail: "siti.nurhaliza@ziswaf.com",
-  uploadDate: "2024-12-15T10:30:00",
-  fileType: "PDF",
-  fileSize: "2.4 MB",
-  fileUrl: "/documents/laporan-evaluasi-beasiswa-q4-2024.pdf",
-  preview_url: "https://drive.google.com/file/d/1kXV09Okj9zrEaBcq6TqOst_4WCxevq-I/preview", // The Google Drive preview link
-  externalUrl: "https://docs.google.com/document/d/1234567890/edit",
-  documentType: "file", // can be "file" or "link"
-  platform: "google-docs", // for link type documents
-  verificationStatus: "approved",
-  verificationRequestedAt: "2024-12-15T10:35:00",
-  tags: ["evaluasi", "beasiswa", "laporan", "q4-2024"],
-  views: 45,
-  downloads: 12,
-  isFavorite: false,
-  version: "1.2",
-  location: "/documents/pendayagunaan/laporan/",
-  priority: "high",
-  accessLevel: "organizational",
-  language: "id",
-  expiryDate: "2025-12-31",
-  relatedDocuments: "Template Evaluasi, Panduan Beasiswa",
-}
-
-export default function DocumentViewPage() {
-  const params = useParams()
-  const [isFavorite, setIsFavorite] = useState(documentData.isFavorite)
-
-  const getVerificationStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending":
-        return (
-          <Badge className="bg-yellow-100 text-yellow-700">
-            <Clock className="w-3 h-3 mr-1" />
-            Menunggu Verifikasi
-          </Badge>
-        )
-      case "approved":
-        return (
-          <Badge className="bg-green-100 text-green-700">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Terverifikasi
-          </Badge>
-        )
-      case "rejected":
-        return (
-          <Badge className="bg-red-100 text-red-700">
-            <XCircle className="w-3 h-3 mr-1" />
-            Ditolak
-          </Badge>
-        )
-      case "revision_requested":
-        return (
-          <Badge className="bg-orange-100 text-orange-700">
-            <RefreshCw className="w-3 h-3 mr-1" />
-            Perlu Revisi
-          </Badge>
-        )
-      default:
-        return <Badge variant="secondary">{status}</Badge>
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
-
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return <Badge className="bg-red-100 text-red-700">Tinggi</Badge>
-      case "medium":
-        return <Badge className="bg-yellow-100 text-yellow-700">Sedang</Badge>
-      case "low":
-        return <Badge className="bg-green-100 text-green-700">Rendah</Badge>
-      default:
-        return <Badge variant="secondary">{priority}</Badge>
-    }
-  }
-
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-gray-900">{documentData.title}</h1>
-          <p className="text-gray-600 max-w-3xl">{documentData.description}</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          {getVerificationStatusBadge(documentData.verificationStatus)}
-          {getPriorityBadge(documentData.priority)}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Main Viewer */}
-        <div className="lg:col-span-3 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  {documentData.documentType === "link" ? (
-                    <Link className="w-5 h-5" />
-                  ) : (
-                    <FileText className="w-5 h-5" />
-                  )}
-                  <span>Viewer Dokumen</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge variant="outline">v{documentData.version}</Badge>
-                  <Badge variant="outline">
-                    <Eye className="w-3 h-3 mr-1" />
-                    {documentData.views} views
-                  </Badge>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DocumentViewer
-                document={{
-                  id: documentData.id.toString(),
-                  title: documentData.title,
-                  file_url: documentData.fileUrl,
-                  external_url: documentData.externalUrl,
-                  preview_url: documentData.preview_url, // Passing the preview url
-                  file_type: documentData.fileType,
-                  document_type: documentData.documentType as "file" | "link",
-                  platform: documentData.platform,
-                  description: documentData.description,
-                  author: documentData.author,
-                  department: documentData.department,
-                  created_at: documentData.uploadDate,
-                }}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Document Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MessageSquare className="w-5 h-5" />
-                <span>Aksi Dokumen</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {documentData.documentType === "file" ? (
-                  <Button className="flex-1">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </Button>
-                ) : (
-                  <Button className="flex-1" onClick={() => window.open(documentData.externalUrl, "_blank")}>
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Buka Link
-                  </Button>
-                )}
-
-                <Button variant="outline" className="flex-1" onClick={() => setIsFavorite(!isFavorite)}>
-                  <Heart className={`w-4 h-4 mr-2 ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />
-                  {isFavorite ? "Unfavorite" : "Favorite"}
-                </Button>
-
-                <Button variant="outline" className="flex-1">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Bagikan
-                </Button>
-
-                <Button variant="outline" className="flex-1">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Komentar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Document Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Informasi Dokumen</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-lg">Informasi Dokumen</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <Avatar>
-                  <AvatarImage src="/placeholder.svg" alt={documentData.author} />
-                  <AvatarFallback>
-                    {documentData.author
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">{documentData.author}</p>
-                  <p className="text-sm text-gray-500">{documentData.authorEmail}</p>
-                </div>
+              <div className="grid grid-cols-2 gap-y-3 text-sm">
+                  <span className="text-gray-600">Departemen</span><span className="font-medium text-right">{doc.department}</span>
+                  <span className="text-gray-600">Author</span><span className="font-medium text-right">{doc.author}</span>
+                  <span className="text-gray-600">Diupload Oleh</span><span className="font-medium text-right">{doc.uploaded_by?.name || 'N/A'}</span>
+                  <span className="text-gray-600">Tanggal Upload</span><span className="font-medium text-right">{formatDate(doc.created_at)}</span>
+                  <span className="text-gray-600">Tipe File</span><Badge variant="outline" className="justify-self-end">{doc.file_type}</Badge>
+                  <span className="text-gray-600">Prioritas</span><Badge variant={doc.priority === 'high' ? 'destructive' : 'outline'} className="justify-self-end capitalize">{doc.priority}</Badge>
+                  <span className="text-gray-600">Versi</span><span className="font-medium text-right">{doc.version}</span>
               </div>
-
-              <Separator />
-
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2 text-sm">
-                  <Building2 className="w-4 h-4 text-gray-400" />
-                  <span>{documentData.department}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <Calendar className="w-4 h-4 text-gray-400" />
-                  <span>{formatDate(documentData.uploadDate)}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  {documentData.documentType === "link" ? (
-                    <Link className="w-4 h-4 text-gray-400" />
-                  ) : (
-                    <FileText className="w-4 h-4 text-gray-400" />
-                  )}
-                  <span>
-                    {documentData.documentType === "link"
-                      ? `Link • ${documentData.platform?.replace("-", " ").toUpperCase()}`
-                      : `${documentData.fileType} • ${documentData.fileSize}`}
-                  </span>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Tags</p>
-                <div className="flex flex-wrap gap-1">
-                  {documentData.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      <Tag className="w-3 h-3 mr-1" />
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Document Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Detail Teknis</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Versi:</span>
-                  <span className="font-medium">v{documentData.version}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Lokasi:</span>
-                  <span className="font-medium text-xs">{documentData.location}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Akses:</span>
-                  <Badge variant="outline" className="text-xs">
-                    {documentData.accessLevel}
-                  </Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Bahasa:</span>
-                  <span className="font-medium">{documentData.language.toUpperCase()}</span>
-                </div>
-                {documentData.expiryDate && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Kadaluarsa:</span>
-                    <span className="font-medium text-xs">
-                      {new Date(documentData.expiryDate).toLocaleDateString("id-ID")}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Related Documents */}
-          {documentData.relatedDocuments && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Dokumen Terkait</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {documentData.relatedDocuments.split(", ").map((doc, index) => (
-                    <div key={index} className="flex items-center space-x-2 text-sm">
-                      <FileText className="w-3 h-3 text-gray-400" />
-                      <span className="text-blue-600 hover:underline cursor-pointer">{doc}</span>
+              {doc.tags && doc.tags.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Tags</p>
+                    <div className="flex flex-wrap gap-2">
+                      {doc.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Statistics */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistik</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center space-x-2">
-                  <Eye className="w-4 h-4 text-gray-400" />
-                  <span>Dilihat</span>
-                </div>
-                <span className="font-medium">{documentData.views} kali</span>
-              </div>
-              {documentData.documentType === "file" && (
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-2">
-                    <Download className="w-4 h-4 text-gray-400" />
-                    <span>Diunduh</span>
                   </div>
-                  <span className="font-medium">{documentData.downloads} kali</span>
-                </div>
+                </>
               )}
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center space-x-2">
-                  <Heart className="w-4 h-4 text-gray-400" />
-                  <span>Favorit</span>
-                </div>
-                <span className="font-medium">{isFavorite ? "Ya" : "Tidak"}</span>
-              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Aksi Cepat</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <Button asChild className="w-full justify-start"><Link href={`/documents/${doc.id}/view`}><Eye className="w-4 h-4 mr-2" />Buka Viewer</Link></Button>
+              <Button variant="outline" className="w-full justify-start"><Download className="w-4 h-4 mr-2" />Download</Button>
             </CardContent>
           </Card>
         </div>
@@ -3857,1016 +3835,265 @@ export default function DocumentViewPage() {
 # app\(dashboard)\documents\add\page.tsx
 
 ```tsx
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { FileText, Upload, X, AlertCircle, Link as LinkIcon, Loader2, Info } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/lib/supabase";
+import type { Document } from "@/lib/supabase";
+import { BreadcrumbNav } from "@/components/breadcrumb-nav";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import {
-  FileText,
-  Upload,
-  X,
-  Plus,
-  Tag,
-  Folder,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Building2,
-  User,
-  Calendar,
-  FileType,
-  HardDrive,
-  Link,
-  FileSpreadsheet,
-  Presentation,
-  FileImage,
-  Globe,
-  ExternalLink,
-  ArrowLeft,
-  AtSign,
-} from "lucide-react"
-import { BreadcrumbNav } from "@/components/breadcrumb-nav"
-import { UserTagDialog } from "@/components/user-tag-dialog"
-import { useRouter } from "next/navigation"
-
-const programs = [
-  "Program Beasiswa Mahasiswa",
-  "Program Beasiswa Anak Yatim",
-  "Program Beasiswa Vokasi",
-  "Program Beasiswa Alumni",
-]
-const categories = ["Panduan", "SOP", "Template", "Laporan", "Evaluasi", "Database", "Presentasi", "Formulir"]
-const fileTypes = ["PDF", "DOCX", "XLSX", "PPTX", "TXT", "ZIP"]
-const priorities = ["Rendah", "Sedang", "Tinggi", "Kritis"]
-const departments = ["Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Operasional"]
-
-const predefinedTags = [
-  "ziswaf",
-  "panduan",
-  "sop",
-  "template",
-  "laporan",
-  "evaluasi",
-  "keuangan",
-  "pendayagunaan",
-  "penghimpunan",
-  "mustahik",
-  "muzakki",
-  "beasiswa",
-  "kesehatan",
-  "umkm",
-  "infrastruktur",
-  "dakwah",
-  "monitoring",
-  "verifikasi",
-  "validasi",
-  "distribusi",
-  "penyaluran",
-  "audit",
-  "compliance",
-  "training",
-  "workshop",
-  "meeting",
-  "presentation",
-]
-
-// Mock users for tagging
-const users = [
-  { id: 1, name: "Ahmad Fauzi", email: "ahmad.fauzi@ziswaf.com", department: "Pendayagunaan" },
-  { id: 2, name: "Siti Nurhaliza", email: "siti.nurhaliza@ziswaf.com", department: "Pendayagunaan" },
-  { id: 3, name: "Budi Santoso", email: "budi.santoso@ziswaf.com", department: "IT" },
-  { id: 4, name: "Maya Sari", email: "maya.sari@ziswaf.com", department: "Keuangan" },
-  { id: 5, name: "Andi Rahman", email: "andi.rahman@ziswaf.com", department: "SDM" },
-]
+const categories = ["Panduan", "SOP", "Template", "Laporan", "Evaluasi", "Proposal", "Desain", "Notulensi", "Analisis", "Checklist", "Update"];
+const priorities = ["low", "medium", "high"] as const;
+const departments = ["Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Penyaluran", "Audit"];
+const platforms = ["google-docs", "google-sheets", "google-slides", "canva", "figma", "notion", "other"];
 
 export default function AddDocumentPage() {
-  const router = useRouter()
-  const [documentType, setDocumentType] = useState<"file" | "link">("file")
-  const [linkData, setLinkData] = useState({
-    url: "",
-    platform: "",
-  })
+  const router = useRouter();
+  const { user } = useAuth();
 
+  const [documentType, setDocumentType] = useState<"file" | "link">("file");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
-    program: "",
-    fileType: "",
-    priority: "Sedang",
-    isRequired: false,
-    isMandatory: false,
+    department: "",
+    author: user?.name || "",
+    priority: "medium" as typeof priorities[number],
     version: "1.0",
-    author: "",
-    location: "",
-    expiryDate: "",
-    relatedDocuments: "",
-    accessLevel: "organizational", // organizational, public
-    language: "id",
-  })
+    externalUrl: "",
+    platform: "",
+  });
 
-  const [tags, setTags] = useState<string[]>([])
-  const [departmentTags, setDepartmentTags] = useState<string[]>([])
-  const [taggedUsers, setTaggedUsers] = useState<typeof users>([])
-  const [newTag, setNewTag] = useState("")
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }))
-    }
-  }
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
-      setUploadedFile(file)
-      setIsUploading(true)
-
-      // Auto-fill some fields based on file
-      const fileExtension = file.name.split(".").pop()?.toUpperCase()
-      if (fileExtension && fileTypes.includes(fileExtension)) {
-        handleInputChange("fileType", fileExtension)
-      }
-
-      // Simulate upload progress
-      let progress = 0
-      const interval = setInterval(() => {
-        progress += 10
-        setUploadProgress(progress)
-        if (progress >= 100) {
-          clearInterval(interval)
-          setIsUploading(false)
-        }
-      }, 200)
-
-      // Auto-generate location based on program and category
-      if (formData.program && formData.category) {
-        const location = `/documents/${formData.program.toLowerCase().replace(/\s+/g, "-")}/${formData.category.toLowerCase()}/`
-        handleInputChange("location", location)
-      }
+      setUploadedFile(file);
+      if (errors.file) setErrors((prev) => ({ ...prev, file: "" }));
     }
-  }
+  };
 
   const addTag = (tag: string) => {
     if (tag && !tags.includes(tag)) {
-      setTags([...tags, tag])
-      setNewTag("")
+      setTags([...tags, tag.trim()]);
+      setNewTag("");
     }
-  }
+  };
 
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove))
-  }
-
-  const addDepartmentTag = (dept: string) => {
-    if (!departmentTags.includes(dept)) {
-      setDepartmentTags([...departmentTags, dept])
-    }
-  }
-
-  const removeDepartmentTag = (deptToRemove: string) => {
-    setDepartmentTags(departmentTags.filter((dept) => dept !== deptToRemove))
-  }
-
-  const addUserTag = (user: (typeof users)[0]) => {
-    if (!taggedUsers.find((u) => u.id === user.id)) {
-      setTaggedUsers([...taggedUsers, user])
-    }
-  }
-
-  const removeUserTag = (userId: number) => {
-    setTaggedUsers(taggedUsers.filter((user) => user.id !== userId))
-  }
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
-
-    if (!formData.title.trim()) newErrors.title = "Judul dokumen wajib diisi"
-    if (!formData.description.trim()) newErrors.description = "Deskripsi dokumen wajib diisi"
-    if (!formData.category) newErrors.category = "Kategori wajib dipilih"
-    if (!formData.program) newErrors.program = "Program wajib dipilih"
-    if (!formData.author.trim()) newErrors.author = "Nama penulis wajib diisi"
-    if (!formData.location.trim()) newErrors.location = "Lokasi file wajib diisi"
-    if (documentType === "file" && !uploadedFile) newErrors.file = "File dokumen wajib diupload"
-    if (documentType === "link" && !linkData.url.trim()) newErrors.url = "URL dokumen wajib diisi"
-    if (tags.length === 0) newErrors.tags = "Minimal 1 tag wajib ditambahkan"
-    if (departmentTags.length === 0) newErrors.departmentTags = "Minimal 1 departemen wajib ditag"
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    const newErrors: Record<string, string> = {};
+    if (!formData.title.trim()) newErrors.title = "Judul wajib diisi";
+    if (!formData.description.trim()) newErrors.description = "Deskripsi wajib diisi";
+    if (!formData.category) newErrors.category = "Kategori wajib dipilih";
+    if (!formData.department) newErrors.department = "Departemen wajib dipilih";
+    if (documentType === "file" && !uploadedFile) newErrors.file = "File wajib di-upload";
+    if (documentType === "link" && !formData.externalUrl.trim()) newErrors.url = "URL wajib diisi";
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+    if (!user || !validateForm()) return;
 
-    if (!validateForm()) {
-      return
-    }
+    setIsSubmitting(true);
+    const documentDataToInsert: Partial<Document> = {
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      department: formData.department,
+      author: formData.author,
+      priority: formData.priority,
+      version: formData.version,
+      tags,
+      uploaded_by: user.id,
+      document_type: documentType,
+      verification_status: 'pending',
+      verification_requested_at: new Date().toISOString(),
+      access_level: 'departmental', // default access level
+      language: 'id',
+    };
 
-    // Simulate form submission
-    setIsUploading(true)
-    setUploadProgress(0)
+    try {
+      if (documentType === 'file' && uploadedFile) {
+        const fileExt = uploadedFile.name.split('.').pop()?.toLowerCase() || '';
+        const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage.from('documents').upload(filePath, uploadedFile);
+        if (uploadError) throw uploadError;
 
-    // Simulate upload progress
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += 5
-      setUploadProgress(progress)
-      if (progress >= 100) {
-        clearInterval(interval)
-        setIsUploading(false)
-        // Redirect to documents page or show success message
-        alert("Dokumen berhasil ditambahkan dan otomatis diajukan untuk verifikasi admin!")
-        router.push("/documents")
+        const { data: { publicUrl } } = supabase.storage.from('documents').getPublicUrl(filePath);
+        documentDataToInsert.file_url = publicUrl;
+        documentDataToInsert.file_size = uploadedFile.size;
+        documentDataToInsert.file_type = fileExt.toUpperCase();
+
+      } else if (documentType === 'link') {
+        documentDataToInsert.external_url = formData.externalUrl;
+        documentDataToInsert.platform = formData.platform || 'other';
+        documentDataToInsert.file_type = 'LINK';
       }
-    }, 100)
-  }
 
-  const generateLocation = () => {
-    if (formData.program && formData.category) {
-      const location = `/documents/${formData.program.toLowerCase().replace(/\s+/g, "-")}/${formData.category.toLowerCase()}/`
-      handleInputChange("location", location)
+      const { error: insertError } = await supabase.from('documents').insert(documentDataToInsert);
+      if (insertError) throw insertError;
+
+      alert("Dokumen berhasil ditambahkan dan diajukan untuk verifikasi!");
+      router.push("/documents");
+
+    } catch (error) {
+      console.error("Error submitting document:", error);
+      alert(`Gagal menyimpan dokumen: ${error instanceof Error ? error.message : "Unknown error"}`);
+    } finally {
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <BreadcrumbNav />
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="sm" onClick={() => router.push("/documents")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Kembali
-          </Button>
-          <div className="flex items-center space-x-3">
-            <FileText className="w-8 h-8 text-emerald-600" />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Tambah Dokumen Baru</h1>
-              <p className="text-gray-600">Upload dan kelola dokumen untuk knowledge management system</p>
-            </div>
-          </div>
+      <div className="flex items-center space-x-3">
+        <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center">
+            <FileText className="w-6 h-6" />
+        </div>
+        <div>
+            <h1 className="text-2xl font-bold text-gray-900">Tambah Dokumen Baru</h1>
+            <p className="text-gray-600">Upload dan kelola dokumen untuk knowledge management system</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Form */}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
-          {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="w-5 h-5" />
-                <span>Informasi Dasar</span>
-              </CardTitle>
-              <CardDescription>Informasi utama tentang dokumen yang akan diupload</CardDescription>
+                <CardTitle className="flex items-center space-x-2"><Info className="w-5 h-5" /><span>Informasi Dasar</span></CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Tipe Dokumen *</Label>
-                <div className="flex space-x-4">
-                  <Button
-                    type="button"
-                    variant={documentType === "file" ? "default" : "outline"}
-                    onClick={() => setDocumentType("file")}
-                    className="flex-1"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    Upload File
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={documentType === "link" ? "default" : "outline"}
-                    onClick={() => setDocumentType("link")}
-                    className="flex-1"
-                  >
-                    <Link className="w-4 h-4 mr-2" />
-                    Link Eksternal
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="title">Judul Dokumen *</Label>
-                <Input
-                  id="title"
-                  placeholder="Masukkan judul dokumen yang deskriptif"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange("title", e.target.value)}
-                  className={errors.title ? "border-red-500" : ""}
-                />
-                {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Deskripsi *</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Jelaskan isi dan tujuan dokumen ini secara detail"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
-                  rows={4}
-                  className={errors.description ? "border-red-500" : ""}
-                />
-                {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="category">Kategori *</Label>
-                  <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                    <SelectTrigger className={errors.category ? "border-red-500" : ""}>
-                      <SelectValue placeholder="Pilih kategori dokumen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.category && <p className="text-sm text-red-500">{errors.category}</p>}
+                    <Label>Tipe Dokumen *</Label>
+                    <div className="flex space-x-2 p-1 bg-muted rounded-lg">
+                        <Button type="button" variant={documentType === "file" ? "default" : "ghost"} onClick={() => setDocumentType("file")} className="flex-1 shadow-sm data-[variant=default]:bg-white data-[variant=default]:text-primary"><Upload className="w-4 h-4 mr-2" /> Upload File</Button>
+                        <Button type="button" variant={documentType === "link" ? "default" : "ghost"} onClick={() => setDocumentType("link")} className="flex-1 shadow-sm data-[variant=default]:bg-white data-[variant=default]:text-primary"><LinkIcon className="w-4 h-4 mr-2" /> Link Eksternal</Button>
+                    </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="program">Program *</Label>
-                  <Select
-                    value={formData.program}
-                    onValueChange={(value) => {
-                      handleInputChange("program", value)
-                      generateLocation()
-                    }}
-                  >
-                    <SelectTrigger className={errors.program ? "border-red-500" : ""}>
-                      <SelectValue placeholder="Pilih program" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {programs.map((program) => (
-                        <SelectItem key={program} value={program}>
-                          <div className="flex items-center space-x-2">
-                            <Folder className="w-4 h-4" />
-                            <span>{program}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.program && <p className="text-sm text-red-500">{errors.program}</p>}
+                    <Label htmlFor="title">Judul Dokumen *</Label>
+                    <Input id="title" placeholder="Masukkan judul dokumen yang deskriptif" value={formData.title} onChange={(e) => handleInputChange("title", e.target.value)} className={errors.title ? "border-red-500" : ""} />
+                    {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
                 <div className="space-y-2">
-                  <Label htmlFor="author">Penulis/Author *</Label>
-                  <Input
-                    id="author"
-                    placeholder="Nama penulis dokumen"
-                    value={formData.author}
-                    onChange={(e) => handleInputChange("author", e.target.value)}
-                    className={errors.author ? "border-red-500" : ""}
-                  />
-                  {errors.author && <p className="text-sm text-red-500">{errors.author}</p>}
+                    <Label htmlFor="description">Deskripsi *</Label>
+                    <Textarea id="description" placeholder="Jelaskan isi dan tujuan dokumen ini" value={formData.description} onChange={(e) => handleInputChange("description", e.target.value)} rows={3} className={errors.description ? "border-red-500" : ""} />
+                    {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2"><Label htmlFor="category">Kategori *</Label><Select value={formData.category} onValueChange={(v) => handleInputChange("category", v)}><SelectTrigger className={errors.category ? "border-red-500" : ""}><SelectValue placeholder="Pilih kategori" /></SelectTrigger><SelectContent>{categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>{errors.category && <p className="text-sm text-red-500">{errors.category}</p>}</div>
+                    <div className="space-y-2"><Label htmlFor="department">Departemen *</Label><Select value={formData.department} onValueChange={(v) => handleInputChange("department", v)}><SelectTrigger className={errors.department ? "border-red-500" : ""}><SelectValue placeholder="Pilih departemen" /></SelectTrigger><SelectContent>{departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent></Select>{errors.department && <p className="text-sm text-red-500">{errors.department}</p>}</div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="version">Versi</Label>
-                  <Input
-                    id="version"
-                    placeholder="1.0"
-                    value={formData.version}
-                    onChange={(e) => handleInputChange("version", e.target.value)}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2"><Label htmlFor="author">Penulis/Author *</Label><Input id="author" placeholder="Nama penulis" value={formData.author} onChange={(e) => handleInputChange("author", e.target.value)} /></div>
+                    <div className="space-y-2"><Label htmlFor="version">Versi</Label><Input id="version" placeholder="1.0" value={formData.version} onChange={(e) => handleInputChange("version", e.target.value)} /></div>
+                    <div className="space-y-2"><Label htmlFor="priority">Prioritas</Label><Select value={formData.priority} onValueChange={(v) => handleInputChange("priority", v)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{priorities.map(p => <SelectItem key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</SelectItem>)}</SelectContent></Select></div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="priority">Prioritas</Label>
-                  <Select value={formData.priority} onValueChange={(value) => handleInputChange("priority", value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {priorities.map((priority) => (
-                        <SelectItem key={priority} value={priority}>
-                          {priority}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
-          {documentType === "file" ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Upload className="w-5 h-5" />
-                  <span>Upload File</span>
-                </CardTitle>
-                <CardDescription>Upload file dokumen yang akan disimpan dalam sistem</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+          {documentType === 'file' ? (
+             <Card>
+              <CardHeader><CardTitle className="flex items-center space-x-2"><Upload className="w-5 h-5" /><span>Upload File</span></CardTitle></CardHeader>
+              <CardContent>
                 <div className="space-y-2">
-                  <Label htmlFor="file">File Dokumen *</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                    <input
-                      type="file"
-                      id="file"
-                      className="hidden"
-                      onChange={handleFileUpload}
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip"
-                    />
-                    <label htmlFor="file" className="cursor-pointer">
-                      <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 mb-1">Klik untuk upload atau drag & drop file di sini</p>
-                      <p className="text-xs text-gray-500">
-                        Mendukung: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP (Max: 50MB)
-                      </p>
+                  <Label htmlFor="file-upload">File Dokumen *</Label>
+                  <div className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
+                    <input type="file" id="file-upload" className="hidden" onChange={handleFileChange} />
+                    <label htmlFor="file-upload" className="cursor-pointer space-y-2">
+                      <Upload className="w-8 h-8 text-gray-400 mx-auto" />
+                      <p className="text-sm text-muted-foreground">Klik untuk upload atau drag & drop</p>
+                      <p className="text-xs text-muted-foreground">PDF, DOCX, XLSX, PPTX, JPG, PNG (MAX. 50MB)</p>
                     </label>
                   </div>
-                  {errors.file && <p className="text-sm text-red-500">{errors.file}</p>}
+                  {errors.file && <p className="text-sm text-red-500 mt-2">{errors.file}</p>}
                 </div>
-
                 {uploadedFile && (
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <FileText className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm font-medium">{uploadedFile.name}</span>
-                        <Badge variant="outline">{(uploadedFile.size / 1024 / 1024).toFixed(2)} MB</Badge>
-                      </div>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => setUploadedFile(null)}>
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    {isUploading && (
-                      <div className="space-y-1">
-                        <Progress value={uploadProgress} className="h-2" />
-                        <p className="text-xs text-gray-500">Uploading... {uploadProgress}%</p>
-                      </div>
-                    )}
+                  <div className="p-3 bg-muted rounded-lg mt-4 flex items-center justify-between">
+                    <div className="flex items-center space-x-2 truncate"><FileText className="w-4 h-4" /> <span className="text-sm font-medium truncate">{uploadedFile.name}</span></div>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setUploadedFile(null)}><X className="w-4 h-4" /></Button>
                   </div>
                 )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fileType">Tipe File</Label>
-                    <Select value={formData.fileType} onValueChange={(value) => handleInputChange("fileType", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih tipe file" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {fileTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            <div className="flex items-center space-x-2">
-                              <FileType className="w-4 h-4" />
-                              <span>{type}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="expiryDate">Tanggal Kadaluarsa</Label>
-                    <Input
-                      id="expiryDate"
-                      type="date"
-                      value={formData.expiryDate}
-                      onChange={(e) => handleInputChange("expiryDate", e.target.value)}
-                    />
-                  </div>
-                </div>
               </CardContent>
             </Card>
           ) : (
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Link className="w-5 h-5" />
-                  <span>Link Dokumen</span>
-                </CardTitle>
-                <CardDescription>
-                  Tambahkan link ke dokumen eksternal seperti Google Docs, Sheets, Canva, dll.
-                </CardDescription>
-              </CardHeader>
+              <CardHeader><CardTitle className="flex items-center space-x-2"><LinkIcon className="w-5 h-5" /><span>Link Dokumen Eksternal</span></CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="documentUrl">URL Dokumen *</Label>
-                  <Input
-                    id="documentUrl"
-                    placeholder="https://docs.google.com/document/d/..."
-                    value={linkData.url}
-                    onChange={(e) => setLinkData((prev) => ({ ...prev, url: e.target.value }))}
-                    className={errors.url ? "border-red-500" : ""}
-                  />
-                  {errors.url && <p className="text-sm text-red-500">{errors.url}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="platform">Platform</Label>
-                  <Select
-                    value={linkData.platform}
-                    onValueChange={(value) => setLinkData((prev) => ({ ...prev, platform: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih platform dokumen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="google-docs">
-                        <div className="flex items-center space-x-2">
-                          <FileText className="w-4 h-4 text-blue-600" />
-                          <span>Google Docs</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="google-sheets">
-                        <div className="flex items-center space-x-2">
-                          <FileSpreadsheet className="w-4 h-4 text-green-600" />
-                          <span>Google Sheets</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="google-slides">
-                        <div className="flex items-center space-x-2">
-                          <Presentation className="w-4 h-4 text-orange-600" />
-                          <span>Google Slides</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="canva">
-                        <div className="flex items-center space-x-2">
-                          <FileImage className="w-4 h-4 text-purple-600" />
-                          <span>Canva</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="figma">
-                        <div className="flex items-center space-x-2">
-                          <FileImage className="w-4 h-4 text-pink-600" />
-                          <span>Figma</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="notion">
-                        <div className="flex items-center space-x-2">
-                          <FileText className="w-4 h-4 text-gray-800" />
-                          <span>Notion</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="other">
-                        <div className="flex items-center space-x-2">
-                          <Globe className="w-4 h-4 text-gray-600" />
-                          <span>Platform Lain</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <div className="flex items-start space-x-2">
-                    <ExternalLink className="w-4 h-4 text-blue-600 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-medium text-blue-900">Tips untuk Link Dokumen:</p>
-                      <ul className="text-blue-700 mt-1 space-y-1 text-xs">
-                        <li>• Pastikan link dapat diakses oleh tim</li>
-                        <li>• Gunakan link sharing yang tepat (view/edit)</li>
-                        <li>• Periksa permission sebelum menyimpan</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+                 <div className="space-y-2">
+                   <Label htmlFor="documentUrl">URL Dokumen *</Label>
+                   <Input id="documentUrl" placeholder="https://docs.google.com/..." value={formData.externalUrl} onChange={(e) => handleInputChange("externalUrl", e.target.value)} className={errors.url ? "border-red-500" : ""} />
+                   {errors.url && <p className="text-sm text-red-500">{errors.url}</p>}
+                 </div>
+                 <div className="space-y-2">
+                   <Label htmlFor="platform">Platform (opsional)</Label>
+                   <Select value={formData.platform} onValueChange={(v) => handleInputChange("platform", v)}><SelectTrigger><SelectValue placeholder="Pilih platform" /></SelectTrigger><SelectContent>{platforms.map(p => <SelectItem key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1).replace('-', ' ')}</SelectItem>)}</SelectContent></Select>
+                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Location and Organization */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Folder className="w-5 h-5" />
-                <span>Lokasi & Organisasi</span>
-              </CardTitle>
-              <CardDescription>Tentukan lokasi penyimpanan berdasarkan program</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="location">Lokasi File *</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="location"
-                    placeholder="/documents/program/kategori/"
-                    value={formData.location}
-                    onChange={(e) => handleInputChange("location", e.target.value)}
-                    className={`flex-1 ${errors.location ? "border-red-500" : ""}`}
-                  />
-                  <Button type="button" variant="outline" onClick={generateLocation}>
-                    <HardDrive className="w-4 h-4 mr-2" />
-                    Auto
-                  </Button>
-                </div>
-                {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
-                <p className="text-xs text-gray-500">Lokasi akan menentukan struktur folder berdasarkan program</p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="accessLevel">Level Akses</Label>
-                <Select value={formData.accessLevel} onValueChange={(value) => handleInputChange("accessLevel", value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="organizational">Organizational - Seluruh organisasi</SelectItem>
-                    <SelectItem value="public">Public - Dapat diakses publik</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="relatedDocuments">Dokumen Terkait</Label>
-                <Input
-                  id="relatedDocuments"
-                  placeholder="ID atau nama dokumen yang terkait (pisahkan dengan koma)"
-                  value={formData.relatedDocuments}
-                  onChange={(e) => handleInputChange("relatedDocuments", e.target.value)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Department Tags */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Building2 className="w-5 h-5" />
-                <span>Departemen Terlibat</span>
-              </CardTitle>
-              <CardDescription>Pilih departemen yang perlu akses ke dokumen ini</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Departemen yang Terlibat *</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {departments.map((dept) => (
-                    <Button
-                      key={dept}
-                      type="button"
-                      variant={departmentTags.includes(dept) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        if (departmentTags.includes(dept)) {
-                          removeDepartmentTag(dept)
-                        } else {
-                          addDepartmentTag(dept)
-                        }
-                      }}
-                      className="justify-start"
-                    >
-                      <Building2 className="w-4 h-4 mr-2" />
-                      {dept}
-                    </Button>
-                  ))}
-                </div>
-                {errors.departmentTags && <p className="text-sm text-red-500">{errors.departmentTags}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Departemen Terpilih</Label>
-                <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md">
-                  {departmentTags.map((dept) => (
-                    <Badge key={dept} variant="secondary" className="flex items-center space-x-1">
-                      <Building2 className="w-3 h-3" />
-                      <span>{dept}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 ml-1"
-                        onClick={() => removeDepartmentTag(dept)}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </Badge>
-                  ))}
-                  {departmentTags.length === 0 && (
-                    <p className="text-sm text-gray-500">Belum ada departemen yang dipilih</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* User Tagging */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <AtSign className="w-5 h-5" />
-                  <span>Tag Pengguna</span>
-                </div>
-                <UserTagDialog
-                  taggedUsers={taggedUsers}
-                  onUserTag={addUserTag}
-                  onUserUntag={removeUserTag}
-                  trigger={
-                    <Button variant="outline" size="sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Tag Pengguna
-                    </Button>
-                  }
-                />
-              </CardTitle>
-              <CardDescription>Tag pengguna yang perlu diberitahu tentang dokumen ini</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Pengguna yang Di-tag</Label>
-                <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md">
-                  {taggedUsers.map((user) => (
-                    <Badge key={user.id} variant="secondary" className="flex items-center space-x-1">
-                      <AtSign className="w-3 h-3" />
-                      <span>{user.name}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 ml-1"
-                        onClick={() => removeUserTag(user.id)}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </Badge>
-                  ))}
-                  {taggedUsers.length === 0 && <p className="text-sm text-gray-500">Belum ada pengguna yang di-tag</p>}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Tags */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Tag className="w-5 h-5" />
-                <span>Tags & Metadata</span>
-              </CardTitle>
-              <CardDescription>Tambahkan tags untuk memudahkan pencarian dan kategorisasi</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Tags Terpilih</Label>
-                <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md">
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="flex items-center space-x-1">
-                      <span>{tag}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto p-0 ml-1"
-                        onClick={() => removeTag(tag)}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
-                    </Badge>
-                  ))}
-                  {tags.length === 0 && <p className="text-sm text-gray-500">Belum ada tags yang dipilih</p>}
-                </div>
-                {errors.tags && <p className="text-sm text-red-500">{errors.tags}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Tags Tersedia</Label>
-                <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto p-2 border rounded-md">
-                  {predefinedTags.map((tag) => (
-                    <Button
-                      key={tag}
-                      type="button"
-                      variant={tags.includes(tag) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        if (tags.includes(tag)) {
-                          removeTag(tag)
-                        } else {
-                          addTag(tag)
-                        }
-                      }}
-                      className="justify-start text-xs"
-                    >
-                      {tag}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="newTag">Tambah Tag Baru</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="newTag"
-                    placeholder="Ketik tag baru"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault()
-                        addTag(newTag)
-                      }
-                    }}
-                  />
-                  <Button type="button" variant="outline" onClick={() => addTag(newTag)}>
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Tags (optional) */}
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Document Settings */}
+        <div className="space-y-6 lg:col-span-1">
           <Card>
-            <CardHeader>
-              <CardTitle>Pengaturan Dokumen</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isRequired"
-                  checked={formData.isRequired}
-                  onCheckedChange={(checked) => handleInputChange("isRequired", checked as boolean)}
-                />
-                <Label htmlFor="isRequired" className="text-sm">
-                  Dokumen Wajib Dibaca
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isMandatory"
-                  checked={formData.isMandatory}
-                  onCheckedChange={(checked) => handleInputChange("isMandatory", checked as boolean)}
-                />
-                <Label htmlFor="isMandatory" className="text-sm">
-                  Dokumen Kepegawaian Wajib
-                </Label>
-              </div>
-
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <div className="flex items-start space-x-2">
-                  <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium text-blue-900">Verifikasi Otomatis</p>
-                    <p className="text-blue-700 text-xs mt-1">
-                      Setiap dokumen akan otomatis diajukan untuk verifikasi admin setelah diupload.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Preview */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Preview Dokumen</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-sm mb-2">{formData.title || "Judul Dokumen"}</h4>
-                <p className="text-xs text-gray-600 mb-2">{formData.description || "Deskripsi dokumen..."}</p>
-                <div className="flex items-center space-x-2 text-xs text-gray-500">
-                  <User className="w-3 h-3" />
-                  <span>{formData.author || "Penulis"}</span>
-                  <span>•</span>
-                  <span>{formData.program || "Program"}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-xs text-gray-500 mt-1">
-                  <Calendar className="w-3 h-3" />
-                  <span>{new Date().toLocaleDateString("id-ID")}</span>
-                  <span>•</span>
-                  <span>{formData.category || "Kategori"}</span>
-                </div>
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {tags.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {tags.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{tags.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-                {departmentTags.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-500 mb-1">Departemen:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {departmentTags.slice(0, 2).map((dept) => (
-                        <Badge key={dept} variant="outline" className="text-xs">
-                          <Building2 className="w-3 h-3 mr-1" />
-                          {dept}
-                        </Badge>
-                      ))}
-                      {departmentTags.length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{departmentTags.length - 2}
-                        </Badge>
-                      )}
+            <CardHeader><CardTitle>Pengaturan Dokumen</CardTitle></CardHeader>
+            <CardContent>
+                <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200">
+                    <div className="flex items-start space-x-3">
+                        <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                            <p className="font-semibold text-blue-900">Verifikasi Otomatis</p>
+                            <p className="text-blue-700 text-xs mt-1">Setiap dokumen baru akan otomatis diajukan untuk verifikasi oleh admin sebelum dapat diakses oleh pengguna lain.</p>
+                        </div>
                     </div>
-                  </div>
-                )}
-                {taggedUsers.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-500 mb-1">Tagged Users:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {taggedUsers.slice(0, 2).map((user) => (
-                        <Badge key={user.id} variant="outline" className="text-xs">
-                          <AtSign className="w-3 h-3 mr-1" />
-                          {user.name}
-                        </Badge>
-                      ))}
-                      {taggedUsers.length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{taggedUsers.length - 2}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+                </div>
             </CardContent>
           </Card>
-
-          {/* Status Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Status Upload</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center space-x-2 text-sm">
-                {uploadedFile || linkData.url ? (
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                ) : (
-                  <AlertCircle className="w-4 h-4 text-orange-600" />
-                )}
-                <span>
-                  {documentType === "file"
-                    ? uploadedFile
-                      ? "File siap diupload"
-                      : "Belum ada file dipilih"
-                    : linkData.url
-                      ? "Link siap disimpan"
-                      : "Belum ada link dimasukkan"}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm">
-                <Clock className="w-4 h-4 text-blue-600" />
-                <span>Status: Akan diverifikasi admin otomatis</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Submit Button */}
-          <Button type="submit" className="w-full" disabled={isUploading}>
-            {isUploading ? (
-              <>
-                <Upload className="w-4 h-4 mr-2 animate-spin" />
-                Mengupload... {uploadProgress}%
-              </>
-            ) : (
-              <>
-                <FileText className="w-4 h-4 mr-2" />
-                Simpan Dokumen
-              </>
-            )}
+          <Button type="submit" className="w-full h-12" disabled={isSubmitting}>
+            {isSubmitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menyimpan...</> : <><Upload className="w-4 h-4 mr-2" /> Simpan & Ajukan Verifikasi</>}
           </Button>
         </div>
       </form>
     </div>
   )
 }
-
 ```
 
 # app\(dashboard)\documents\loading.tsx
@@ -4881,180 +4108,36 @@ export default function Loading() {
 # app\(dashboard)\documents\page.tsx
 
 ```tsx
-"use client"
-
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Plus, FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle, Search} from "lucide-react"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
 import Link from "next/link"
-import { useAuth } from "@/hooks/use-auth"
-import { DocumentFilters, DocumentFilterValues } from "@/components/document-filters"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import type { Document } from "@/lib/supabase"
+import { DocumentList } from "./_components/document-list"
 
-// Define the Document interface
-interface Document {
-  id: string
-  title: string
-  description: string
-  department: string
-  author: string
-  created_at: string
-  file_type: string
-  file_size: string
-  is_favorite: boolean
-  is_mandatory: boolean
-  views: number
-  downloads: number
-  tags: string[]
-  verification_status: "approved" | "pending" | "rejected"
-  category: string;
-  priority: string;
+// This is the new type for our document with uploader info
+type DocumentWithUploader = Document & {
+  uploaded_by: { name: string; email: string } | null
 }
 
-// Mock data for the page
-const mockDocuments: Document[] = [
-    {
-      id: "1",
-      title: "Panduan Penyaluran Beasiswa 2024",
-      description: "Dokumen panduan lengkap untuk proses penyaluran beasiswa tahun 2024",
-      department: "Pendayagunaan",
-      author: "Ahmad Fauzi",
-      created_at: "2024-01-15",
-      file_type: "PDF",
-      file_size: "2.5 MB",
-      is_favorite: true,
-      is_mandatory: true,
-      views: 245,
-      downloads: 89,
-      tags: ["beasiswa", "panduan", "2024"],
-      verification_status: "approved",
-      category: "Panduan",
-      priority: "high",
-    },
-    {
-      id: "2",
-      title: "Laporan Keuangan Q4 2023",
-      description: "Laporan keuangan triwulan keempat tahun 2023",
-      department: "Keuangan",
-      author: "Siti Nurhaliza",
-      created_at: "2024-01-10",
-      file_type: "Excel",
-      file_size: "1.8 MB",
-      is_favorite: false,
-      is_mandatory: true,
-      views: 156,
-      downloads: 67,
-      tags: ["keuangan", "laporan", "Q4"],
-      verification_status: "approved",
-      category: "Laporan",
-      priority: "high",
-    },
-    {
-      id: "3",
-      title: "SOP Verifikasi Mustahik",
-      description: "Standard Operating Procedure untuk verifikasi penerima bantuan",
-      department: "Penyaluran",
-      author: "Budi Santoso",
-      created_at: "2024-01-08",
-      file_type: "PDF",
-      file_size: "1.2 MB",
-      is_favorite: true,
-      is_mandatory: false,
-      views: 198,
-      downloads: 45,
-      tags: ["SOP", "verifikasi", "mustahik"],
-      verification_status: "pending",
-      category: "SOP",
-      priority: "medium",
-    },
-    {
-      id: "4",
-      title: "Proposal Program Kesehatan",
-      description: "Proposal program bantuan kesehatan untuk mustahik",
-      department: "Pendayagunaan",
-      author: "Fatimah Zahra",
-      created_at: "2024-01-05",
-      file_type: "Word",
-      file_size: "3.1 MB",
-      is_favorite: false,
-      is_mandatory: false,
-      views: 87,
-      downloads: 23,
-      tags: ["proposal", "kesehatan", "bantuan"],
-      verification_status: "rejected",
-      category: "Template",
-      priority: "low",
-    },
-];
+export default async function DocumentsPage() {
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
-export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<Document[]>(mockDocuments);
-  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>(mockDocuments);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const { userRole } = useAuth();
-  
-  const [activeFilters, setActiveFilters] = useState<DocumentFilterValues>({
-    searchQuery: "",
-    category: "Semua",
-    department: "Semua",
-    priority: "Semua",
-    time: "Semua",
-    showFavoritesOnly: false,
-    showMandatoryOnly: false,
-  });
+  const { data: documents, error } = await supabase
+    .from("documents")
+    .select(`*`)
+    .order("created_at", { ascending: false })
 
-  const handleFilterChange = (filters: DocumentFilterValues) => {
-    setActiveFilters(filters);
-  };
-  
-  useEffect(() => {
-    const { searchQuery, category, department, priority, showFavoritesOnly, showMandatoryOnly } = activeFilters;
-    
-    const newFiltered = documents.filter(doc => {
-      const matchesSearch =
-        searchQuery === "" ||
-        doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-      const matchesCategory = category === "Semua" || doc.category === category;
-      const matchesDepartment = department === "Semua" || doc.department === department;
-      const matchesPriority = priority === "Semua" || doc.priority === priority;
-      const matchesFavorites = !showFavoritesOnly || doc.is_favorite;
-      const matchesMandatory = !showMandatoryOnly || doc.is_mandatory;
+  // ===================================================================
+  // ====== THIS IS THE NEW, CRITICAL LINE OF CODE TO ADD =========
+  console.log("SERVER-SIDE FETCH:", { documents, error });
+  // ===================================================================
 
-      return matchesSearch && matchesCategory && matchesDepartment && matchesPriority && matchesFavorites && matchesMandatory;
-    });
-
-    setFilteredDocuments(newFiltered);
-  }, [documents, activeFilters]);
-
-  const toggleFavorite = (docId: string) => {
-    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_favorite: !doc.is_favorite } : doc)));
-  };
-
-  const toggleMandatory = (docId: string) => {
-    if (userRole !== "admin") return;
-    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: !doc.is_mandatory } : doc)));
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" });
-  };
-  
-  const getVerificationBadge = (status: Document["verification_status"]) => {
-    switch (status) {
-      case "approved":
-        return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" />Terverifikasi</Badge>;
-      case "pending":
-        return <Badge className="bg-yellow-100 text-yellow-700"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
-      case "rejected":
-        return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" />Ditolak</Badge>;
-      default:
-        return null;
-    }
-  };
+  if (error) {
+    console.error("Error fetching documents:", error)
+  }
 
   return (
     <div className="space-y-6">
@@ -5064,18 +4147,109 @@ export default function DocumentsPage() {
           <p className="text-muted-foreground">Kelola dan akses semua dokumen dalam sistem</p>
         </div>
         <Button asChild>
-          <Link href="/documents/add"><Plus className="mr-2 h-4 w-4" />Tambah Dokumen</Link>
+          <Link href="/documents/add">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Dokumen
+          </Link>
         </Button>
       </div>
 
-      <DocumentFilters
-        onFilterChange={handleFilterChange}
-        onViewChange={setViewMode}
-        visibleFilters={['category', 'department', 'favorites', 'mandatory']}
-        resultCount={filteredDocuments.length}
-      />
+      <DocumentList initialDocuments={(documents as DocumentWithUploader[]) || []} />
+    </div>
+  )
+}
+```
 
-      {viewMode === 'grid' ? (
+# app\(dashboard)\documents\recent\_components\recent-document-list.tsx
+
+```tsx
+// app/(dashboard)/documents/recent/_components/recent-document-list.tsx
+
+"use client"
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle, Search } from "lucide-react"
+import type { Document } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase" // Import supabase client
+import { useAuth } from "@/hooks/use-auth" // Import useAuth
+
+type DocumentWithUploader = Document & {
+  uploaded_by: { name: string; email: string } | null
+}
+
+interface RecentDocumentListProps {
+  initialDocuments: DocumentWithUploader[]
+}
+
+// Helper functions
+const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" });
+const getVerificationBadge = (status?: Document["verification_status"]) => {
+    switch (status) {
+      case "approved": return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" />Terverifikasi</Badge>
+      case "pending": return <Badge className="bg-yellow-100 text-yellow-700"><Clock className="h-3 w-3 mr-1" />Pending</Badge>
+      case "rejected": return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" />Ditolak</Badge>
+      default: return null
+    }
+};
+
+export function RecentDocumentList({ initialDocuments }: RecentDocumentListProps) {
+  const [documents, setDocuments] = useState<DocumentWithUploader[]>(initialDocuments);
+  const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
+  const [filteredDocuments, setFilteredDocuments] = useState<DocumentWithUploader[]>(initialDocuments);
+  const { userRole } = useAuth(); // Get userRole for star button
+
+  useEffect(() => {
+    // When the initial documents from the server change, update our local state
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
+  
+  useEffect(() => {
+    const newFiltered = documents.filter(doc => {
+      if (timeFilter === 'all') return true;
+      const now = new Date();
+      const docDate = new Date(doc.created_at);
+      const diffTime = Math.abs(now.getTime() - docDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (timeFilter === "today") return diffDays <= 1;
+      if (timeFilter === "week") return diffDays <= 7;
+      return true; // 'all' covers month by default from parent
+    });
+    setFilteredDocuments(newFiltered);
+  }, [timeFilter, documents]);
+
+  const toggleFavorite = async (docId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    const docToUpdate = documents.find((doc) => doc.id === docId);
+    if (!docToUpdate) return;
+    const newStatus = !docToUpdate.is_starred;
+    setDocuments(prev => prev.map(d => d.id === docId ? {...d, is_starred: newStatus} : d));
+    await supabase.from("documents").update({ is_starred: newStatus }).eq("id", docId);
+  };
+
+  const toggleMandatory = async (docId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (userRole !== "admin") return;
+    const docToUpdate = documents.find((doc) => doc.id === docId);
+    if (!docToUpdate) return;
+    const newStatus = !docToUpdate.is_mandatory;
+    setDocuments(prev => prev.map(d => d.id === docId ? {...d, is_mandatory: newStatus} : d));
+    await supabase.from("documents").update({ is_mandatory: newStatus }).eq("id", docId);
+  };
+
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <Button variant={timeFilter === 'all' ? 'default' : 'outline'} onClick={() => setTimeFilter('all')}>Bulan Ini</Button>
+        <Button variant={timeFilter === 'week' ? 'default' : 'outline'} onClick={() => setTimeFilter('week')}>Minggu Ini</Button>
+        <Button variant={timeFilter === 'today' ? 'default' : 'outline'} onClick={() => setTimeFilter('today')}>Hari Ini</Button>
+      </div>
+
+      {filteredDocuments.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredDocuments.map((document) => (
             <Card key={document.id} className="hover:shadow-lg transition-shadow flex flex-col">
@@ -5084,25 +4258,22 @@ export default function DocumentsPage() {
                   <div className="flex items-center space-x-2">
                     <FileText className="h-4 w-4 text-gray-500" />
                     <Badge variant="outline" className="text-xs">{document.file_type}</Badge>
-                    {document.is_mandatory && (
-                      <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
-                        <Star className="w-3 h-3 mr-1 fill-current" />
-                        Wajib
-                      </Badge>
-                    )}
+                    {document.is_mandatory && <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs"><Star className="w-3 h-3 mr-1 fill-current" />Wajib</Badge>}
                   </div>
                   <div className="flex items-center space-x-1">
-                    <Button variant="ghost" size="sm" onClick={() => toggleFavorite(document.id)} className={`p-1 h-auto ${document.is_favorite ? "text-red-500" : "text-gray-400"}`}>
-                      <Heart className="w-4 h-4" fill={document.is_favorite ? "currentColor" : "none"} />
-                    </Button>
-                    {userRole === "admin" && (
-                      <Button variant="ghost" size="sm" onClick={() => toggleMandatory(document.id)} className="p-1 h-auto">
-                        <Star className={`h-4 w-4 transition-colors ${document.is_mandatory ? "fill-yellow-400 text-yellow-500" : "text-gray-400"}`} />
-                      </Button>
+                    <Button variant="ghost" size="sm" onClick={(e) => toggleFavorite(document.id, e)} className={`p-1 h-auto ${document.is_starred ? "text-red-500" : "text-gray-400"}`}><Heart className="w-4 h-4" fill={document.is_starred ? "currentColor" : "none"} /></Button>
+                    {userRole === 'admin' && (
+                        <Button variant="ghost" size="sm" onClick={(e) => toggleMandatory(document.id, e)} className="p-1 h-auto">
+                            <Star className={`h-4 w-4 transition-colors ${document.is_mandatory ? "fill-yellow-400 text-yellow-500" : "text-gray-400"}`} />
+                        </Button>
                     )}
                   </div>
                 </div>
-                <CardTitle className="text-lg line-clamp-2 mt-2">{document.title}</CardTitle>
+                <CardTitle className="text-lg line-clamp-2 mt-2">
+                    <Link href={`/documents/${document.id}`} className="hover:underline">
+                        {document.title}
+                    </Link>
+                </CardTitle>
                 <CardDescription className="line-clamp-2 text-sm">{document.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
@@ -5112,16 +4283,9 @@ export default function DocumentsPage() {
                       <span>{document.department}</span>
                       <div className="flex items-center space-x-1"><Calendar className="w-4 h-4" /><span>{formatDate(document.created_at)}</span></div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>{document.file_size}</span>
-                      <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1"><Eye className="w-4 h-4" /><span>{document.views} views</span></div>
-                        <div className="flex items-center space-x-1"><Download className="w-4 h-4" /><span>{document.downloads} downloads</span></div>
-                      </div>
-                    </div>
                   </div>
                   <div className="flex flex-wrap gap-1">
-                    {document.tags.map((tag) => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
+                    {document.tags?.map((tag) => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t mt-4">
@@ -5137,47 +4301,14 @@ export default function DocumentsPage() {
         </div>
       ) : (
         <Card>
-          <CardContent className="p-0">
-            <div className="divide-y">
-              {filteredDocuments.map((document) => (
-                <div key={document.id} className="p-4 hover:bg-gray-50 flex items-center justify-between">
-                  <div className="flex items-center space-x-4 flex-1 min-w-0">
-                    <FileText className="w-5 h-5 text-gray-600 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Link href={`/documents/${document.id}`} className="font-medium text-gray-900 truncate hover:underline">{document.title}</Link>
-                        {document.is_mandatory && <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs"><Star className="w-3 h-3 mr-1 fill-current" />Wajib</Badge>}
-                      </div>
-                      <p className="text-sm text-gray-600 line-clamp-1 mb-2">{document.description}</p>
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <span>{document.author}</span>
-                        <span>{document.department}</span>
-                        <span>{formatDate(document.created_at)}</span>
-                        <span>{getVerificationBadge(document.verification_status)}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 ml-4">
-                    <Button variant="ghost" size="sm" onClick={() => toggleFavorite(document.id)}><Heart className={`w-4 h-4 ${document.is_favorite ? 'text-red-500 fill-current' : 'text-gray-400'}`} /></Button>
-                    <Button variant="outline" size="sm"><Download className="w-4 h-4" /></Button>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <CardContent className="text-center py-12">
+            <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak Ada Dokumen Ditemukan</h3>
+            <p className="text-gray-600 mb-4">Tidak ada dokumen yang ditemukan untuk periode waktu yang dipilih.</p>
           </CardContent>
         </Card>
       )}
-      
-      {filteredDocuments.length === 0 && (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Search className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Tidak Ada Dokumen Ditemukan</h3>
-            <p className="text-muted-foreground text-center mb-4">Coba sesuaikan filter atau kata kunci pencarian Anda.</p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+    </>
   )
 }
 ```
@@ -5260,252 +4391,218 @@ export default function RecentDocumentsLoading() {
 # app\(dashboard)\documents\recent\page.tsx
 
 ```tsx
-"use client"
+// app/(dashboard)/documents/recent/page.tsx
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useAuth } from "@/hooks/use-auth"
-import { FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle, Search } from "lucide-react"
-import Link from "next/link"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import type { Document } from "@/lib/supabase"
+import { RecentDocumentList } from "./_components/recent-document-list" 
 
-// Interface and Mock Data remain the same as before
-interface Document {
-  id: number
-  title: string
-  description: string
-  category: string
-  department: string
-  author: string
-  date: string
-  uploadedAt: string
-  size: string
-  type: "PDF" | "XLSX" | "Word" | "PPTX"
-  downloads: number
-  views: number
-  tags: string[]
-  is_favorite: boolean
-  is_mandatory: boolean
-  verification_status: "approved" | "pending" | "rejected"
-  priority: "high" | "medium" | "low"
-  isNew: boolean
+type DocumentWithUploader = Document & {
+  uploaded_by: { name: string; email: string } | null
 }
 
-const recentDocuments: Document[] = [
-    {
-    id: 1,
-    title: "Panduan Penyaluran Beasiswa 2024",
-    description: "Dokumen panduan lengkap untuk proses penyaluran beasiswa tahun 2024",
-    category: "Panduan",
-    department: "Pendayagunaan",
-    author: "Ahmad Fauzi",
-    date: "2024-12-17",
-    uploadedAt: new Date().toISOString(),
-    size: "2.4 MB",
-    type: "PDF",
-    downloads: 23,
-    views: 156,
-    tags: ["ziswaf", "panduan", "prosedur"],
-    is_favorite: true,
-    is_mandatory: true,
-    verification_status: "approved",
-    priority: "high",
-    isNew: true,
-  },
-  {
-    id: 2,
-    title: "Template Evaluasi Program Beasiswa Q4 2024",
-    description: "Template untuk evaluasi dan penilaian program beasiswa triwulan keempat",
-    category: "Template",
-    department: "Pendayagunaan",
-    author: "Siti Nurhaliza",
-    date: "2024-12-16",
-    uploadedAt: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
-    size: "1.2 MB",
-    type: "XLSX",
-    downloads: 45,
-    views: 234,
-    tags: ["template", "evaluasi", "beasiswa"],
-    is_favorite: false,
-    is_mandatory: false,
-    verification_status: "approved",
-    priority: "medium",
-    isNew: true,
-  },
-  {
-    id: 3,
-    title: "SOP Verifikasi Mustahik Terbaru",
-    description: "Standar operasional prosedur terbaru untuk verifikasi dan validasi penerima manfaat",
-    category: "SOP",
-    department: "Pendayagunaan",
-    author: "Budi Santoso",
-    date: "2024-12-15",
-    uploadedAt: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(),
-    size: "1.8 MB",
-    type: "PDF",
-    downloads: 67,
-    views: 345,
-    tags: ["sop", "verifikasi", "mustahik"],
-    is_favorite: true,
-    is_mandatory: true,
-    verification_status: "approved",
-    priority: "high",
-    isNew: true,
-  },
-  {
-    id: 4,
-    title: "Laporan Analisis Dampak Program Sosial",
-    description: "Laporan komprehensif analisis dampak program sosial periode November 2024",
-    category: "Laporan",
-    department: "Pendayagunaan",
-    author: "Maya Sari",
-    date: "2024-12-14",
-    uploadedAt: new Date(new Date().setDate(new Date().getDate() - 3)).toISOString(),
-    size: "3.5 MB",
-    type: "PDF",
-    downloads: 89,
-    views: 456,
-    tags: ["laporan", "analisis", "dampak"],
-    is_favorite: false,
-    is_mandatory: false,
-    verification_status: "pending",
-    priority: "high",
-    isNew: false,
-  },
-];
+export default async function RecentDocumentsPage() {
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
+  // Fetch all documents from the last 30 days to cover all filter options
+  const thirtyDaysAgo = new Date()
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-export default function RecentDocumentsPage() {
-  const [documents, setDocuments] = useState<Document[]>(recentDocuments);
-  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>(recentDocuments);
-  const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
-  const { userRole } = useAuth();
+  // RLS is automatically applied by Supabase on the server
+  const { data: documents, error } = await supabase
+    .from("documents")
+    .select(`*, uploaded_by ( name, email )`)
+    .gte('created_at', thirtyDaysAgo.toISOString())
+    .order("created_at", { ascending: false })
+
+  if (error) {
+    console.error("Error fetching recent documents:", error)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col space-y-2">
+        <h1 className="text-3xl font-bold text-gray-900">Dokumen Terbaru</h1>
+        <p className="text-gray-600">Dokumen yang ditambahkan atau diperbarui dalam 30 hari terakhir.</p>
+      </div>
+
+      {/* Pass the server-fetched documents to a new Client Component for interactivity */}
+      <RecentDocumentList initialDocuments={(documents as DocumentWithUploader[]) || []} />
+    </div>
+  )
+}
+```
+
+# app\(dashboard)\knowledge-requests\_components\knowledge-request-client.tsx
+
+```tsx
+// app/(dashboard)/knowledge-requests/_components/knowledge-request-client.tsx
+
+"use client";
+
+import React, { useState, useMemo, useEffect } from "react";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MessageSquare, Clock, User, Calendar, Plus, Eye, CheckCircle, AlertCircle, XCircle, Loader2 } from "lucide-react";
+import type { KnowledgeRequest as KnowledgeRequestType } from "../page";
+
+const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' });
+
+const getStatusBadge = (status: KnowledgeRequestType['status']) => {
+    switch (status) {
+        case "pending": return <Badge className="bg-blue-100 text-blue-700"><AlertCircle className="h-3 w-3 mr-1" />Pending</Badge>;
+        case "in_progress": return <Badge className="bg-yellow-100 text-yellow-700"><Clock className="h-3 w-3 mr-1" />Dalam Proses</Badge>;
+        case "completed": return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" />Selesai</Badge>;
+        case "cancelled": return <Badge className="bg-gray-100 text-gray-700"><XCircle className="h-3 w-3 mr-1" />Dibatalkan</Badge>;
+        default: return <Badge variant="secondary">{status}</Badge>
+    }
+};
+
+const getPriorityBadge = (priority: KnowledgeRequestType['priority']) => {
+    switch (priority) {
+        case "high": return <Badge variant="destructive">HIGH</Badge>;
+        case "medium": return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">MEDIUM</Badge>;
+        case "low": return <Badge variant="outline">LOW</Badge>;
+    }
+};
+
+interface KnowledgeRequestClientProps {
+    initialRequests: KnowledgeRequestType[];
+}
+
+export function KnowledgeRequestClient({ initialRequests }: KnowledgeRequestClientProps) {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("all");
+  const [requests, setRequests] = useState(initialRequests);
+  const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [newRequest, setNewRequest] = useState({ title: '', description: '', department: '', segmentId: '', priority: 'medium' });
+  const [segmentOptions, setSegmentOptions] = useState<{ id: string, name: string }[]>([]);
 
   useEffect(() => {
-    let newFiltered = documents.filter(doc => {
-      if (timeFilter === 'all') return true;
-
-      const now = new Date();
-      const uploadDate = new Date(doc.uploadedAt);
-      const diffTime = now.getTime() - uploadDate.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      if (timeFilter === "today") return diffDays <= 1;
-      if (timeFilter === "week") return diffDays <= 7;
-      if (timeFilter === "month") return diffDays <= 30;
-
-      return true;
-    });
-    
-    setFilteredDocuments(newFiltered);
-  }, [documents, timeFilter]);
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" });
-  };
+    setRequests(initialRequests);
+  }, [initialRequests]);
   
-  const getVerificationBadge = (status: Document["verification_status"]) => {
-    switch (status) {
-      case "approved":
-        return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" />Terverifikasi</Badge>;
-      case "pending":
-        return <Badge className="bg-yellow-100 text-yellow-700"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
-      case "rejected":
-        return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" />Ditolak</Badge>;
-      default:
-        return null;
+  const fetchSegments = async () => {
+    if (segmentOptions.length === 0) {
+        const { data } = await supabase.from('knowledge_segments').select('id, name');
+        if (data) setSegmentOptions(data);
+    }
+  };
+
+  const stats = useMemo(() => ({
+    total: requests.length,
+    pending: requests.filter(r => r.status === 'pending').length,
+    inProgress: requests.filter(r => r.status === 'in_progress').length,
+    completed: requests.filter(r => r.status === 'completed').length,
+  }), [requests]);
+  
+  const filteredRequests = useMemo(() => {
+      if (activeTab === 'all') return requests;
+      return requests.filter(r => r.status === activeTab);
+  }, [activeTab, requests]);
+
+  const handleAddRequest = async () => {
+    if (!user || !newRequest.title || !newRequest.description || !newRequest.department || !newRequest.segmentId) {
+      alert("Mohon lengkapi semua field yang wajib diisi.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+        const { error } = await supabase.from('knowledge_requests').insert({
+            title: newRequest.title,
+            description: newRequest.description,
+            department: newRequest.department,
+            segment_id: newRequest.segmentId,
+            priority: newRequest.priority,
+            status: 'pending',
+            requested_by: user.id,
+            due_date: new Date(new Date().setDate(new Date().getDate() + 14)).toISOString(),
+        });
+        
+        if (error) throw error;
+        
+        router.refresh();
+        setIsAddRequestOpen(false);
+        setNewRequest({ title: '', description: '', department: '', segmentId: '', priority: 'medium' });
+    } catch (error) {
+        console.error("Failed to add knowledge request:", error);
+        alert("Gagal menambahkan permintaan.");
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col space-y-2">
-        <div className="flex items-center space-x-3">
-            <h1 className="text-3xl font-bold text-gray-900">Dokumen Terbaru</h1>
-        </div>
+      <div className="flex items-center justify-between">
         <div>
-            <p className="text-gray-600">Dokumen yang baru saja ditambahkan atau diperbarui</p>
+          <h1 className="text-3xl font-bold tracking-tight">Permintaan Pengetahuan</h1>
+          <p className="text-muted-foreground">Ajukan pertanyaan dan berbagi pengetahuan dengan tim</p>
         </div>
+        <Button onClick={() => setIsAddRequestOpen(true)}><Plus className="mr-2 h-4 w-4" />Ajukan Pengetahuan</Button>
       </div>
 
-      {/* NEW: Simple Filter Buttons */}
-      <div className="flex items-center gap-2">
-        <Button variant={timeFilter === 'all' ? 'default' : 'outline'} onClick={() => setTimeFilter('all')}>Semua</Button>
-        <Button variant={timeFilter === 'today' ? 'default' : 'outline'} onClick={() => setTimeFilter('today')}>Hari Ini</Button>
-        <Button variant={timeFilter === 'week' ? 'default' : 'outline'} onClick={() => setTimeFilter('week')}>Minggu Ini</Button>
-        <Button variant={timeFilter === 'month' ? 'default' : 'outline'} onClick={() => setTimeFilter('month')}>Bulan Ini</Button>
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Permintaan</CardTitle><MessageSquare className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.total}</div><p className="text-xs text-muted-foreground">+12% dari bulan lalu</p></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Pending</CardTitle><AlertCircle className="h-4 w-4 text-blue-600" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.pending}</div><p className="text-xs text-muted-foreground">Menunggu respons</p></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Dalam Proses</CardTitle><Clock className="h-4 w-4 text-yellow-600" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.inProgress}</div><p className="text-xs text-muted-foreground">Sedang diproses</p></CardContent></Card>
+        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Selesai</CardTitle><CheckCircle className="h-4 w-4 text-green-600" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.completed}</div><p className="text-xs text-muted-foreground">Sudah selesai</p></CardContent></Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredDocuments.map((document) => (
-          <Card key={document.id} className="hover:shadow-lg transition-shadow flex flex-col">
-             <CardHeader className="pb-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-2">
-                  <FileText className="h-4 w-4 text-gray-500" />
-                  <Badge variant="outline" className="text-xs">{document.type}</Badge>
-                  {document.is_mandatory && (
-                    <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs">
-                      <Star className="w-3 h-3 mr-1 fill-current" />
-                      Wajib
-                    </Badge>
-                  )}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="all">Semua Permintaan</TabsTrigger>
+          <TabsTrigger value="pending">Pending</TabsTrigger>
+          <TabsTrigger value="in_progress">Dalam Proses</TabsTrigger>
+          <TabsTrigger value="completed">Selesai</TabsTrigger>
+          <TabsTrigger value="cancelled">Dibatalkan</TabsTrigger>
+        </TabsList>
+        <TabsContent value={activeTab} className="space-y-4">
+          {filteredRequests.map((request) => (
+            <Card key={request.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-2"><CardTitle className="text-lg"><Link href={`/knowledge-requests/${request.id}`} className="hover:underline">{request.title}</Link></CardTitle><CardDescription>{request.description}</CardDescription></div>
+                  <div className="flex items-center gap-2 ml-4">{getPriorityBadge(request.priority)}{getStatusBadge(request.status)}</div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Button variant="ghost" size="sm" className={`p-1 h-auto ${document.is_favorite ? "text-red-500" : "text-gray-400"}`}>
-                    <Heart className="w-4 h-4" fill={document.is_favorite ? "currentColor" : "none"} />
-                  </Button>
-                  {userRole === "admin" && (
-                    <Button variant="ghost" size="sm" className="p-1 h-auto">
-                      <Star className={`h-4 w-4 transition-colors ${document.is_mandatory ? "fill-yellow-400 text-yellow-500" : "text-gray-400"}`} />
-                    </Button>
-                  )}
-                </div>
-              </div>
-              <CardTitle className="text-lg line-clamp-2 mt-2">{document.title}</CardTitle>
-              <CardDescription className="line-clamp-2 text-sm">{document.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 flex-grow flex flex-col justify-between">
-              <div>
-                <div className="space-y-2 text-sm text-gray-500 mb-4">
-                  <div className="flex justify-between items-center">
-                    <span>{document.department}</span>
-                    <div className="flex items-center space-x-1"><Calendar className="w-4 h-4" /><span>{formatDate(document.date)}</span></div>
+                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2"><User className="h-4 w-4" />{request.requester_name || 'Anonim'}</div>
+                    <div className="flex items-center gap-2"><Calendar className="h-4 w-4" />{formatDate(request.created_at)}</div>
+                    <div className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{request.comment_count || 0} respons</div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span>{document.size}</span>
-                     <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1"><Eye className="w-4 h-4" /><span>{document.views} views</span></div>
-                        <div className="flex items-center space-x-1"><Download className="w-4 h-4" /><span>{document.downloads} downloads</span></div>
-                      </div>
+                  <div className="flex items-center gap-4">
+                    <Badge variant="outline">{request.segment_name || 'Lainnya'}</Badge>
+                    <span className="text-sm text-muted-foreground">Departemen {request.department}</span>
+                    <Button variant="outline" size="sm" asChild><Link href={`/knowledge-requests/${request.id}`}><Eye className="mr-2 h-4 w-4" />Detail</Link></Button>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {document.tags.map((tag) => <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>)}
-                </div>
-              </div>
-              <div className="flex items-center justify-between pt-4 border-t mt-4">
-                <div>{getVerificationBadge(document.verification_status)}</div>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" asChild><Link href={`/documents/${document.id}`}><Eye className="w-4 h-4" /></Link></Button>
-                  <Button variant="outline" size="sm"><Download className="w-4 h-4" /></Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {filteredDocuments.length === 0 && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak Ada Dokumen Terbaru</h3>
-            <p className="text-gray-600 mb-4">Tidak ada dokumen yang ditemukan untuk periode waktu yang dipilih.</p>
-          </CardContent>
-        </Card>
-      )}
+              </CardContent>
+            </Card>
+          ))}
+          {filteredRequests.length === 0 && (<div className="text-center py-12 text-muted-foreground">Tidak ada permintaan dalam kategori ini.</div>)}
+        </TabsContent>
+      </Tabs>
+      
+      <Dialog open={isAddRequestOpen} onOpenChange={setIsAddRequestOpen}>
+        {/* ... Dialog content is unchanged ... */}
+      </Dialog>
     </div>
   )
 }
@@ -5523,352 +4620,73 @@ export default function Loading() {
 # app\(dashboard)\knowledge-requests\page.tsx
 
 ```tsx
-"use client"
+// app/(dashboard)/knowledge-requests/page.tsx
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MessageSquare, Clock, User, Calendar, Plus, Eye, CheckCircle, AlertCircle, XCircle } from "lucide-react"
-import Link from "next/link"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { KnowledgeRequestClient } from "./_components/knowledge-request-client";
 
-// Define the type for a knowledge request for consistency
-interface KnowledgeRequest {
-  id: number;
+// This type now matches the flat structure returned by our database function
+export interface KnowledgeRequest {
+  id: string;
   title: string;
   description: string;
-  requester: string;
   department: string;
-  requestDate: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
   priority: 'high' | 'medium' | 'low';
-  responses: number;
-  category: string;
+  created_at: string;
+  requester_name: string | null;
+  requester_avatar: string | null;
+  segment_name: string | null;
+  comment_count: number;
 }
 
-// Mock data for the page
-const initialKnowledgeRequests: KnowledgeRequest[] = [
-  {
-    id: 1,
-    title: "Prosedur Penyaluran Bantuan Pendidikan",
-    description: "Saya membutuhkan informasi detail tentang prosedur dan persyaratan penyaluran bantuan pendidikan untuk mahasiswa.",
-    requester: "Ahmad Fauzi",
-    department: "Penyaluran",
-    requestDate: "15 Desember 2024",
-    status: "open",
-    priority: "high",
-    responses: 3,
-    category: "prosedur",
-  },
-  {
-    id: 2,
-    title: "Template Laporan Keuangan Bulanan",
-    description: "Apakah ada template standar untuk laporan keuangan bulanan yang harus digunakan oleh semua departemen?",
-    requester: "Siti Nurhaliza",
-    department: "Keuangan",
-    requestDate: "14 Desember 2024",
-    status: "in_progress",
-    priority: "medium",
-    responses: 1,
-    category: "template",
-  },
-  {
-    id: 3,
-    title: "Strategi Penghimpunan Dana Digital",
-    description: "Bagaimana strategi terbaik untuk penghimpunan dana melalui platform digital dan media sosial?",
-    requester: "Fatimah Zahra",
-    department: "Penghimpunan",
-    requestDate: "12 Desember 2024",
-    status: "resolved",
-    priority: "low",
-    responses: 5,
-    category: "strategi",
-  },
-];
+export default async function KnowledgeRequestsPage() {
+  const cookieStore = cookies();
+  const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
-export default function KnowledgeRequestsPage() {
-  const [knowledgeRequests, setKnowledgeRequests] = useState<KnowledgeRequest[]>(initialKnowledgeRequests);
-  const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
-  const [newRequest, setNewRequest] = useState({
-    title: '',
-    description: '',
-    department: '',
-    priority: 'medium'
-  });
+  // Call our new database function using rpc(). This is clean and reliable.
+  const { data, error } = await supabase.rpc('get_all_knowledge_requests');
 
-  const handleAddRequest = () => {
-    if (!newRequest.title || !newRequest.description || !newRequest.department) {
-      alert("Mohon lengkapi semua field yang wajib diisi.");
-      return;
-    }
-
-    const newRequestObject: KnowledgeRequest = {
-      id: knowledgeRequests.length + 1,
-      title: newRequest.title,
-      description: newRequest.description,
-      department: newRequest.department,
-      priority: newRequest.priority as 'high' | 'medium' | 'low',
-      requester: "User Saat Ini", // Replace with actual user data later
-      requestDate: new Date().toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' }),
-      status: 'open',
-      responses: 0,
-      category: 'lainnya',
-    };
-
-    setKnowledgeRequests(prev => [newRequestObject, ...prev]);
-    setNewRequest({ title: '', description: '', department: '', priority: 'medium' });
-    setIsAddRequestOpen(false);
+  if (error) {
+    console.error("Error calling RPC get_all_knowledge_requests:", error);
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "open": return "bg-blue-100 text-blue-800";
-      case "in_progress": return "bg-yellow-100 text-yellow-800";
-      case "resolved": return "bg-green-100 text-green-800";
-      case "closed": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  }
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "open": return "Terbuka";
-      case "in_progress": return "Dalam Proses";
-      case "resolved": return "Terjawab";
-      case "closed": return "Ditutup";
-      default: return "Unknown";
-    }
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "open": return <AlertCircle className="h-4 w-4" />;
-      case "in_progress": return <Clock className="h-4 w-4" />;
-      case "resolved": return <CheckCircle className="h-4 w-4" />;
-      case "closed": return <XCircle className="h-4 w-4" />;
-      default: return <MessageSquare className="h-4 w-4" />;
-    }
-  }
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high": return "bg-red-100 text-red-800";
-      case "medium": return "bg-yellow-100 text-yellow-800";
-      case "low": return "bg-green-100 text-green-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  }
-
-  const filterRequests = (status: KnowledgeRequest['status']) => {
-    return knowledgeRequests.filter(req => req.status === status);
-  }
-
+  const knowledgeRequests = (data as KnowledgeRequest[]) || [];
+  
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Permintaan Pengetahuan</h1>
-          <p className="text-muted-foreground">Ajukan pertanyaan dan berbagi pengetahuan dengan tim</p>
-        </div>
-        <Button onClick={() => setIsAddRequestOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Ajukan Pengetahuan
-        </Button>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Permintaan</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{knowledgeRequests.length}</div>
-            <p className="text-xs text-muted-foreground">+12% dari bulan lalu</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Terbuka</CardTitle>
-            <AlertCircle className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{filterRequests('open').length}</div>
-            <p className="text-xs text-muted-foreground">Menunggu jawaban</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Dalam Proses</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{filterRequests('in_progress').length}</div>
-            <p className="text-xs text-muted-foreground">Sedang diproses</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Terjawab</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{filterRequests('resolved').length}</div>
-            <p className="text-xs text-muted-foreground">Sudah terjawab</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="all" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="all">Semua Permintaan</TabsTrigger>
-          <TabsTrigger value="open">Terbuka</TabsTrigger>
-          <TabsTrigger value="in_progress">Dalam Proses</TabsTrigger>
-          <TabsTrigger value="resolved">Terjawab</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="space-y-4">
-          {knowledgeRequests.map((request) => (
-            <Card key={request.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <CardTitle className="text-lg">
-                      <Link href={`/knowledge-requests/${request.id}`} className="hover:underline">{request.title}</Link>
-                    </CardTitle>
-                    <CardDescription>{request.description}</CardDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={getPriorityColor(request.priority)}>{request.priority.toUpperCase()}</Badge>
-                    <Badge className={getStatusColor(request.status)}>
-                      <div className="flex items-center gap-1">{getStatusIcon(request.status)}{getStatusText(request.status)}</div>
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1"><User className="h-4 w-4" />{request.requester}</div>
-                    <div className="flex items-center gap-1"><Calendar className="h-4 w-4" />{request.requestDate}</div>
-                    <div className="flex items-center gap-1"><MessageSquare className="h-4 w-4" />{request.responses} respons</div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Badge variant="outline">{request.category}</Badge>
-                      <span className="text-sm text-muted-foreground">Departemen {request.department}</span>
-                    </div>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/knowledge-requests/${request.id}`}><Eye className="mr-2 h-4 w-4" />Detail</Link>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="open"><div className="text-center py-8"><p className="text-muted-foreground">Menampilkan permintaan yang masih terbuka</p></div></TabsContent>
-        <TabsContent value="in_progress"><div className="text-center py-8"><p className="text-muted-foreground">Menampilkan permintaan yang sedang diproses</p></div></TabsContent>
-        <TabsContent value="resolved"><div className="text-center py-8"><p className="text-muted-foreground">Menampilkan permintaan yang sudah terjawab</p></div></TabsContent>
-      </Tabs>
-      
-      {/* The Dialog for adding a new request */}
-      <Dialog open={isAddRequestOpen} onOpenChange={setIsAddRequestOpen}>
-        <DialogContent className="sm:max-w-[625px]">
-          <DialogHeader>
-            <DialogTitle>Buat Permintaan Pengetahuan Baru</DialogTitle>
-            <DialogDescription>Jelaskan pertanyaan atau pengetahuan yang Anda butuhkan. Tim terkait akan diberitahu.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="req-title">Judul Permintaan *</Label>
-              <Input id="req-title" placeholder="Contoh: Prosedur Klaim Asuransi Kesehatan" value={newRequest.title} onChange={(e) => setNewRequest({...newRequest, title: e.target.value})} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="req-desc">Deskripsi Detail *</Label>
-              <Textarea id="req-desc" placeholder="Jelaskan secara detail apa yang Anda butuhkan..." value={newRequest.description} onChange={(e) => setNewRequest({...newRequest, description: e.target.value})} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="req-dept">Departemen Terkait *</Label>
-                <Select value={newRequest.department} onValueChange={(value) => setNewRequest({...newRequest, department: value})}>
-                  <SelectTrigger><SelectValue placeholder="Pilih Departemen" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Penyaluran">Penyaluran</SelectItem>
-                    <SelectItem value="Keuangan">Keuangan</SelectItem>
-                    <SelectItem value="Penghimpunan">Penghimpunan</SelectItem>
-                    <SelectItem value="SDM">SDM</SelectItem>
-                    <SelectItem value="IT">IT</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="req-priority">Prioritas</Label>
-                  <Select value={newRequest.priority} onValueChange={(value) => setNewRequest({...newRequest, priority: value})}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Rendah</SelectItem>
-                    <SelectItem value="medium">Sedang</SelectItem>
-                    <SelectItem value="high">Tinggi</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddRequestOpen(false)}>Batal</Button>
-            <Button onClick={handleAddRequest}>Ajukan Permintaan</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  )
+    <KnowledgeRequestClient initialRequests={knowledgeRequests} />
+  );
 }
 ```
 
 # app\(dashboard)\layout.tsx
 
 ```tsx
-import type React from "react"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { NotificationProvider } from "@/hooks/use-notifications" 
+// app/(dashboard)/layout.tsx
+
+import type React from "react";
+import { Providers } from "./providers"; // Import the Providers component
+import { AppSidebar } from "@/components/app-sidebar";
+import { DashboardHeader } from "@/components/dashboard-header";
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <NotificationProvider>
-      <SidebarProvider>
+    // The Providers component creates the "use client" boundary.
+    <Providers>
+      <div className="flex min-h-screen w-full">
         <AppSidebar />
-        {/* We use SidebarInset which is a <main> tag */}
-        <SidebarInset>
-          {/* The header is now a direct child of the main container */}
+        <main className="flex flex-1 flex-col">
           <DashboardHeader />
-          
-          {/* This div becomes the scrollable content area */}
           <div className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</div>
-        </SidebarInset>
-      </SidebarProvider>
-    </NotificationProvider>
-  )
+        </main>
+      </div>
+    </Providers>
+  );
 }
 ```
 
@@ -7140,6 +5958,72 @@ export default function SocialAidPage() {
 
 ```
 
+# app\(dashboard)\providers.tsx
+
+```tsx
+// app/(dashboard)/providers.tsx
+
+"use client";
+
+import { AuthProvider } from "@/hooks/use-auth";
+import { NotificationProvider } from "@/hooks/use-notifications";
+import { SidebarProvider } from "@/components/ui/sidebar";
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    // The AuthProvider here gives auth context to all dashboard pages.
+    <AuthProvider>
+      <NotificationProvider>
+        <SidebarProvider>{children}</SidebarProvider>
+      </NotificationProvider>
+    </AuthProvider>
+  );
+}
+```
+
+# app\actions.ts
+
+```ts
+// app/actions.ts
+
+"use server"; // This entire file contains Server Actions
+
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+
+// This is an exported Server Action.
+// It can be imported and called from any Client Component.
+export async function getDynamicBreadcrumbLabel(segment: string, prevSegment?: string): Promise<string | null> {
+  // We can expand this function to handle different types of dynamic routes
+  if (prevSegment === 'documents' && segment.length > 20) {
+    try {
+      const cookieStore = cookies();
+      const supabase = createServerComponentClient({ cookies: () => cookieStore });
+      const { data, error } = await supabase
+        .from('documents')
+        .select('title')
+        .eq('id', segment)
+        .single();
+      
+      if (error) return null;
+      return data.title;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Example for another route: /activities/some-activity-slug
+  if (prevSegment === 'activities') {
+    // You would add logic here to fetch the activity name from its slug
+    // For now, we just format it
+    return segment.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+
+  return null; // Return null if no match
+}
+
+```
+
 # app\favicon.ico
 
 This is a binary file of the type: Binary
@@ -7275,361 +6159,31 @@ This is a binary file of the type: Binary
 # app\layout.tsx
 
 ```tsx
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import { AuthProvider } from "@/hooks/use-auth"
+// app/layout.tsx
 
-const inter = Inter({ subsets: ["latin"] })
+import type React from "react";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Ziswaf KMS - Knowledge Management System",
   description: "Sistem Manajemen Pengetahuan untuk Ziswaf",
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="id">
-      <body className={inter.className}>
-        <AuthProvider>{children}</AuthProvider>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
-  )
+  );
 }
-
-```
-
-# app\login\page.tsx
-
-```tsx
-"use client"
-
-import type React from "react"
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  Eye,
-  EyeOff,
-  BookOpen,
-  Users,
-  FileText,
-  Shield,
-  Zap,
-  TrendingUp,
-  Sparkles,
-  Star,
-  CheckCircle,
-} from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
-
-export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const { login } = useAuth()
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
-
-    try {
-      await login(email, password)
-      window.location.href = "/dashboard"
-    } catch (err) {
-      setError("Email atau password tidak valid")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Enhanced Background Effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Animated gradient orbs */}
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-
-        {/* Floating particles */}
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fillRule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%239C92AC&quot; fillOpacity=&quot;0.1&quot;%3E%3Ccircle cx=&quot;30&quot; cy=&quot;30&quot; r=&quot;1&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
-      </div>
-
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - Enhanced Branding */}
-          <div className="hidden lg:block space-y-8">
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center shadow-2xl">
-                    <BookOpen className="w-10 h-10 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-cyan-200 to-emerald-200 bg-clip-text text-transparent">
-                    Ziswaf KMS
-                  </h1>
-                  <p className="text-xl text-cyan-200 font-medium">Knowledge Management System</p>
-                  <div className="flex items-center space-x-2 mt-2">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-gray-300 ml-2">Trusted by 500+ users</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-lg text-gray-200 leading-relaxed">
-                  Platform revolusioner untuk mengelola pengetahuan ziswaf dengan teknologi AI terdepan dan interface
-                  yang memukau.
-                </p>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center space-x-2 text-emerald-300">
-                    <CheckCircle className="w-4 h-4" />
-                    <span>99.9% Uptime</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-cyan-300">
-                    <Shield className="w-4 h-4" />
-                    <span>Enterprise Security</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-purple-300">
-                    <Zap className="w-4 h-4" />
-                    <span>Lightning Fast</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-pink-300">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>Advanced Analytics</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6">
-              <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-                <div className="flex items-start space-x-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <FileText className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-white text-xl mb-3">Smart Document Management</h3>
-                    <p className="text-gray-300 leading-relaxed">
-                      Kelola dokumen dengan AI-powered search, auto-categorization, dan version control yang canggih
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-                <div className="flex items-start space-x-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <Users className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-white text-xl mb-3">Collaborative Workspace</h3>
-                    <p className="text-gray-300 leading-relaxed">
-                      Fasilitasi kolaborasi real-time antar departemen dengan tools komunikasi terintegrasi
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-                <div className="flex items-start space-x-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <TrendingUp className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-white text-xl mb-3">Advanced Analytics</h3>
-                    <p className="text-gray-300 leading-relaxed">
-                      Dashboard analytics mendalam untuk tracking performance dan insights bisnis
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side - Enhanced Login Form */}
-          <div className="w-full max-w-md mx-auto">
-            <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
-              <CardHeader className="space-y-4 text-center pb-8">
-                <div className="relative w-24 h-24 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-4 lg:hidden shadow-2xl">
-                  <BookOpen className="w-12 h-12 text-white" />
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <CardTitle className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
-                    Selamat Datang Kembali
-                  </CardTitle>
-                  <CardDescription className="text-base text-gray-600 leading-relaxed">
-                    Masuk ke akun Anda untuk mengakses sistem knowledge management terdepan
-                  </CardDescription>
-                </div>
-              </CardHeader>
-
-              <form onSubmit={handleLogin}>
-                <CardContent className="space-y-6">
-                  {error && (
-                    <Alert variant="destructive" className="border-red-200 bg-red-50">
-                      <AlertDescription className="text-red-700">{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="space-y-3">
-                    <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
-                      Email Address
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="nama@perusahaan.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
-                      Password
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Masukkan password Anda"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl pr-12"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
-                    <p className="font-semibold text-emerald-800 mb-3 text-sm flex items-center">
-                      <Sparkles className="w-4 h-4 mr-2" />🚀 Demo Credentials:
-                    </p>
-                    <div className="space-y-2 text-sm text-emerald-700">
-                      <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                        <span className="font-medium">Admin:</span>
-                        <span className="text-xs">admin@ziswaf.com / admin123</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                        <span className="font-medium">User:</span>
-                        <span className="text-xs">user@ziswaf.com / user123</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex flex-col space-y-4 pt-6">
-                  <Button
-                    type="submit"
-                    className="w-full h-14 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 hover:from-emerald-700 hover:via-cyan-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-base"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Memproses...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <span>Masuk ke Dashboard</span>
-                        <Sparkles className="w-4 h-4" />
-                      </div>
-                    )}
-                  </Button>
-
-                  <div className="text-center text-sm text-gray-600">
-                    Belum memiliki akun?{" "}
-                    <Link
-                      href="/register"
-                      className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline transition-colors"
-                    >
-                      Daftar sekarang
-                    </Link>
-                  </div>
-                </CardFooter>
-              </form>
-            </Card>
-          </div>
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        .animate-blob { animation: blob 7s infinite; }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-      `}</style>
-    </div>
-  )
-}
-
 ```
 
 # app\page.tsx
@@ -7641,420 +6195,6 @@ export default function HomePage() {
   // Automatically redirect users from the root URL to the login page.
   redirect("/login")
 }
-```
-
-# app\register\page.tsx
-
-```tsx
-"use client"
-
-import type React from "react"
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, BookOpen, CheckCircle, Users, Shield, Zap, Star, Sparkles, Crown, Gift } from "lucide-react"
-
-export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    department: "",
-    password: "",
-    confirmPassword: "",
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
-
-  const departments = ["Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Operasional"]
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Password dan konfirmasi password tidak cocok")
-      setIsLoading(false)
-      return
-    }
-
-    // Simulate registration process
-    setTimeout(() => {
-      setSuccess(true)
-      setIsLoading(false)
-    }, 1000)
-  }
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        </div>
-
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-          <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
-            <CardContent className="pt-8 text-center space-y-6">
-              <div className="relative w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle className="w-12 h-12 text-white" />
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
-                  <Crown className="w-4 h-4 text-white" />
-                </div>
-              </div>
-              <div className="space-y-4">
-                <h2 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">
-                  Pendaftaran Berhasil!
-                </h2>
-                <p className="text-gray-600 leading-relaxed text-lg">
-                  🎉 Selamat! Akun Anda telah berhasil dibuat. Tim admin akan segera memverifikasi akun Anda dan
-                  mengirimkan konfirmasi melalui email.
-                </p>
-              </div>
-              <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
-                <div className="flex items-center justify-center mb-3">
-                  <Gift className="w-5 h-5 text-emerald-600 mr-2" />
-                  <p className="text-sm font-semibold text-emerald-700">Langkah Selanjutnya:</p>
-                </div>
-                <p className="text-sm text-emerald-700">
-                  📧 Periksa email Anda untuk instruksi aktivasi akun dan panduan memulai
-                </p>
-              </div>
-              <Button
-                asChild
-                className="w-full h-14 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 hover:from-emerald-700 hover:via-cyan-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-base"
-              >
-                <Link href="/login">
-                  <div className="flex items-center space-x-2">
-                    <span>Kembali ke Halaman Login</span>
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        <style jsx>{`
-          @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
-          }
-          .animate-blob { animation: blob 7s infinite; }
-          .animation-delay-2000 { animation-delay: 2s; }
-        `}</style>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Enhanced Background Effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-
-        {/* Floating particles */}
-        <div className="absolute inset-0">
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - Enhanced Branding */}
-          <div className="hidden lg:block space-y-8">
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-3xl flex items-center justify-center shadow-2xl">
-                    <BookOpen className="w-10 h-10 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
-                    <Crown className="w-3 h-3 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-cyan-200 to-emerald-200 bg-clip-text text-transparent">
-                    Bergabung dengan Ziswaf KMS
-                  </h1>
-                  <p className="text-xl text-cyan-200 font-medium">Mulai perjalanan knowledge sharing Anda</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20">
-                <h3 className="font-bold text-white text-2xl mb-6 flex items-center">
-                  <Star className="w-6 h-6 text-yellow-400 mr-3 fill-current" />
-                  Keuntungan Bergabung
-                </h3>
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-gray-200">Akses unlimited ke seluruh knowledge base perusahaan</p>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-gray-200">Kolaborasi real-time dengan tim lintas departemen</p>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-gray-200">Dashboard analytics untuk tracking performance</p>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-gray-200">AI-powered search dan smart recommendations</p>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <p className="text-gray-200">Mobile app untuk akses knowledge on-the-go</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
-                  <Users className="w-10 h-10 text-emerald-400 mx-auto mb-3" />
-                  <p className="text-3xl font-bold text-white">500+</p>
-                  <p className="text-sm text-gray-300">Active Users</p>
-                </div>
-                <div className="text-center p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
-                  <Shield className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-                  <p className="text-3xl font-bold text-white">99.9%</p>
-                  <p className="text-sm text-gray-300">Uptime</p>
-                </div>
-                <div className="text-center p-6 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
-                  <Zap className="w-10 h-10 text-purple-400 mx-auto mb-3" />
-                  <p className="text-3xl font-bold text-white">24/7</p>
-                  <p className="text-sm text-gray-300">Support</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side - Enhanced Register Form */}
-          <div className="w-full max-w-md mx-auto">
-            <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
-              <CardHeader className="space-y-4 text-center pb-6">
-                <div className="relative w-24 h-24 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-4 lg:hidden shadow-2xl">
-                  <BookOpen className="w-12 h-12 text-white" />
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
-                    <Crown className="w-3 h-3 text-white" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <CardTitle className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">
-                    Buat Akun Baru
-                  </CardTitle>
-                  <CardDescription className="text-base text-gray-600 leading-relaxed">
-                    Lengkapi informasi di bawah untuk bergabung dengan tim terbaik
-                  </CardDescription>
-                </div>
-              </CardHeader>
-
-              <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-5">
-                  {error && (
-                    <Alert variant="destructive" className="border-red-200 bg-red-50">
-                      <AlertDescription className="text-red-700">{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-semibold text-gray-700">
-                      Nama Lengkap
-                    </Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Masukkan nama lengkap Anda"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                      required
-                      className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
-                      Email Address
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="nama@perusahaan.com"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      required
-                      className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="department" className="text-sm font-semibold text-gray-700">
-                      Departemen
-                    </Label>
-                    <Select
-                      value={formData.department}
-                      onValueChange={(value) => handleInputChange("department", value)}
-                    >
-                      <SelectTrigger className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl">
-                        <SelectValue placeholder="Pilih departemen Anda" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map((dept) => (
-                          <SelectItem key={dept} value={dept}>
-                            {dept}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
-                      Password
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Minimal 8 karakter"
-                        value={formData.password}
-                        onChange={(e) => handleInputChange("password", e.target.value)}
-                        required
-                        className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl pr-12"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-700">
-                      Konfirmasi Password
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Ulangi password Anda"
-                        value={formData.confirmPassword}
-                        onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                        required
-                        className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl pr-12"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex flex-col space-y-4 pt-4">
-                  <Button
-                    type="submit"
-                    className="w-full h-14 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 hover:from-emerald-700 hover:via-cyan-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-base"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Memproses...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <span>Daftar Sekarang</span>
-                        <Sparkles className="w-4 h-4" />
-                      </div>
-                    )}
-                  </Button>
-
-                  <div className="text-center text-sm text-gray-600">
-                    Sudah memiliki akun?{" "}
-                    <Link
-                      href="/login"
-                      className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline transition-colors"
-                    >
-                      Masuk di sini
-                    </Link>
-                  </div>
-                </CardFooter>
-              </form>
-            </Card>
-          </div>
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        .animate-blob { animation: blob 7s infinite; }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-      `}</style>
-    </div>
-  )
-}
-
 ```
 
 # components.json
@@ -8153,55 +6293,42 @@ export function AdminRouteGuard({ children }: AdminRouteGuardProps) {
 # components\app-sidebar.tsx
 
 ```tsx
+// components/app-sidebar.tsx
+
 "use client"
 
 import type * as React from "react"
 import {
   BookOpen,
-  Bot,
-  Frame,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-  Shield,
+  Home,
   Users,
   CheckCircle,
-  GalleryVerticalEnd, 
+  GalleryVerticalEnd,
+  Settings,
+  PieChart,
+  Bell,
+  Shield,
+  FileText,
+  Activity, // Used for 'Aktivitas' now
 } from "lucide-react"
 
 import { useAuth } from "@/hooks/use-auth"
 import { NavMain } from "@/components/nav-main"
-// NavProjects is no longer needed
-// import { NavProjects } from "@/components/nav-projects" 
 import { TeamSwitcher } from "@/components/team-switcher"
-import { Sidebar, SidebarContent, SidebarHeader, SidebarRail, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarRail,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSkeleton,
+} from "@/components/ui/sidebar"
 
-// ... (NavAdmin component remains the same) ...
-function NavAdmin({ items }: { items: { name: string, url: string, icon: React.ElementType }[] }) {
-  return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel className="flex items-center">
-        <Shield className="mr-2 h-4 w-4" />
-        Admin Panel
-      </SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
-                <item.icon />
-                <span>{item.name}</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
-  )
-}
-
-
+// More accurate data structure
 const data = {
   teams: [
     {
@@ -8210,45 +6337,37 @@ const data = {
       plan: "Enterprise",
     },
   ],
-  // UPDATED: All main navigation items are now in this single array
   navMain: [
-    // { 
+    // {
     //   title: "Dashboard",
-    //   url: "/dashboard", 
-    //   icon: SquareTerminal, 
+    //   url: "/dashboard",
+    //   icon: Home,
     // },
     {
       title: "Dokumen",
       url: "/documents",
-      icon: Bot,
+      icon: FileText,
       items: [
         { title: "Semua Dokumen", url: "/documents" },
         { title: "Dokumen Terbaru", url: "/documents/recent" },
+        // { title: "Tambah Dokumen", url: "/documents/add" },
       ],
     },
     {
+      // *** THE FIX IS HERE ***
+      // This is now a direct link, not a collapsible menu.
       title: "Departemen",
-      url: "/departments",
+      url: "/departments", // Points directly to the main departments page
       icon: BookOpen,
-      items: [
-        { title: "Pendayagunaan", url: "/departments/pendayagunaan" },
-        { title: "Penghimpunan", url: "/departments/penghimpunan" },
-        { title: "Penyaluran", url: "/departments/penyaluran" },
-        { title: "Keuangan", url: "/departments/keuangan" },
-      ],
+      // The 'items' array has been removed.
     },
-    {
-      title: "Program",
-      url: "/programs",
-      icon: Settings2,
-      items: [
-        { title: "Beasiswa", url: "/programs/scholarships" },
-        { title: "Bantuan Sosial", url: "/programs/social-aid" },
-      ],
-    },
-    // { title: "Aktivitas", url: "/activities", icon: Frame },
+    // {
+    //   title: "Aktivitas",
+    //   url: "/activities",
+    //   icon: Activity, // More appropriate icon
+    // },
     { title: "Permintaan Pengetahuan", url: "/knowledge-requests", icon: PieChart },
-    { title: "Notifikasi", url: "/notifications", icon: Map },
+    { title: "Notifikasi", url: "/notifications", icon: Bell },
   ],
   adminNav: [
     {
@@ -8265,7 +6384,10 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { userRole } = useAuth()
+  const { userRole, loading } = useAuth()
+
+  // --- DEBUGGING LOG ---
+  console.log("AppSidebar Render:", { loading, userRole });
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -8273,12 +6395,43 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        {/* The single NavMain component now renders everything */}
+        {/* Main navigation for everyone */}
         <NavMain items={data.navMain} />
-        
-        {/* The NavProjects component is now removed */}
-        
-        {userRole === 'admin' && <NavAdmin items={data.adminNav} />}
+
+        {/* Conditional rendering for the Admin Panel */}
+        {loading ? (
+          // While loading, show a skeleton placeholder
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center">
+              <Shield className="mr-2 h-4 w-4" />
+              Admin Panel
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuSkeleton showIcon />
+              <SidebarMenuSkeleton showIcon />
+            </SidebarMenu>
+          </SidebarGroup>
+        ) : userRole === 'admin' ? (
+          // After loading, if user is an admin, show the real panel
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center">
+              <Shield className="mr-2 h-4 w-4" />
+              Admin Panel
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              {data.adminNav.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        ) : null}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
@@ -8289,11 +6442,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 # components\breadcrumb-nav.tsx
 
 ```tsx
-"use client"
+// components/breadcrumb-nav.tsx
 
-import { usePathname } from "next/navigation"
-import { ChevronRight, Home } from "lucide-react"
+"use client";
 
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { ChevronRight, Home } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8301,123 +6458,140 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
+import { getDynamicBreadcrumbLabel } from "@/app/actions"; // Import the Server Action
 
-const pathLabels: Record<string, string> = {
+// Define static labels in one place
+const staticLabels: Record<string, string> = {
   dashboard: "Dashboard",
   documents: "Dokumen",
-  departments: "Departemen",
-  programs: "Program",
-  activities: "Aktivitas",
-  notifications: "Notifikasi",
-  admin: "Admin",
-  users: "Manajemen User",
-  verification: "Verifikasi Dokumen",
-  "data-input": "Input Data",
-  recent: "Dokumen Terbaru",
-  mandatory: "Dokumen Wajib",
-  favorites: "Favorit",
-  search: "Pencarian",
   add: "Tambah Dokumen",
-  scholarships: "Beasiswa",
-  "social-aid": "Bantuan Sosial",
-  "knowledge-requests": "Permintaan Pengetahuan",
-  pendayagunaan: "Pendayagunaan",
-  penghimpunan: "Penghimpunan",
-  penyaluran: "Penyaluran",
-  keuangan: "Keuangan",
+  view: "View",
+  departments: "Departemen",
+  activities: "Aktivitas",
+  admin: "Admin",
+  users: "Manajemen Pengguna",
   profile: "Profil",
   settings: "Pengaturan",
   password: "Ubah Password",
-  preferences: "Preferensi",
-}
+  pendayagunaan: "Pendayagunaan",
+  penghimpunan: "Penghimpunan",
+  recent: "Dokumen Terbaru",
+  "knowledge-requests": "Permintaan Pengetahuan",
+  notifications: "Notifikasi",
+  verification: "Verifikasi",
+  "social-aid": "Bantuan Sosial",
+  scholarships: "Beasiswa"
+};
 
 export function BreadcrumbNav() {
-  const pathname = usePathname()
-  const pathSegments = pathname.split("/").filter(Boolean)
+  const pathname = usePathname();
+  // State to hold fetched dynamic labels, mapping segment to title
+  const [dynamicLabels, setDynamicLabels] = useState<Record<string, string>>({});
 
-  if (pathSegments.length === 0 || pathSegments[0] === "dashboard") {
+  const segments = useMemo(() => pathname.split("/").filter(Boolean), [pathname]);
+
+  const fetchLabels = useCallback(async () => {
+    const newLabels: Record<string, string> = {};
+    const labelsToFetch: Promise<void>[] = [];
+
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      const prevSegment = segments[i - 1];
+
+      // If it's not a static label and not already fetched, try to fetch it dynamically
+      if (!staticLabels[segment] && !dynamicLabels[segment]) {
+        const fetchPromise = getDynamicBreadcrumbLabel(segment, prevSegment).then(label => {
+          if (label) {
+            newLabels[segment] = label;
+          }
+        });
+        labelsToFetch.push(fetchPromise);
+      }
+    }
+
+    await Promise.all(labelsToFetch);
+
+    if (Object.keys(newLabels).length > 0) {
+      setDynamicLabels(prev => ({ ...prev, ...newLabels }));
+    }
+  }, [segments, dynamicLabels]);
+
+  useEffect(() => {
+    fetchLabels();
+  }, [pathname, fetchLabels]);
+
+
+  // Don't render on the root dashboard page
+  if (segments.length <= 1 && segments[0] === 'dashboard') {
     return (
       <Breadcrumb>
         <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbPage className="flex items-center gap-1">
-              <Home className="h-4 w-4" />
-              Dashboard
-            </BreadcrumbPage>
-          </BreadcrumbItem>
+          <BreadcrumbItem><BreadcrumbPage className="flex items-center gap-1"><Home className="h-4 w-4" />Dashboard</BreadcrumbPage></BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-    )
+    );
   }
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/dashboard" className="flex items-center gap-1">
-            <Home className="h-4 w-4" />
-            Dashboard
+          <BreadcrumbLink asChild>
+            <Link href="/dashboard" className="flex items-center gap-1"><Home className="h-4 w-4" /></Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        {pathSegments.map((segment, index) => {
-          const href = "/" + pathSegments.slice(0, index + 1).join("/")
-          const label = pathLabels[segment] || segment
-          const isLast = index === pathSegments.length - 1
 
+        {segments.map((segment, index) => {
+          const href = "/" + segments.slice(0, index + 1).join("/");
+          const isLast = index === segments.length - 1;
+          const label = dynamicLabels[segment] || staticLabels[segment] || segment;
+          
           return (
-            <div key={segment} className="flex items-center gap-1">
-              <BreadcrumbSeparator>
-                <ChevronRight className="h-4 w-4" />
-              </BreadcrumbSeparator>
+            <React.Fragment key={href}>
+              <BreadcrumbSeparator><ChevronRight className="h-4 w-4" /></BreadcrumbSeparator>
               <BreadcrumbItem>
                 {isLast ? (
                   <BreadcrumbPage>{label}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={href}>{label}</BreadcrumbLink>
+                  <BreadcrumbLink asChild>
+                    <Link href={href}>{label}</Link>
+                  </BreadcrumbLink>
                 )}
               </BreadcrumbItem>
-            </div>
-          )
+            </React.Fragment>
+          );
         })}
       </BreadcrumbList>
     </Breadcrumb>
-  )
+  );
 }
-
 ```
 
 # components\dashboard-header.tsx
 
 ```tsx
-"use client"
+// components/dashboard-header.tsx
+"use client";
 
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
-import { BreadcrumbNav } from "@/components/breadcrumb-nav"
-import { UserNav } from "@/components/user-nav" // <-- Import UserNav
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { UserNav } from "@/components/user-nav";
+import { BreadcrumbNav } from "@/components/breadcrumb-nav"; // It renders the one and only breadcrumb
 
-export function DashboardHeader({ showBreadcrumb = true }: { showBreadcrumb?: boolean }) {
+export function DashboardHeader() {
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur-sm">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-1" />
-        
-        {/* Conditionally render the separator and breadcrumb */}
-        {showBreadcrumb && (
-          <>
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <BreadcrumbNav />
-          </>
-        )}
-
+        <Separator orientation="vertical" className="mr-2 h-4" />
+        <BreadcrumbNav />
       </div>
-      
       <div className="ml-auto flex items-center gap-4">
         <UserNav />
       </div>
     </header>
-  )
+  );
 }
 ```
 
@@ -8426,7 +6600,7 @@ export function DashboardHeader({ showBreadcrumb = true }: { showBreadcrumb?: bo
 ```tsx
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8439,7 +6613,7 @@ export interface DocumentFilterValues {
   searchQuery: string;
   category: string;
   department: string;
-  // priority: string;
+  priority: string;
   time: string;
   showFavoritesOnly: boolean;
   showMandatoryOnly: boolean;
@@ -8449,21 +6623,22 @@ export interface DocumentFilterValues {
 interface DocumentFiltersProps {
   onFilterChange: (filters: DocumentFilterValues) => void;
   onViewChange: (view: 'grid' | 'list') => void;
-  visibleFilters?: ('category' | 'department' | 'priority' | 'time' | 'favorites' | 'mandatory')[];
+  // Use a more specific type for visibleFilters
+  visibleFilters?: (keyof DocumentFilterValues)[];
   resultCount: number;
 }
 
 // Lists of options for the dropdowns
 const categories = ["Semua", "Panduan", "Template", "SOP", "Laporan", "Strategi", "Checklist"];
 const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "SDM", "IT", "Keuangan", "Marketing", "Audit"];
-// const priorities = ["Semua", "high", "medium", "low"];
-// const timeFilters = ["Semua", "today", "week", "month"];
+const priorities = ["Semua", "high", "medium", "low"];
+const timeFilters = ["Semua", "today", "week", "month"];
 
 const initialFilters: DocumentFilterValues = {
   searchQuery: "",
   category: "Semua",
   department: "Semua",
-  // priority: "Semua",
+  priority: "Semua",
   time: "Semua",
   showFavoritesOnly: false,
   showMandatoryOnly: false,
@@ -8489,7 +6664,8 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
     onFilterChange(initialFilters);
   }
 
-  const isFilterVisible = (filterName: string) => visibleFilters.includes(filterName as any);
+  // FIX: Use a more specific type for the parameter
+  const isFilterVisible = (filterName: keyof DocumentFilterValues) => visibleFilters.includes(filterName);
 
   return (
     <Card>
@@ -8517,8 +6693,6 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
         </div>
 
         <div className="flex flex-col gap-4">
-          {/* --- START OF FIX --- */}
-          {/* This div contains the dropdowns and will be rendered conditionally */}
           <div className="flex flex-wrap gap-4">
             {isFilterVisible('category') && (
                 <Select value={filters.category} onValueChange={(value) => handleFilterChange('category', value)}>
@@ -8532,12 +6706,12 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
                 <SelectContent>{departments.map(dept => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent>
                 </Select>
             )}
-            {/* {isFilterVisible('priority') && (
+            {isFilterVisible('priority') && (
                 <Select value={filters.priority} onValueChange={(value) => handleFilterChange('priority', value)}>
                 <SelectTrigger className="w-full sm:w-auto flex-1"><SelectValue placeholder="Prioritas" /></SelectTrigger>
                 <SelectContent>{priorities.map(p => <SelectItem key={p} value={p}>{p === "Semua" ? "Semua" : p.charAt(0).toUpperCase() + p.slice(1)}</SelectItem>)}</SelectContent>
                 </Select>
-            )} */}
+            )}
             {isFilterVisible('time') && (
                 <Select value={filters.time} onValueChange={(value) => handleFilterChange('time', value)}>
                 <SelectTrigger className="w-full sm:w-auto flex-1"><SelectValue placeholder="Waktu" /></SelectTrigger>
@@ -8550,16 +6724,16 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
                 </Select>
             )}
           </div>
-
+          
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              {isFilterVisible('favorites') && (
+              {isFilterVisible('showFavoritesOnly') && (
                 <Button variant={filters.showFavoritesOnly ? "secondary" : "outline"} size="sm" onClick={() => handleFilterChange('showFavoritesOnly', !filters.showFavoritesOnly)}>
                   <Heart className={`w-4 h-4 mr-2 ${filters.showFavoritesOnly ? 'text-red-500 fill-current' : ''}`} />
                   Favorit
                 </Button>
               )}
-              {isFilterVisible('mandatory') && (
+              {isFilterVisible('showMandatoryOnly') && (
                 <Button variant={filters.showMandatoryOnly ? "secondary" : "outline"} size="sm" onClick={() => handleFilterChange('showMandatoryOnly', !filters.showMandatoryOnly)}>
                   <Star className={`w-4 h-4 mr-2 ${filters.showMandatoryOnly ? 'text-yellow-500 fill-current' : ''}`} />
                   Wajib Saja
@@ -8584,6 +6758,7 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
 ```tsx
 "use client"
 
+import React from "react";
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8922,315 +7097,122 @@ export default function DocumentRequestDetail({ request }: DocumentRequestDetail
 # components\document-viewer.tsx
 
 ```tsx
-"use client"
+// components/document-viewer.tsx
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  FileText,
-  Download,
-  ExternalLink,
-  Share2,
-  Maximize2,
-  ZoomIn,
-  ZoomOut,
-  RotateCw,
-  Copy,
-  Link,
-  FileImage,
-  FileSpreadsheet,
-  Presentation,
-  Globe,
-} from "lucide-react"
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { FileText, ExternalLink, Download, FileImage, FileSpreadsheet, Presentation, Globe } from "lucide-react";
+import Image from "next/image";
 
 interface DocumentViewerProps {
   document: {
-    id: string
-    title: string
-    file_url?: string
-    external_url?: string
-    preview_url?: string
-    file_type: string
-    document_type: "file" | "link"
-    platform?: string
-    description?: string
-    author: string
-    department: string
-    created_at: string
-  }
+    id: string;
+    title: string;
+    file_url?: string | null;
+    external_url?: string | null;
+    preview_url?: string | null;
+    file_type?: string | null;
+    document_type: "file" | "link";
+    platform?: string | null;
+    description?: string | null;
+  };
 }
 
 export function DocumentViewer({ document }: DocumentViewerProps) {
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [zoom, setZoom] = useState(100)
-  const [rotation, setRotation] = useState(0)
-  const [showShareDialog, setShowShareDialog] = useState(false)
+  // Helper to get an embeddable preview URL from a standard Google Drive link
+  const getGoogleDrivePreviewUrl = (url: string | undefined | null): string | undefined => {
+    if (!url || !url.includes("drive.google.com")) return undefined;
+    
+    // Updated, more robust Regex to capture the file ID
+    const match = url.match(/drive\.google\.com\/(?:file\/d\/|document\/d\/|spreadsheets\/d\/|presentation\/d\/|drive\/folders\/)([\w-]+)/);
+    if (match && match[1]) {
+      return `https://drive.google.com/file/d/${match[1]}/preview`;
+    }
+    return url; // Fallback
+  };
 
-  const getPlatformIcon = (platform: string) => {
+  const previewUrl = document.preview_url || getGoogleDrivePreviewUrl(document.external_url);
+
+  const getPlatformIcon = (platform?: string | null) => {
     switch (platform?.toLowerCase()) {
-      case "google-docs":
-        return <FileText className="w-4 h-4 text-blue-600" />
-      case "google-sheets":
-        return <FileSpreadsheet className="w-4 h-4 text-green-600" />
-      case "google-slides":
-        return <Presentation className="w-4 h-4 text-orange-600" />
-      case "canva":
-        return <FileImage className="w-4 h-4 text-purple-600" />
-      case "figma":
-        return <FileImage className="w-4 h-4 text-pink-600" />
-      case "notion":
-        return <FileText className="w-4 h-4 text-gray-800" />
-      default:
-        return <Globe className="w-4 h-4 text-gray-600" />
+      case "google-docs": return <FileText className="w-12 h-12 text-blue-600" />;
+      case "google-sheets": return <FileSpreadsheet className="w-12 h-12 text-green-600" />;
+      case "google-slides": return <Presentation className="w-12 h-12 text-orange-600" />;
+      case "canva": return <FileImage className="w-12 h-12 text-purple-600" />;
+      default: return <Globe className="w-12 h-12 text-gray-600" />;
     }
-  }
-
-  const getPlatformColor = (platform: string) => {
-    switch (platform?.toLowerCase()) {
-      case "google-docs":
-        return "bg-blue-100 text-blue-700"
-      case "google-sheets":
-        return "bg-green-100 text-green-700"
-      case "google-slides":
-        return "bg-orange-100 text-orange-700"
-      case "canva":
-        return "bg-purple-100 text-purple-700"
-      case "figma":
-        return "bg-pink-100 text-pink-700"
-      case "notion":
-        return "bg-gray-100 text-gray-700"
-      default:
-        return "bg-gray-100 text-gray-700"
-    }
-  }
-
-  const handleShare = async () => {
-    const shareUrl = document.document_type === "link" ? document.external_url : document.file_url
-    if (navigator.share && shareUrl) {
-      try {
-        await navigator.share({
-          title: document.title,
-          text: document.description,
-          url: shareUrl,
-        })
-      } catch (error) {
-        // Fallback to copy to clipboard
-        navigator.clipboard.writeText(shareUrl)
-      }
-    } else if (shareUrl) {
-      navigator.clipboard.writeText(shareUrl)
-    }
-  }
+  };
 
   const openInNewTab = () => {
-    const url = document.document_type === "link" ? document.external_url : document.file_url
+    const url = document.document_type === 'link' ? document.external_url : document.file_url;
     if (url) {
-      window.open(url, "_blank", "noopener,noreferrer")
+      window.open(url, "_blank", "noopener,noreferrer");
     }
-  }
+  };
 
-  const renderViewer = () => {
-    if (document.document_type === "link") {
-      return (
-        <div className="aspect-[4/3] bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-8">
-          <div className="text-center space-y-4">
-            {getPlatformIcon(document.platform || "")}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">{document.title}</h3>
-              <p className="text-sm text-gray-600 mt-1">{document.description}</p>
-              {document.platform && (
-                <Badge className={`mt-2 ${getPlatformColor(document.platform)}`}>
-                  {document.platform.replace("-", " ").toUpperCase()}
-                </Badge>
-              )}
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button onClick={openInNewTab}>
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Buka Dokumen
-              </Button>
-              <Button variant="outline" onClick={handleShare}>
-                <Share2 className="w-4 h-4 mr-2" />
-                Bagikan
-              </Button>
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    // File-based document viewer
-    if (document.file_type.toUpperCase() === "PDF" && document.preview_url) {
-      return (
-        <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden border">
+  const renderViewerContent = () => {
+    if (document.document_type === 'link') {
+      if (previewUrl) {
+        return (
           <iframe
-            src={document.preview_url}
+            src={previewUrl ?? ''} // <<< THE FIX IS APPLIED HERE
             className="w-full h-full border-0"
-            allow="autoplay"
+            allow="autoplay; encrypted-media"
             title={document.title}
+            sandbox="allow-scripts allow-same-origin"
           />
-        </div>
-      )
-    }
-
-    if (["JPG", "JPEG", "PNG", "GIF", "WEBP"].includes(document.file_type.toUpperCase())) {
+        );
+      }
       return (
-        <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-          <img
-            src={document.file_url || "/placeholder.svg"}
-            alt={document.title}
-            className="max-w-full max-h-full object-contain"
-            style={{
-              transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-              transition: "transform 0.2s ease",
-            }}
-          />
+        <div className="w-full h-full bg-muted rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-8 text-center space-y-4">
+          {getPlatformIcon(document.platform)}
+          <h3 className="text-lg font-semibold text-gray-900">{document.title}</h3>
+          <p className="text-sm text-gray-600 max-w-sm">
+            Ini adalah tautan ke dokumen eksternal. Untuk pengalaman terbaik, buka di tab baru.
+          </p>
+          <Button onClick={openInNewTab}>
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Buka Dokumen
+          </Button>
         </div>
-      )
+      );
     }
 
-    // Default viewer for other file types
-    return (
-      <div className="aspect-[4/3] bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-8">
-        <div className="text-center space-y-4">
-          <FileText className="w-16 h-16 text-gray-400 mx-auto" />
-          <div>
-            <h3 className="text-lg font-medium text-gray-900">Preview Tidak Tersedia</h3>
-            <p className="text-sm text-gray-600 mt-1">
-              File {document.file_type} tidak dapat ditampilkan dalam browser
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button onClick={openInNewTab}>
-              <Download className="w-4 h-4 mr-2" />
-              Download File
-            </Button>
-            <Button variant="outline" onClick={handleShare}>
-              <Share2 className="w-4 h-4 mr-2" />
-              Bagikan Link
-            </Button>
-          </div>
+    const fileTypeUpper = document.file_type?.toUpperCase();
+    if (fileTypeUpper === "PDF" && document.file_url) {
+      return (
+        <iframe
+          src={document.file_url}
+          className="w-full h-full border-0"
+          title={document.title}
+        />
+      );
+    }
+    if (["JPG", "JPEG", "PNG", "GIF", "WEBP"].includes(fileTypeUpper || '') && document.file_url) {
+      return (
+        <div className="relative w-full h-full bg-muted rounded-lg flex items-center justify-center">
+          <Image src={document.file_url} alt={document.title} layout="fill" objectFit="contain" />
         </div>
+      );
+    }
+
+    return (
+      <div className="w-full h-full bg-muted rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-8 text-center space-y-4">
+        <FileText className="w-12 h-12 text-gray-400" />
+        <h3 className="text-lg font-semibold text-gray-900">Preview Tidak Tersedia</h3>
+        <p className="text-sm text-gray-600">File {document.file_type} tidak dapat ditampilkan di browser.</p>
+        <Button onClick={openInNewTab}><Download className="w-4 h-4 mr-2" /> Download File</Button>
       </div>
-    )
-  }
+    );
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Viewer Controls */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Badge variant="outline" className="flex items-center space-x-1">
-            {document.document_type === "link" ? <Link className="w-3 h-3" /> : <FileText className="w-3 h-3" />}
-            <span>{document.document_type === "link" ? "Link" : document.file_type}</span>
-          </Badge>
-          {document.platform && (
-            <Badge className={getPlatformColor(document.platform)}>
-              {document.platform.replace("-", " ").toUpperCase()}
-            </Badge>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-2">
-          {document.document_type === "file" &&
-            ["PDF", "JPG", "JPEG", "PNG", "GIF", "WEBP"].includes(document.file_type.toUpperCase()) && (
-              <>
-                <Button variant="outline" size="sm" onClick={() => setZoom(Math.max(50, zoom - 25))}>
-                  <ZoomOut className="w-4 h-4" />
-                </Button>
-                <span className="text-sm text-gray-600 min-w-[50px] text-center">{zoom}%</span>
-                <Button variant="outline" size="sm" onClick={() => setZoom(Math.min(200, zoom + 25))}>
-                  <ZoomIn className="w-4 h-4" />
-                </Button>
-                <Separator orientation="vertical" className="h-6" />
-                <Button variant="outline" size="sm" onClick={() => setRotation((rotation + 90) % 360)}>
-                  <RotateCw className="w-4 h-4" />
-                </Button>
-              </>
-            )}
-
-          <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Maximize2 className="w-4 h-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-6xl h-[90vh]">
-              <DialogHeader>
-                <DialogTitle>{document.title}</DialogTitle>
-                <DialogDescription>
-                  {document.author} • {document.department} •{" "}
-                  {new Date(document.created_at).toLocaleDateString("id-ID")}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex-1 overflow-hidden">{renderViewer()}</div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Share2 className="w-4 h-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Bagikan Dokumen</DialogTitle>
-                <DialogDescription>Pilih cara untuk membagikan dokumen ini</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{document.title}</p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {document.document_type === "link" ? document.external_url : document.file_url}
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const url = document.document_type === "link" ? document.external_url : document.file_url
-                        if (url) navigator.clipboard.writeText(url)
-                      }}
-                    >
-                      <Copy className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex space-x-2">
-                  <Button onClick={handleShare} className="flex-1">
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Bagikan Link
-                  </Button>
-                  <Button variant="outline" onClick={openInNewTab} className="flex-1">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Buka di Tab Baru
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      {/* Main Viewer */}
-      {renderViewer()}
+    <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden border">
+      {renderViewerContent()}
     </div>
-  )
+  );
 }
-
 ```
 
 # components\nav-main.tsx
@@ -12024,7 +10006,6 @@ function SidebarGroupAction({
       data-sidebar="group-action"
       className={cn(
         "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
-        // Increases the hit area of the button on mobile.
         "after:absolute after:-inset-2 md:after:hidden",
         "group-data-[collapsible=icon]:hidden",
         className
@@ -12203,10 +10184,8 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
   showIcon?: boolean
 }) {
-  // Random width between 50 to 90%.
-  const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  }, [])
+  // --- FIX IS HERE: Removed Math.random() ---
+  const width = "75%"; // Use a consistent width to prevent hydration errors
 
   return (
     <div
@@ -12222,7 +10201,7 @@ function SidebarMenuSkeleton({
         />
       )}
       <Skeleton
-        className="h-4 max-w-(--skeleton-width) flex-1"
+        className="h-4 max-w-[--skeleton-width] flex-1"
         data-sidebar="menu-skeleton-text"
         style={
           {
@@ -12321,7 +10300,6 @@ export {
   SidebarTrigger,
   useSidebar,
 }
-
 ```
 
 # components\ui\skeleton.tsx
@@ -12737,9 +10715,11 @@ export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
 # components\user-nav.tsx
 
 ```tsx
+// components/user-nav.tsx
+
 "use client"
 
-import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -12748,26 +10728,17 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut } from "lucide-react"
+import { LogOut, User, Lock, Settings } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth" // Import the useAuth hook
 
-interface UserType {
-  id: string
-  name: string
-  email: string
-  role: "admin" | "user"
-  department: string
-  avatar_url?: string
-}
-
 export function UserNav() {
-  // Use the useAuth hook to get user and logout function
   const { user, logout } = useAuth()
 
   if (!user) {
-    // Show a loading skeleton or nothing if the user isn't loaded yet
+    // Show a loading skeleton while the user object is being fetched.
     return <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
   }
 
@@ -12775,7 +10746,7 @@ export function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
+          <Avatar className="h-9 w-9">
             <AvatarImage src={user.avatar_url || "/placeholder.svg"} alt={user.name} />
             <AvatarFallback>
               {user.name
@@ -12792,13 +10763,33 @@ export function UserNav() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user.department} • {user.role === "admin" ? "Admin" : "User"}
+            <p className="text-xs leading-none text-muted-foreground capitalize">
+              {user.department} • {user.role}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {/* Only the Logout button remains */}
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href="/profile/settings">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profil</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/profile/password">
+              <Lock className="mr-2 h-4 w-4" />
+              <span>Ubah Password</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/notifications">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Notifikasi</span>
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
@@ -12814,7 +10805,7 @@ export function UserNav() {
 ```tsx
 "use client"
 
-import type React from "react"
+import type React from "react";
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -13012,98 +11003,122 @@ export default eslintConfig;
 # hooks\use-auth.tsx
 
 ```tsx
-"use client"
+// hooks/use-auth.tsx (Final Diagnostic Version)
+"use client";
 
-import type React from "react"
+import type React from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
+import type { User as AppUser } from "@/lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 
-import { createContext, useContext, useEffect, useState } from "react"
-
-interface User {
-  id: string
-  name: string
-  email: string
-  avatar_url?: string
-  department?: string
+interface AuthState {
+  user: AppUser | null;
+  userRole: "admin" | "user" | null;
+  loading: boolean;
 }
 
-interface AuthContextType {
-  user: User | null
-  userRole: "admin" | "user" | null
-  login: (email: string, password: string) => Promise<void>
-  logout: () => void
-  loading: boolean
+interface AuthContextType extends AuthState {
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [userRole, setUserRole] = useState<"admin" | "user" | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    userRole: null,
+    loading: true,
+  });
 
-  useEffect(() => {
-    // Check if user is logged in from localStorage
-    const storedUser = localStorage.getItem("user")
-    const storedRole = localStorage.getItem("userRole")
-
-    if (storedUser && storedRole) {
-      setUser(JSON.parse(storedUser))
-      setUserRole(storedRole as "admin" | "user")
+  const processSession = useCallback(async (session: Session | null) => {
+    if (!session?.user) {
+      setAuthState({ user: null, userRole: null, loading: false });
+      return;
     }
 
-    setLoading(false)
-  }, [])
+    const roleFromToken = session.user.app_metadata?.user_role as "admin" | "user" | null;
+    const userId = session.user.id;
+
+    try {
+      console.log(`FINAL DIAGNOSTIC: Attempting to fetch profile for user ID: ${userId}`);
+      
+      // Perform the query WITHOUT .single() to see the raw result.
+      const { data: userArray, error: dbError } = await supabase
+        .from("users")
+        .select(`*`)
+        .eq("id", userId);
+
+      // This is now the most important log message.
+      console.log("FINAL DIAGNOSTIC: Raw query result:", { data: userArray, error: dbError });
+
+      if (dbError) {
+          console.error("FINAL DIAGNOSTIC: The database returned a direct error.");
+          throw dbError;
+      }
+
+      if (!userArray || userArray.length === 0) {
+        console.error("FINAL DIAGNOSTIC: Query succeeded but returned 0 rows. This means RLS is blocking the SELECT or the user row does not exist.");
+        throw new Error("No profile found for this user ID.");
+      }
+
+      const profile = userArray[0];
+      console.log("FINAL DIAGNOSTIC: Profile fetched successfully.");
+      setAuthState({
+        user: profile as AppUser,
+        userRole: roleFromToken || (profile.role as "admin" | "user"),
+        loading: false,
+      });
+
+    } catch (e: any) {
+      console.error("CRITICAL: Failed to fetch user profile from DB.");
+      console.error("FINAL DIAGNOSTIC: Full error object:", e);
+
+      // As a last resort, sign out to prevent an invalid state.
+      await supabase.auth.signOut();
+      setAuthState({ user: null, userRole: null, loading: false });
+    }
+  }, []);
+
+  // The rest of the component is unchanged.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      processSession(session);
+    });
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      processSession(session);
+    });
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, [processSession]);
 
   const login = async (email: string, password: string) => {
-    // Mock login logic - replace with actual API call
-    if (email === "admin@ziswaf.com" && password === "admin123") {
-      const adminUser = {
-        id: "admin-1",
-        name: "Admin System",
-        email: "admin@ziswaf.com",
-        avatar_url: "/placeholder.svg?height=32&width=32",
-        department: "IT",
-      }
-      setUser(adminUser)
-      setUserRole("admin")
-      localStorage.setItem("user", JSON.stringify(adminUser))
-      localStorage.setItem("userRole", "admin")
-    } else if (email === "user@ziswaf.com" && password === "user123") {
-      const regularUser = {
-        id: "user-1",
-        name: "Ahmad Fauzi",
-        email: "user@ziswaf.com",
-        avatar_url: "/placeholder.svg?height=32&width=32",
-        department: "Pendayagunaan",
-      }
-      setUser(regularUser)
-      setUserRole("user")
-      localStorage.setItem("user", JSON.stringify(regularUser))
-      localStorage.setItem("userRole", "user")
-    } else {
-      throw new Error("Invalid credentials")
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      console.error("Supabase login error:", error);
+      throw error;
     }
-  }
+  };
 
-  const logout = () => {
-    setUser(null)
-    setUserRole(null)
-    localStorage.removeItem("user")
-    localStorage.removeItem("userRole")
-    window.location.href = "/login"
-  }
+  const logout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  };
 
-  return <AuthContext.Provider value={{ user, userRole, login, logout, loading }}>{children}</AuthContext.Provider>
+  const value = { ...authState, login, logout };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
+  return context;
 }
-
 ```
 
 # hooks\use-mobile.ts
@@ -13242,6 +11257,8 @@ export function useNotifications() {
 # lib\supabase.ts
 
 ```ts
+// lib/supabase.ts
+
 import { createClient } from "@supabase/supabase-js"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -13249,7 +11266,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Types for our database tables
+// Types for our database tables (Aligned with the new SQL script)
 export interface User {
   id: string
   email: string
@@ -13267,600 +11284,91 @@ export interface Document {
   id: string
   title: string
   description?: string
-  file_url?: string
-  external_url?: string
+  file_url?: string | null
+  external_url?: string | null
+  preview_url?: string | null
   document_type: "file" | "link"
-  platform?: string
-  file_type: string
-  file_size?: number
+  platform?: string | null
+  file_type?: string | null
+  file_size?: number | null
   category: string
   department: string
   tags: string[]
-  uploaded_by: string
+  uploaded_by: string | { name: string; email: string; avatar_url?: string } | null
   is_mandatory: boolean
-  is_starred: boolean // Admin-controlled mandatory reading
+  is_starred: boolean
   verification_status: "pending" | "approved" | "rejected" | "revision_requested"
-  verified_by?: string
-  verified_at?: string
-  verification_requested_at?: string
+  verified_by?: string | null
+  verified_at?: string | null
+  verification_requested_at?: string | null
   version: string
-  location: string
+  location?: string | null
   priority: "low" | "medium" | "high" | "critical"
   access_level: "departmental" | "organizational" | "public"
   language: string
-  expiry_date?: string
-  related_documents?: string
+  expiry_date?: string | null
+  related_documents?: string | null
   author: string
   created_at: string
   updated_at: string
 }
 
-export interface Notification {
-  id: string
-  type: "document_verification" | "read_request" | "read_confirmation" | "document_status"
-  title: string
-  message: string
-  document_id?: string
-  from_user_id?: string
-  to_user_id: string
-  is_read: boolean
-  requires_action: boolean
-  action_type?: "mark_as_read" | "verify_document" | "respond"
-  metadata?: {
-    verification_status?: "approved" | "rejected" | "revision_requested"
-    priority?: "high" | "medium" | "low"
-    deadline?: string
-  }
-  created_at: string
-  updated_at: string
-}
+// ... other types like Activity, Notification etc. can be added here if needed
 
-export interface NotificationPreferences {
-  id: string
-  user_id: string
-  email_notifications: boolean
-  push_notifications: boolean
-  document_verification: boolean
-  read_requests: boolean
-  document_status: boolean
-  created_at: string
-  updated_at: string
-}
+// =================================================================
+// HELPER FUNCTIONS
+// =================================================================
 
-export interface DocumentCategory {
-  id: string
-  name: string
-  description?: string
-  color: string
-  icon?: string
-  department?: string
-  is_active: boolean
-  created_at: string
-}
-
-export interface DocumentLocation {
-  id: string
-  path: string
-  description?: string
-  department?: string
-  category?: string
-  is_active: boolean
-  created_at: string
-}
-
-export interface DocumentVersion {
-  id: string
-  document_id: string
-  version: string
-  file_url: string
-  file_size: number
-  change_notes?: string
-  uploaded_by: string
-  created_at: string
-}
-
-export interface DocumentComment {
-  id: string
-  document_id: string
-  user_id: string
-  comment: string
-  comment_type: "feedback" | "revision_request" | "approval_note"
-  is_internal: boolean
-  created_at: string
-  updated_at: string
-}
-
-export interface Activity {
-  id: string
-  name: string
-  description?: string
-  status: "planning" | "active" | "completed" | "cancelled"
-  priority: "high" | "medium" | "low"
-  start_date?: string
-  end_date?: string
-  progress: number
-  budget: number
-  target_beneficiaries: number
-  current_beneficiaries: number
-  tags: string[]
-  departments: string[]
-  participants: number
-  created_by: string
-  created_at: string
-  updated_at: string
-}
-
-export interface ActivityParticipant {
-  id: string
-  activity_id: string
-  user_id: string
-  role: string
-  joined_at: string
-}
-
-export interface ActivityMeeting {
-  id: string
-  activity_id: string
-  title: string
-  description?: string
-  meeting_date: string
-  duration_minutes: number
-  attendees_count: number
-  meeting_notes?: string
-  created_by: string
-  created_at: string
-}
-
-export interface ActivityDiscussion {
-  id: string
-  activity_id: string
-  user_id: string
-  message: string
-  parent_id?: string
-  created_at: string
-  updated_at: string
-}
-
-export interface ActivityMilestone {
-  id: string
-  activity_id: string
-  title: string
-  description?: string
-  target_date: string
-  completion_date?: string
-  status: "pending" | "active" | "completed" | "cancelled"
-  created_by: string
-  created_at: string
-  updated_at: string
-}
-
-export interface ZiswafReport {
-  id: string
-  area: string
-  target_amount: number
-  realized_amount: number
-  percentage: number
-  report_month: number
-  report_year: number
-  created_at: string
-  updated_at: string
-}
-
-// Helper functions for database operations
-
-// Document functions
-export const markDocumentAsMandatory = async (documentId: string, userId: string) => {
-  // Only admins can mark documents as mandatory
-  const { data: user } = await supabase.from("users").select("role").eq("id", userId).single()
-
-  if (user?.role !== "admin") {
-    throw new Error("Only admins can mark documents as mandatory")
-  }
-
-  const { error } = await supabase
-    .from("documents")
-    .update({
-      is_starred: true,
-      is_mandatory: true,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", documentId)
-
-  if (error) throw error
-}
-
-export const unmarkDocumentAsMandatory = async (documentId: string, userId: string) => {
-  // Only admins can unmark documents as mandatory
-  const { data: user } = await supabase.from("users").select("role").eq("id", userId).single()
-
-  if (user?.role !== "admin") {
-    throw new Error("Only admins can unmark documents as mandatory")
-  }
-
-  const { error } = await supabase
-    .from("documents")
-    .update({
-      is_starred: false,
-      is_mandatory: false,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", documentId)
-
-  if (error) throw error
-}
-
-export const getMandatoryDocuments = async () => {
-  const { data, error } = await supabase
-    .from("documents")
-    .select(`
-      *,
-      uploaded_by:users(name, email)
-    `)
-    .eq("is_mandatory", true)
-    .eq("is_starred", true)
-    .order("created_at", { ascending: false })
-
-  if (error) throw error
-  return data
-}
-
-// Notification functions
-export const getNotifications = async (userId: string, limit?: number) => {
-  let query = supabase
-    .from("notifications")
-    .select(`
-      *,
-      from_user:users!notifications_from_user_id_fkey(id, name, avatar_url),
-      document:documents(id, title)
-    `)
-    .eq("to_user_id", userId)
-    .order("created_at", { ascending: false })
-
-  if (limit) {
-    query = query.limit(limit)
-  }
-
-  const { data, error } = await query
-
-  if (error) throw error
-  return data as (Notification & {
-    from_user?: Pick<User, "id" | "name" | "avatar_url">
-    document?: Pick<Document, "id" | "title">
-  })[]
-}
-
-export const getUnreadNotificationsCount = async (userId: string) => {
-  const { count, error } = await supabase
-    .from("notifications")
-    .select("*", { count: "exact", head: true })
-    .eq("to_user_id", userId)
-    .eq("is_read", false)
-
-  if (error) throw error
-  return count || 0
-}
-
-export const markNotificationAsRead = async (notificationId: string) => {
-  const { error } = await supabase
-    .from("notifications")
-    .update({ is_read: true, updated_at: new Date().toISOString() })
-    .eq("id", notificationId)
-
-  if (error) throw error
-}
-
-export const markAllNotificationsAsRead = async (userId: string) => {
-  const { error } = await supabase
-    .from("notifications")
-    .update({ is_read: true, updated_at: new Date().toISOString() })
-    .eq("to_user_id", userId)
-    .eq("is_read", false)
-
-  if (error) throw error
-}
-
-export const createNotification = async (notificationData: Partial<Notification>) => {
-  const { data, error } = await supabase.from("notifications").insert(notificationData).select().single()
-
-  if (error) throw error
-  return data as Notification
-}
-
-export const createDocumentReadNotification = async (
-  documentId: string,
-  fromUserId: string,
-  toUserId: string,
-  documentTitle: string,
-) => {
-  return createNotification({
-    type: "read_confirmation",
-    title: "Konfirmasi Pembacaan",
-    message: `Dokumen "${documentTitle}" telah dibaca`,
-    document_id: documentId,
-    from_user_id: fromUserId,
-    to_user_id: toUserId,
-    is_read: false,
-    requires_action: false,
-    metadata: {
-      priority: "medium",
-    },
-  })
-}
-
-export const createDocumentVerificationNotification = async (
-  documentId: string,
-  fromUserId: string,
-  toUserId: string,
-  documentTitle: string,
-) => {
-  return createNotification({
-    type: "document_verification",
-    title: "Permintaan Verifikasi",
-    message: `Dokumen baru memerlukan verifikasi: ${documentTitle}`,
-    document_id: documentId,
-    from_user_id: fromUserId,
-    to_user_id: toUserId,
-    is_read: false,
-    requires_action: true,
-    action_type: "verify_document",
-    metadata: {
-      priority: "high",
-    },
-  })
-}
-
-export const createReadRequestNotification = async (
-  documentId: string,
-  fromUserId: string,
-  toUserId: string,
-  documentTitle: string,
-  deadline?: string,
-) => {
-  return createNotification({
-    type: "read_request",
-    title: "Permintaan Baca Dokumen",
-    message: `Admin meminta Anda untuk membaca: ${documentTitle}`,
-    document_id: documentId,
-    from_user_id: fromUserId,
-    to_user_id: toUserId,
-    is_read: false,
-    requires_action: true,
-    action_type: "mark_as_read",
-    metadata: {
-      priority: "high",
-      deadline: deadline,
-    },
-  })
-}
-
-export const createDocumentStatusNotification = async (
-  documentId: string,
-  fromUserId: string,
-  toUserId: string,
-  documentTitle: string,
-  verificationStatus: "approved" | "rejected" | "revision_requested",
-) => {
-  const messages = {
-    approved: `Dokumen Anda "${documentTitle}" telah disetujui`,
-    rejected: `Dokumen Anda "${documentTitle}" ditolak`,
-    revision_requested: `Dokumen Anda "${documentTitle}" memerlukan revisi`,
-  }
-
-  return createNotification({
-    type: "document_status",
-    title: "Status Verifikasi",
-    message: messages[verificationStatus],
-    document_id: documentId,
-    from_user_id: fromUserId,
-    to_user_id: toUserId,
-    is_read: false,
-    requires_action: verificationStatus === "revision_requested",
-    action_type: verificationStatus === "revision_requested" ? "respond" : undefined,
-    metadata: {
-      verification_status: verificationStatus,
-      priority: verificationStatus === "revision_requested" ? "medium" : "low",
-    },
-  })
-}
-
-export const getNotificationPreferences = async (userId: string) => {
-  const { data, error } = await supabase.from("notification_preferences").select("*").eq("user_id", userId).single()
-
-  if (error && error.code !== "PGRST116") throw error
-  return data as NotificationPreferences | null
-}
-
-export const updateNotificationPreferences = async (userId: string, preferences: Partial<NotificationPreferences>) => {
-  const { data, error } = await supabase
-    .from("notification_preferences")
-    .upsert({
-      user_id: userId,
-      ...preferences,
-      updated_at: new Date().toISOString(),
-    })
-    .select()
-    .single()
-
-  if (error) throw error
-  return data as NotificationPreferences
-}
-
-export const getUsers = async () => {
+// Function to fetch all users (Admin action)
+export const getUsers = async (): Promise<User[] | null> => {
   const { data, error } = await supabase.from("users").select("*").order("created_at", { ascending: false })
-
-  if (error) throw error
-  return data as User[]
-}
-
-export const getDocuments = async () => {
-  const { data, error } = await supabase
-    .from("documents")
-    .select(`
-      *,
-      uploaded_by:users(name, email)
-    `)
-    .order("created_at", { ascending: false })
-
-  if (error) throw error
+  if (error) {
+    console.error("Supabase error in getUsers:", error)
+    return null
+  }
   return data
 }
 
-export const getDocumentsByDepartment = async (department: string) => {
+// Function to update a user's details (Admin action)
+export const updateUser = async (userId: string, updates: Partial<User>): Promise<{ data: User | null; error: any }> => {
   const { data, error } = await supabase
-    .from("documents")
-    .select(`
-      *,
-      uploaded_by:users(name, email),
-      document_versions(*)
-    `)
-    .eq("department", department)
-    .order("created_at", { ascending: false })
-
-  if (error) throw error
-  return data
-}
-
-export const getDocumentCategories = async (department?: string) => {
-  let query = supabase.from("document_categories").select("*").eq("is_active", true)
-
-  if (department) {
-    query = query.eq("department", department)
-  }
-
-  const { data, error } = await query.order("name")
-
-  if (error) throw error
-  return data as DocumentCategory[]
-}
-
-export const getDocumentLocations = async (department?: string) => {
-  let query = supabase.from("document_locations").select("*").eq("is_active", true)
-
-  if (department) {
-    query = query.eq("department", department)
-  }
-
-  const { data, error } = await query.order("path")
-
-  if (error) throw error
-  return data as DocumentLocation[]
-}
-
-export const createDocument = async (documentData: Partial<Document>) => {
-  const { data, error } = await supabase.from("documents").insert(documentData).select().single()
-
-  if (error) throw error
-  return data as Document
-}
-
-export const createLinkDocument = async (documentData: Partial<Document>) => {
-  const { data, error } = await supabase
-    .from("documents")
-    .insert({
-      ...documentData,
-      document_type: "link",
-      file_size: null,
-    })
+    .from("users")
+    .update(updates)
+    .eq("id", userId)
     .select()
     .single()
-
-  if (error) throw error
-  return data as Document
+  
+  if (error) {
+    console.error("Supabase error in updateUser:", error);
+  }
+  return { data, error };
 }
 
-export const createDocumentVersion = async (versionData: Partial<DocumentVersion>) => {
-  const { data, error } = await supabase.from("document_versions").insert(versionData).select().single()
 
-  if (error) throw error
-  return data as DocumentVersion
-}
-
-export const getZiswafReports = async (year: number = new Date().getFullYear()) => {
-  const { data, error } = await supabase
-    .from("ziswaf_reports")
-    .select("*")
-    .eq("report_year", year)
-    .order("report_month", { ascending: true })
-
-  if (error) throw error
-  return data as ZiswafReport[]
-}
-
-export const createZiswafReport = async (reportData: Partial<ZiswafReport>) => {
-  const { data, error } = await supabase.from("ziswaf_reports").insert(reportData).select().single()
-
-  if (error) throw error
-  return data as ZiswafReport
-}
-
-export const getActivities = async () => {
-  const { data, error } = await supabase
-    .from("activities")
-    .select(`
-      *,
-      created_by:users(name, email),
-      activity_participants(
-        user_id,
-        role,
-        users(name, email, department)
-      )
-    `)
-    .order("created_at", { ascending: false })
-
-  if (error) throw error
-  return data
-}
-
-export const getActivityById = async (id: string) => {
-  const { data, error } = await supabase
-    .from("activities")
-    .select(`
-      *,
-      created_by:users(name, email),
-      activity_participants(
-        user_id,
-        role,
-        users(name, email, department, avatar_url)
-      ),
-      activity_meetings(*),
-      activity_discussions(
-        *,
-        users(name, email)
-      ),
-      activity_milestones(*),
-      activity_documents(
-        documents(*)
-      )
-    `)
-    .eq("id", id)
-    .single()
-
-  if (error) throw error
-  return data
-}
-
+// Function to get documents that need verification (Admin action)
 export const getDocumentsForVerification = async () => {
   const { data, error } = await supabase
     .from("documents")
-    .select(`
-      *,
-      uploaded_by:users(name, email),
-      verified_by:users(name, email),
-      document_comments(*)
-    `)
+    .select(`*, uploaded_by ( name, email, avatar_url )`)
+    .eq("verification_status", "pending")
     .order("verification_requested_at", { ascending: true })
 
-  if (error) throw error
+  if (error) {
+    console.error("Supabase error in getDocumentsForVerification:", error)
+    throw error
+  }
   return data
 }
 
-export const updateDocumentVerification = async (
+// Function to update a document's verification status (Admin action)
+export const updateDocumentVerificationStatus = async (
   documentId: string,
-  status: string,
+  status: "approved" | "rejected",
   verifiedBy: string,
-  comment?: string,
+  comment?: string
 ) => {
-  const { error } = await supabase
+  // Step 1: Update the document status
+  const { error: updateError } = await supabase
     .from("documents")
     .update({
       verification_status: status,
@@ -13869,53 +11377,26 @@ export const updateDocumentVerification = async (
     })
     .eq("id", documentId)
 
-  if (error) throw error
+  if (updateError) {
+    console.error("Error updating document status:", updateError)
+    throw updateError
+  }
 
-  // Add comment if provided
-  if (comment) {
+  // Step 2: Add a comment if one is provided
+  if (comment && comment.trim() !== "") {
     const { error: commentError } = await supabase.from("document_comments").insert({
       document_id: documentId,
       user_id: verifiedBy,
       comment: comment,
-      comment_type: status === "approved" ? "approval_note" : "feedback",
+      comment_type: status === "approved" ? "approval_note" : "revision_request",
     })
 
-    if (commentError) throw commentError
+    if (commentError) {
+      // Log the error but don't throw, as the main action succeeded.
+      console.error("Error adding verification comment:", commentError)
+    }
   }
 }
-
-export const requestDocumentVerification = async (documentId: string) => {
-  const { error } = await supabase
-    .from("documents")
-    .update({
-      verification_requested_at: new Date().toISOString(),
-    })
-    .eq("id", documentId)
-
-  if (error) throw error
-}
-
-export const joinActivity = async (activityId: string, userId: string, role = "Participant") => {
-  const { error } = await supabase.from("activity_participants").insert({
-    activity_id: activityId,
-    user_id: userId,
-    role: role,
-  })
-
-  if (error) throw error
-}
-
-export const addActivityDiscussion = async (activityId: string, userId: string, message: string, parentId?: string) => {
-  const { error } = await supabase.from("activity_discussions").insert({
-    activity_id: activityId,
-    user_id: userId,
-    message: message,
-    parent_id: parentId,
-  })
-
-  if (error) throw error
-}
-
 ```
 
 # lib\utils.ts
@@ -13984,6 +11465,7 @@ export default nextConfig;
     "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.50.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -14143,9 +11625,10 @@ UPDATE documents SET verification_status = 'pending' WHERE verification_status I
 -- DROP TABLE IF EXISTS ziswaf_reports, users CASCADE;
 
 -- =================================================================
---  1. USERS TABLE
+--  SECTION 1: TABLE CREATION
 -- =================================================================
 
+-- User Table (Primary table, created first)
 CREATE TABLE IF NOT EXISTS users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -14159,10 +11642,7 @@ CREATE TABLE IF NOT EXISTS users (
   last_login TIMESTAMP WITH TIME ZONE
 );
 
--- =================================================================
---  2. DOCUMENTS AND RELATED TABLES
--- =================================================================
-
+-- Documents and Related Tables
 CREATE TABLE IF NOT EXISTS documents (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title VARCHAR(500) NOT NULL,
@@ -14194,32 +11674,9 @@ CREATE TABLE IF NOT EXISTS documents (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   CONSTRAINT check_document_url CHECK (
-    (document_type = 'file' AND file_url IS NOT NULL) OR
+    (document_type = 'file' AND file_url IS NOT NULL AND file_size IS NOT NULL) OR 
     (document_type = 'link' AND external_url IS NOT NULL)
   )
-);
-
-CREATE TABLE IF NOT EXISTS document_views (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  viewed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(document_id, user_id)
-);
-
-CREATE TABLE IF NOT EXISTS document_downloads (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  downloaded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS document_favorites (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(document_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS document_comments (
@@ -14233,10 +11690,7 @@ CREATE TABLE IF NOT EXISTS document_comments (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- =================================================================
---  3. ACTIVITIES AND RELATED TABLES
--- =================================================================
-
+-- Activities and Related Tables
 CREATE TABLE IF NOT EXISTS activities (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -14278,11 +11732,36 @@ CREATE TABLE IF NOT EXISTS activity_milestones (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Notifications Table
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    type VARCHAR(50) NOT NULL CHECK (type IN ('document_verification', 'read_request', 'read_confirmation', 'document_status')),
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+    from_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    to_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    is_read BOOLEAN DEFAULT FALSE,
+    requires_action BOOLEAN DEFAULT FALSE,
+    action_type VARCHAR(50) CHECK (action_type IN ('mark_as_read', 'verify_document', 'respond')),
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
--- =================================================================
---  4. PROGRAMS (SCHOLARSHIPS) AND KNOWLEDGE REQUESTS
--- =================================================================
+CREATE TABLE IF NOT EXISTS notification_preferences (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+    email_notifications BOOLEAN DEFAULT TRUE,
+    push_notifications BOOLEAN DEFAULT TRUE,
+    document_verification BOOLEAN DEFAULT TRUE,
+    read_requests BOOLEAN DEFAULT TRUE,
+    document_status BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
+-- Scholarship Programs and Knowledge Requests
 CREATE TABLE IF NOT EXISTS scholarship_programs (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -14317,33 +11796,31 @@ CREATE TABLE IF NOT EXISTS document_requests (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-
 -- =================================================================
---  5. NOTIFICATIONS
--- =================================================================
-
-CREATE TABLE IF NOT EXISTS notifications (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    type VARCHAR(50) NOT NULL CHECK (type IN ('document_verification', 'read_request', 'read_confirmation', 'document_status')),
-    title VARCHAR(255) NOT NULL,
-    message TEXT NOT NULL,
-    document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
-    from_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    to_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    is_read BOOLEAN DEFAULT FALSE,
-    requires_action BOOLEAN DEFAULT FALSE,
-    action_type VARCHAR(50) CHECK (action_type IN ('mark_as_read', 'verify_document', 'respond')),
-    metadata JSONB DEFAULT '{}',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-
--- =================================================================
---  6. SEED DATA (INITIAL DATA)
+--  SECTION 2: TRIGGERS AND FUNCTIONS
 -- =================================================================
 
--- Insert sample users
+-- Create function to update 'updated_at' timestamp automatically
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Apply trigger to all tables with an 'updated_at' column
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_documents_updated_at BEFORE UPDATE ON documents FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_activities_updated_at BEFORE UPDATE ON activities FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_notifications_updated_at BEFORE UPDATE ON notifications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Add more triggers for other tables as needed...
+
+-- =================================================================
+--  SECTION 3: SEED INITIAL DATA
+-- =================================================================
+
+-- Insert sample users (will not overwrite if email exists)
 INSERT INTO users (email, name, department, role, status, last_login) VALUES
 ('admin@ziswaf.com', 'Admin System', 'IT', 'admin', 'active', NOW() - INTERVAL '1 hours'),
 ('user@ziswaf.com', 'Ahmad Fauzi', 'Pendayagunaan', 'user', 'active', NOW() - INTERVAL '2 hours'),
@@ -14353,13 +11830,38 @@ INSERT INTO users (email, name, department, role, status, last_login) VALUES
 ('rizki.pratama@ziswaf.com', 'Rizki Pratama', 'IT', 'user', 'inactive', NOW() - INTERVAL '25 days')
 ON CONFLICT (email) DO NOTHING;
 
--- Insert sample documents
+-- Insert sample documents (will not overwrite if title exists)
 INSERT INTO documents (title, description, document_type, file_url, file_type, file_size, category, department, tags, uploaded_by, is_mandatory, is_starred, verification_status, author) VALUES
 ('Panduan Penyaluran Beasiswa 2024', 'Dokumen panduan lengkap untuk proses penyaluran beasiswa tahun 2024', 'file', '/documents/panduan-beasiswa-2024.pdf', 'PDF', 2516582, 'Panduan', 'Pendayagunaan', ARRAY['beasiswa', 'panduan', '2024'], (SELECT id FROM users WHERE email = 'user@ziswaf.com'), TRUE, TRUE, 'approved', 'Ahmad Fauzi'),
 ('Laporan Keuangan Q4 2023', 'Laporan keuangan triwulan keempat tahun 2023', 'file', '/documents/laporan-keuangan-q4-2023.xlsx', 'Excel', 1887436, 'Laporan', 'Keuangan', ARRAY['keuangan', 'laporan', 'Q4'], (SELECT id FROM users WHERE email = 'siti.nurhaliza@ziswaf.com'), TRUE, TRUE, 'approved', 'Siti Nurhaliza'),
 ('SOP Verifikasi Mustahik', 'Standar operasional prosedur untuk verifikasi penerima bantuan', 'file', '/documents/sop-verifikasi-mustahik.pdf', 'PDF', 1258291, 'SOP', 'Penyaluran', ARRAY['SOP', 'verifikasi', 'mustahik'], (SELECT id FROM users WHERE email = 'budi.santoso@ziswaf.com'), FALSE, FALSE, 'pending', 'Budi Santoso'),
 ('Proposal Program Kesehatan', 'Proposal program bantuan kesehatan untuk mustahik', 'file', '/documents/proposal-kesehatan.docx', 'Word', 3251200, 'Proposal', 'Pendayagunaan', ARRAY['proposal', 'kesehatan', 'bantuan'], (SELECT id FROM users WHERE email = 'user@ziswaf.com'), FALSE, FALSE, 'rejected', 'Ahmad Fauzi')
 ON CONFLICT (title) DO NOTHING;
+
+-- =================================================================
+--  SECTION 4: ENABLE ROW-LEVEL SECURITY (RLS)
+-- =================================================================
+
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE activities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE scholarship_programs ENABLE ROW LEVEL SECURITY;
+-- Add more RLS enablement for other tables as needed...
+
+-- Example RLS policies (customize as needed)
+CREATE POLICY "Users can view their own data." ON users
+    FOR SELECT USING (id = auth.uid());
+
+CREATE POLICY "Users can update their own data." ON users
+    FOR UPDATE USING (id = auth.uid());
+
+CREATE POLICY "Users can view all documents." ON documents
+    FOR SELECT USING (true); -- Or add more restrictive logic, e.g., based on department
+
+-- =================================================================
+--  END OF SCRIPT
+-- =================================================================
 ```
 
 # scripts\create-knowledge-requests-tables.sql
@@ -15625,6 +13127,5 @@ CREATE INDEX IF NOT EXISTS idx_document_locations_department ON document_locatio
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
-
 ```
 

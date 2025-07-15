@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,37 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, BookOpen, CheckCircle, Users, Shield, Zap, Star, Sparkles, Crown, Gift } from "lucide-react"
+import { Eye, EyeOff, BookOpen, CheckCircle, Users, Shield, Zap, Star, Sparkles, Crown } from "lucide-react"
+
+// FIX: Component for client-side only rendering to prevent hydration mismatch
+const FloatingParticles = () => {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null
+  }
+
+  return (
+    <div className="absolute inset-0">
+      {[...Array(15)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${3 + Math.random() * 4}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -72,17 +102,17 @@ export default function RegisterPage() {
                   Pendaftaran Berhasil!
                 </h2>
                 <p className="text-gray-600 leading-relaxed text-lg">
-                  🎉 Selamat! Akun Anda telah berhasil dibuat. Tim admin akan segera memverifikasi akun Anda dan
+                    Selamat! Akun Anda telah berhasil dibuat. Tim admin akan segera memverifikasi akun Anda dan
                   mengirimkan konfirmasi melalui email.
                 </p>
               </div>
               <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
                 <div className="flex items-center justify-center mb-3">
-                  <Gift className="w-5 h-5 text-emerald-600 mr-2" />
+                  {/* <Gift className="w-5 h-5 text-emerald-600 mr-2" /> */}
                   <p className="text-sm font-semibold text-emerald-700">Langkah Selanjutnya:</p>
                 </div>
                 <p className="text-sm text-emerald-700">
-                  📧 Periksa email Anda untuk instruksi aktivasi akun dan panduan memulai
+                  Periksa email Anda untuk instruksi aktivasi akun dan panduan memulai
                 </p>
               </div>
               <Button
@@ -102,13 +132,25 @@ export default function RegisterPage() {
 
         <style jsx>{`
           @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
+            0% {
+              transform: translate(0px, 0px) scale(1);
+            }
+            33% {
+              transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+              transform: translate(-20px, 20px) scale(0.9);
+            }
+            100% {
+              transform: translate(0px, 0px) scale(1);
+            }
           }
-          .animate-blob { animation: blob 7s infinite; }
-          .animation-delay-2000 { animation-delay: 2s; }
+          .animate-blob {
+            animation: blob 7s infinite;
+          }
+          .animation-delay-2000 {
+            animation-delay: 2s;
+          }
         `}</style>
       </div>
     )
@@ -123,20 +165,7 @@ export default function RegisterPage() {
         <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
 
         {/* Floating particles */}
-        <div className="absolute inset-0">
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`,
-              }}
-            />
-          ))}
-        </div>
+        <FloatingParticles />
       </div>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
@@ -181,14 +210,14 @@ export default function RegisterPage() {
                     <div className="w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mt-2 flex-shrink-0"></div>
                     <p className="text-gray-200">Dashboard analytics untuk tracking performance</p>
                   </div>
-                  <div className="flex items-start space-x-4">
+                  {/* <div className="flex items-start space-x-4">
                     <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
                     <p className="text-gray-200">AI-powered search dan smart recommendations</p>
                   </div>
                   <div className="flex items-start space-x-4">
                     <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mt-2 flex-shrink-0"></div>
                     <p className="text-gray-200">Mobile app untuk akses knowledge on-the-go</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -388,20 +417,44 @@ export default function RegisterPage() {
       </div>
 
       <style jsx>{`
+        .grid-pattern-overlay {
+          background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
         @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
         }
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
         }
-        .animate-blob { animation: blob 7s infinite; }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
       `}</style>
     </div>
   )

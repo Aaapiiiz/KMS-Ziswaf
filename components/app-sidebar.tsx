@@ -1,52 +1,39 @@
+// components/app-sidebar.tsx
+
 "use client"
 
 import type * as React from "react"
 import {
   BookOpen,
-  Bot,
-  Frame,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-  Shield,
+  Home,
   Users,
   CheckCircle,
-  GalleryVerticalEnd, 
+  GalleryVerticalEnd,
+  Settings,
+  PieChart,
+  Bell,
+  Shield,
+  FileText,
+  Activity, // Used for 'Aktivitas' now
 } from "lucide-react"
 
 import { useAuth } from "@/hooks/use-auth"
 import { NavMain } from "@/components/nav-main"
-// NavProjects is no longer needed
-// import { NavProjects } from "@/components/nav-projects" 
 import { TeamSwitcher } from "@/components/team-switcher"
-import { Sidebar, SidebarContent, SidebarHeader, SidebarRail, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarRail,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSkeleton,
+} from "@/components/ui/sidebar"
 
-// ... (NavAdmin component remains the same) ...
-function NavAdmin({ items }: { items: { name: string, url: string, icon: React.ElementType }[] }) {
-  return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel className="flex items-center">
-        <Shield className="mr-2 h-4 w-4" />
-        Admin Panel
-      </SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
-                <item.icon />
-                <span>{item.name}</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
-  )
-}
-
-
+// More accurate data structure
 const data = {
   teams: [
     {
@@ -55,45 +42,37 @@ const data = {
       plan: "Enterprise",
     },
   ],
-  // UPDATED: All main navigation items are now in this single array
   navMain: [
-    // { 
+    // {
     //   title: "Dashboard",
-    //   url: "/dashboard", 
-    //   icon: SquareTerminal, 
+    //   url: "/dashboard",
+    //   icon: Home,
     // },
     {
       title: "Dokumen",
       url: "/documents",
-      icon: Bot,
+      icon: FileText,
       items: [
         { title: "Semua Dokumen", url: "/documents" },
         { title: "Dokumen Terbaru", url: "/documents/recent" },
+        // { title: "Tambah Dokumen", url: "/documents/add" },
       ],
     },
     {
+      // *** THE FIX IS HERE ***
+      // This is now a direct link, not a collapsible menu.
       title: "Departemen",
-      url: "/departments",
+      url: "/departments", // Points directly to the main departments page
       icon: BookOpen,
-      items: [
-        { title: "Pendayagunaan", url: "/departments/pendayagunaan" },
-        { title: "Penghimpunan", url: "/departments/penghimpunan" },
-        { title: "Penyaluran", url: "/departments/penyaluran" },
-        { title: "Keuangan", url: "/departments/keuangan" },
-      ],
+      // The 'items' array has been removed.
     },
-    {
-      title: "Program",
-      url: "/programs",
-      icon: Settings2,
-      items: [
-        { title: "Beasiswa", url: "/programs/scholarships" },
-        { title: "Bantuan Sosial", url: "/programs/social-aid" },
-      ],
-    },
-    // { title: "Aktivitas", url: "/activities", icon: Frame },
+    // {
+    //   title: "Aktivitas",
+    //   url: "/activities",
+    //   icon: Activity, // More appropriate icon
+    // },
     { title: "Permintaan Pengetahuan", url: "/knowledge-requests", icon: PieChart },
-    { title: "Notifikasi", url: "/notifications", icon: Map },
+    { title: "Notifikasi", url: "/notifications", icon: Bell },
   ],
   adminNav: [
     {
@@ -110,7 +89,10 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { userRole } = useAuth()
+  const { userRole, loading } = useAuth()
+
+  // --- DEBUGGING LOG ---
+  console.log("AppSidebar Render:", { loading, userRole });
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -118,12 +100,43 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        {/* The single NavMain component now renders everything */}
+        {/* Main navigation for everyone */}
         <NavMain items={data.navMain} />
-        
-        {/* The NavProjects component is now removed */}
-        
-        {userRole === 'admin' && <NavAdmin items={data.adminNav} />}
+
+        {/* Conditional rendering for the Admin Panel */}
+        {loading ? (
+          // While loading, show a skeleton placeholder
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center">
+              <Shield className="mr-2 h-4 w-4" />
+              Admin Panel
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuSkeleton showIcon />
+              <SidebarMenuSkeleton showIcon />
+            </SidebarMenu>
+          </SidebarGroup>
+        ) : userRole === 'admin' ? (
+          // After loading, if user is an admin, show the real panel
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center">
+              <Shield className="mr-2 h-4 w-4" />
+              Admin Panel
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              {data.adminNav.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        ) : null}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

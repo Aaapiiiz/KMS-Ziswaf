@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,7 @@ export interface DocumentFilterValues {
   searchQuery: string;
   category: string;
   department: string;
-  // priority: string;
+  priority: string;
   time: string;
   showFavoritesOnly: boolean;
   showMandatoryOnly: boolean;
@@ -23,21 +23,22 @@ export interface DocumentFilterValues {
 interface DocumentFiltersProps {
   onFilterChange: (filters: DocumentFilterValues) => void;
   onViewChange: (view: 'grid' | 'list') => void;
-  visibleFilters?: ('category' | 'department' | 'priority' | 'time' | 'favorites' | 'mandatory')[];
+  // Use a more specific type for visibleFilters
+  visibleFilters?: (keyof DocumentFilterValues)[];
   resultCount: number;
 }
 
 // Lists of options for the dropdowns
 const categories = ["Semua", "Panduan", "Template", "SOP", "Laporan", "Strategi", "Checklist"];
 const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "SDM", "IT", "Keuangan", "Marketing", "Audit"];
-// const priorities = ["Semua", "high", "medium", "low"];
-// const timeFilters = ["Semua", "today", "week", "month"];
+const priorities = ["Semua", "high", "medium", "low"];
+const timeFilters = ["Semua", "today", "week", "month"];
 
 const initialFilters: DocumentFilterValues = {
   searchQuery: "",
   category: "Semua",
   department: "Semua",
-  // priority: "Semua",
+  priority: "Semua",
   time: "Semua",
   showFavoritesOnly: false,
   showMandatoryOnly: false,
@@ -63,7 +64,8 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
     onFilterChange(initialFilters);
   }
 
-  const isFilterVisible = (filterName: string) => visibleFilters.includes(filterName as any);
+  // FIX: Use a more specific type for the parameter
+  const isFilterVisible = (filterName: keyof DocumentFilterValues) => visibleFilters.includes(filterName);
 
   return (
     <Card>
@@ -91,8 +93,6 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
         </div>
 
         <div className="flex flex-col gap-4">
-          {/* --- START OF FIX --- */}
-          {/* This div contains the dropdowns and will be rendered conditionally */}
           <div className="flex flex-wrap gap-4">
             {isFilterVisible('category') && (
                 <Select value={filters.category} onValueChange={(value) => handleFilterChange('category', value)}>
@@ -106,12 +106,12 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
                 <SelectContent>{departments.map(dept => <SelectItem key={dept} value={dept}>{dept}</SelectItem>)}</SelectContent>
                 </Select>
             )}
-            {/* {isFilterVisible('priority') && (
+            {isFilterVisible('priority') && (
                 <Select value={filters.priority} onValueChange={(value) => handleFilterChange('priority', value)}>
                 <SelectTrigger className="w-full sm:w-auto flex-1"><SelectValue placeholder="Prioritas" /></SelectTrigger>
                 <SelectContent>{priorities.map(p => <SelectItem key={p} value={p}>{p === "Semua" ? "Semua" : p.charAt(0).toUpperCase() + p.slice(1)}</SelectItem>)}</SelectContent>
                 </Select>
-            )} */}
+            )}
             {isFilterVisible('time') && (
                 <Select value={filters.time} onValueChange={(value) => handleFilterChange('time', value)}>
                 <SelectTrigger className="w-full sm:w-auto flex-1"><SelectValue placeholder="Waktu" /></SelectTrigger>
@@ -124,16 +124,16 @@ export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters =
                 </Select>
             )}
           </div>
-
+          
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              {isFilterVisible('favorites') && (
+              {isFilterVisible('showFavoritesOnly') && (
                 <Button variant={filters.showFavoritesOnly ? "secondary" : "outline"} size="sm" onClick={() => handleFilterChange('showFavoritesOnly', !filters.showFavoritesOnly)}>
                   <Heart className={`w-4 h-4 mr-2 ${filters.showFavoritesOnly ? 'text-red-500 fill-current' : ''}`} />
                   Favorit
                 </Button>
               )}
-              {isFilterVisible('mandatory') && (
+              {isFilterVisible('showMandatoryOnly') && (
                 <Button variant={filters.showMandatoryOnly ? "secondary" : "outline"} size="sm" onClick={() => handleFilterChange('showMandatoryOnly', !filters.showMandatoryOnly)}>
                   <Star className={`w-4 h-4 mr-2 ${filters.showMandatoryOnly ? 'text-yellow-500 fill-current' : ''}`} />
                   Wajib Saja
