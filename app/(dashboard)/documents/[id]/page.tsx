@@ -4,8 +4,8 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // <<< THE MISSING IMPORT IS NOW ADDED
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DocumentViewer } from "@/components/document-viewer";
@@ -22,7 +22,12 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
+// This defines the correct type for the page's props
+interface DocumentDetailPageProps {
+  params: { id: string };
+}
+
+export default async function DocumentDetailPage({ params }: DocumentDetailPageProps) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
@@ -38,6 +43,7 @@ export default async function DocumentDetailPage({ params }: { params: { id: str
   }
   
   const doc = document as DocumentWithUploader;
+  const safeExternalUrl = doc.document_type === 'link' ? (doc.external_url || '#') : (doc.file_url || '#');
 
   return (
     <div className="space-y-6">
@@ -50,7 +56,7 @@ export default async function DocumentDetailPage({ params }: { params: { id: str
                 <div className="flex items-center space-x-2">
                     <h1 className="text-2xl font-bold text-gray-900">{doc.title}</h1>
                     <Badge variant={doc.verification_status === "approved" ? "default" : "secondary"}>
-                        {doc.verification_status === "approved" ? "Terverifikasi" : doc.verification_status}
+                        {doc.verification_status || 'Pending'}
                     </Badge>
                 </div>
                 <p className="text-gray-600 max-w-2xl mt-1">{doc.description}</p>
@@ -62,51 +68,35 @@ export default async function DocumentDetailPage({ params }: { params: { id: str
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Preview Dokumen</CardTitle>
-              <CardDescription>
-                Buka di halaman viewer khusus untuk pengalaman terbaik.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DocumentViewer document={doc} />
-            </CardContent>
+            <CardHeader><CardTitle>Preview Dokumen</CardTitle></CardHeader>
+            <CardContent><DocumentViewer document={doc} /></CardContent>
           </Card>
         </div>
-
         <div className="space-y-6">
           <Card>
             <CardHeader><CardTitle className="text-lg">Informasi Dokumen</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-y-3 text-sm">
-                  <span className="text-gray-600">Departemen</span><span className="font-medium text-right">{doc.department}</span>
-                  <span className="text-gray-600">Author</span><span className="font-medium text-right">{doc.author}</span>
-                  <span className="text-gray-600">Diupload Oleh</span><span className="font-medium text-right">{doc.uploaded_by?.name || 'N/A'}</span>
-                  <span className="text-gray-600">Tanggal Upload</span><span className="font-medium text-right">{formatDate(doc.created_at)}</span>
-                  <span className="text-gray-600">Tipe File</span><Badge variant="outline" className="justify-self-end">{doc.file_type}</Badge>
-                  <span className="text-gray-600">Prioritas</span><Badge variant={doc.priority === 'high' ? 'destructive' : 'outline'} className="justify-self-end capitalize">{doc.priority}</Badge>
-                  <span className="text-gray-600">Versi</span><span className="font-medium text-right">{doc.version}</span>
+                  <span>Departemen</span><span className="font-medium text-right">{doc.department}</span>
+                  <span>Author</span><span className="font-medium text-right">{doc.author}</span>
+                  <span>Diupload Oleh</span><span className="font-medium text-right">{doc.uploaded_by?.name || 'N/A'}</span>
+                  <span>Tanggal Upload</span><span className="font-medium text-right">{formatDate(doc.created_at)}</span>
+                  <span>Tipe File</span><Badge variant="outline" className="justify-self-end">{doc.file_type}</Badge>
+                  <span>Prioritas</span><Badge variant={doc.priority === 'high' ? 'destructive' : 'outline'} className="justify-self-end capitalize">{doc.priority}</Badge>
+                  <span>Versi</span><span className="font-medium text-right">{doc.version}</span>
               </div>
               {doc.tags && doc.tags.length > 0 && (
-                <>
-                  <Separator />
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Tags</p>
-                    <div className="flex flex-wrap gap-2">
-                      {doc.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary">{tag}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                </>
+                <><Separator /><div className="space-y-2"><p className="text-sm font-medium">Tags</p><div className="flex flex-wrap gap-2">{doc.tags.map((tag) => (<Badge key={tag} variant="secondary">{tag}</Badge>))}</div></div></>
               )}
             </CardContent>
           </Card>
           <Card>
             <CardHeader><CardTitle className="text-lg">Aksi Cepat</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              <Button asChild className="w-full justify-start"><Link href={doc.document_type === 'link' ? doc.external_url! : doc.file_url!} target="_blank"><Eye className="w-4 h-4 mr-2" />Buka di Tab Baru</Link></Button>
-              <Button variant="outline" className="w-full justify-start" disabled={doc.document_type === 'link'}><Download className="w-4 h-4 mr-2" />Download</Button>
+            <CardContent>
+              <div className="space-y-3">
+                <Button asChild className="w-full justify-start"><Link href={safeExternalUrl} target="_blank"><Eye className="w-4 h-4 mr-2" />Buka di Tab Baru</Link></Button>
+                <Button variant="outline" className="w-full justify-start" disabled={doc.document_type === 'link'}><Download className="w-4 h-4 mr-2" />Download</Button>
+              </div>
             </CardContent>
           </Card>
         </div>
