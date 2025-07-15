@@ -1,37 +1,31 @@
-// app/(dashboard)/documents/[id]/page.tsx
+// app/(dashboard)/documents/[id]/page.tsx (FINAL, CORRECTED VERSION)
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // <<< THE MISSING IMPORT IS NOW ADDED
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { DocumentViewer } from "@/components/document-viewer"; // We will use this component
-import {
-  FileText, Download, Eye, Share2, Edit, Trash2, Clock, User, Building2, Tag, Link as LinkIcon
-} from "lucide-react";
+import { DocumentViewer } from "@/components/document-viewer";
+import { DocumentActions } from "@/components/document-actions";
+import { FileText, Eye, Download, Link as LinkIcon } from "lucide-react";
 import type { Document } from "@/lib/supabase";
 
-// Helper function to format the date
 const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString("id-ID", {
-        year: 'numeric', month: 'long', day: 'numeric'
-    });
+    return new Date(dateString).toLocaleDateString("id-ID", { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
 type DocumentWithUploader = Document & {
-  uploaded_by: { name: string; email: string; avatar_url?: string } | null
-}
+  uploaded_by: { name: string; email: string; avatar_url?: string } | null;
+};
 
-// This is a Server Component that fetches its own data
 export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
-  // Fetch the specific document from Supabase using the ID from the URL
   const { data: document, error } = await supabase
     .from("documents")
     .select(`*, uploaded_by (name, email, avatar_url)`)
@@ -47,8 +41,6 @@ export default async function DocumentDetailPage({ params }: { params: { id: str
 
   return (
     <div className="space-y-6">
-      {/* The Breadcrumb is handled globally, so it's not needed here */}
-      
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
@@ -64,34 +56,24 @@ export default async function DocumentDetailPage({ params }: { params: { id: str
                 <p className="text-gray-600 max-w-2xl mt-1">{doc.description}</p>
             </div>
         </div>
-        <div className="flex items-center gap-2">
-            <Button variant="outline"><Share2 className="w-4 h-4 mr-2" />Bagikan</Button>
-            <Button variant="outline"><Edit className="w-4 h-4 mr-2" />Edit</Button>
-            <Button variant="destructive"><Trash2 className="w-4 h-4 mr-2" />Hapus</Button>
-        </div>
+        <DocumentActions document={doc} />
       </div>
 
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Preview Dokumen</CardTitle>
               <CardDescription>
-                <Link href={`/documents/${doc.id}/view`} className="text-blue-600 hover:underline">
-                    Buka di halaman viewer khusus untuk pengalaman terbaik.
-                </Link>
+                Buka di halaman viewer khusus untuk pengalaman terbaik.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* THE FIX IS HERE: We now embed the DocumentViewer directly */}
               <DocumentViewer document={doc} />
             </CardContent>
           </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
           <Card>
             <CardHeader><CardTitle className="text-lg">Informasi Dokumen</CardTitle></CardHeader>
@@ -120,16 +102,15 @@ export default async function DocumentDetailPage({ params }: { params: { id: str
               )}
             </CardContent>
           </Card>
-          
           <Card>
             <CardHeader><CardTitle className="text-lg">Aksi Cepat</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              <Button asChild className="w-full justify-start"><Link href={`/documents/${doc.id}/view`}><Eye className="w-4 h-4 mr-2" />Buka Viewer</Link></Button>
-              <Button variant="outline" className="w-full justify-start"><Download className="w-4 h-4 mr-2" />Download</Button>
+              <Button asChild className="w-full justify-start"><Link href={doc.document_type === 'link' ? doc.external_url! : doc.file_url!} target="_blank"><Eye className="w-4 h-4 mr-2" />Buka di Tab Baru</Link></Button>
+              <Button variant="outline" className="w-full justify-start" disabled={doc.document_type === 'link'}><Download className="w-4 h-4 mr-2" />Download</Button>
             </CardContent>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }
