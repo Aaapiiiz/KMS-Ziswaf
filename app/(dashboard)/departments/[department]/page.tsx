@@ -30,6 +30,7 @@ export default async function DepartmentDetailPage({ params }: { params: { depar
   const departmentNameForDB = departmentData.name;
 
   const supabase = createServerComponentClient({ cookies });
+  await supabase.auth.getSession();
 
   // The problematic "await supabase.auth.getSession()" line has been removed.
 

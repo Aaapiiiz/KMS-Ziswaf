@@ -12,8 +12,10 @@ type DocumentWithUploader = Document & {
 
 export default async function RecentDocumentsPage() {
   const supabase = createServerComponentClient({ cookies });
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  await supabase.auth.getSession();
 
   // Use the direct query method with a date filter.
   // The RLS policies we set up will allow this to work correctly.
