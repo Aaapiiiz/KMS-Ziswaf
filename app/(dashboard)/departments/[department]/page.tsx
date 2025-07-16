@@ -1,4 +1,4 @@
-// app/(dashboard)/departments/[department]/page.tsx (FINAL, CORRECTED VERSION)
+// app/(dashboard)/departments/[department]/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -17,14 +17,13 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-// --- THIS IS THE DEFINITIVE FIX ---
-// This is the standard way to type props for dynamic pages in Next.js
-type DepartmentPageProps = {
+// The props for a Next.js page with dynamic segments.
+// We type them inline to avoid potential type conflicts from custom type names.
+export default async function DepartmentDetailPage({
+  params,
+}: {
   params: { department: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function DepartmentDetailPage({ params }: DepartmentPageProps) {
+}) {
   const departmentSlug = params.department.toLowerCase();
   const departmentData = departmentInfo[departmentSlug];
 
