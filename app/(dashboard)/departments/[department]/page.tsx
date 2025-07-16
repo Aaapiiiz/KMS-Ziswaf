@@ -1,11 +1,9 @@
 // ngejerwisokto/app/(dashboard)/departments/[department]/page.tsx
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { DepartmentDetailView } from "./_components/department-detail-view";
-import type { Document } from "@/lib/supabase";
-export const dynamic = 'force-dynamic';
+
+// Hapus semua impor terkait Supabase dan `async` dari sini.
 
 const departmentInfo: { [key: string]: { name: string; description: string; head: string; headAvatar: string; members: number } } = {
   pendayagunaan: { name: "Pendayagunaan", description: "Departemen yang bertanggung jawab atas penyaluran dan pendayagunaan dana ziswaf.", head: "Budi Santoso", headAvatar: "/placeholder.svg?height=40&width=40", members: 12 },
@@ -18,7 +16,8 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-export default async function DepartmentDetailPage({ params }: { params: { department: string } }) {
+// Komponen ini sekarang SINKRON dan tidak lagi menyebabkan bug.
+export default function DepartmentDetailPage({ params }: { params: { department: string } }) {
   const { department } = params;
   const departmentSlug = department.toLowerCase();
   const departmentData = departmentInfo[departmentSlug];
@@ -26,28 +25,11 @@ export default async function DepartmentDetailPage({ params }: { params: { depar
   if (!departmentData) {
     notFound();
   }
-  
-  const departmentNameForDB = departmentData.name;
 
-  const supabase = createServerComponentClient({ cookies });
-  await supabase.auth.getSession();
-
-  // The problematic "await supabase.auth.getSession()" line has been removed.
-
-  const { data: documents, error } = await supabase
-    .from("documents")
-    .select('*')
-    .eq('department', departmentNameForDB)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error(`Error fetching documents for ${departmentNameForDB}:`, error);
-  }
-
+  // Kita hanya meneruskan data statis. Komponen di bawah ini akan mengambil datanya sendiri.
   return (
     <DepartmentDetailView
       departmentData={departmentData}
-      documents={(documents as Document[]) || []}
     />
   );
 }

@@ -221,7 +221,7 @@ export default function DepartmentsPage() {
               {/* Actions */}
               <div className="w-full flex gap-2">
                 <Button asChild size="sm" className="flex-1">
-                  <Link href={`/departments/${department.id}`}>
+                  <Link href="/not-implemented">
                     <Eye className="mr-2 h-4 w-4" />
                     Detail
                   </Link>
