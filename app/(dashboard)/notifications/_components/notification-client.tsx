@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Check, Clock, FileText, Users, Settings, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { Bell, Check, FileText, Users, Settings, Trash2, Loader2 } from "lucide-react";
 
 // This interface must match the shape of the data we fetch
 export interface Notification {

@@ -1,4 +1,4 @@
-// app/(dashboard)/documents/[id]/page.tsx (FINAL, CORRECTED VERSION)
+// app/(dashboard)/documents/[id]/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -22,13 +22,13 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-// --- THIS IS THE DEFINITIVE FIX ---
-type DocumentDetailPageProps = {
+// The props for a Next.js page with dynamic segments.
+// We type them inline to avoid potential type conflicts from custom type names.
+export default async function DocumentDetailPage({
+  params,
+}: {
   params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function DocumentDetailPage({ params }: DocumentDetailPageProps) {
+}) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
