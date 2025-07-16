@@ -12,6 +12,7 @@ export async function getDynamicBreadcrumbLabel(segment: string, prevSegment?: s
   if (prevSegment === 'documents' && segment.length > 20) {
     try {
       const supabase = createServerComponentClient({ cookies });
+      await supabase.auth.getSession();
       const { data, error } = await supabase
         .from('documents')
         .select('title')

@@ -20,7 +20,8 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
 // REMOVED THE TYPE ANNOTATION FROM THE PROPS.
 // This allows Next.js to infer the correct type during build.
 export default async function DepartmentDetailPage({ params }: { params: { department: string } }) {
-  const departmentSlug = params.department.toLowerCase();
+  const { department } = params;
+  const departmentSlug = department.toLowerCase();
   const departmentData = departmentInfo[departmentSlug];
 
   if (!departmentData) {
@@ -30,6 +31,7 @@ export default async function DepartmentDetailPage({ params }: { params: { depar
   const departmentNameForDB = departmentData.name;
 
   const supabase = createServerComponentClient({ cookies });
+  await supabase.auth.getSession();
 
   const { data: documents, error } = await supabase
     .from("documents")
