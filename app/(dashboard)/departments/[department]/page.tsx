@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { DepartmentDetailView } from "./_components/department-detail-view";
 import type { Document } from "@/lib/supabase";
+export const dynamic = 'force-dynamic';
 
 const departmentInfo: { [key: string]: { name: string; description: string; head: string; headAvatar: string; members: number } } = {
   pendayagunaan: { name: "Pendayagunaan", description: "Departemen yang bertanggung jawab atas penyaluran dan pendayagunaan dana ziswaf.", head: "Budi Santoso", headAvatar: "/placeholder.svg?height=40&width=40", members: 12 },

@@ -1,4 +1,4 @@
-// app/(dashboard)/notifications/_components/notification-client.tsx (FINAL, COMPLETE VERSION)
+// ngejerwisokto/app/(dashboard)/notifications/_components/notification-client.tsx
 
 "use client";
 
@@ -6,7 +6,6 @@ import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,8 +37,7 @@ export function NotificationClient() {
     const fetchNotifications = async () => {
       setLoading(true);
       try {
-        // Use a direct query, NOT RPC, and perform the JOIN here.
-        // Supabase is smart enough to fetch the related user via the foreign key.
+        // FIX: Use `!inner` to ensure the join returns a single object, not an array.
         const { data, error } = await supabase
           .from('notifications')
           .select(`
@@ -50,15 +48,21 @@ export function NotificationClient() {
             is_read,
             requires_action,
             created_at,
-            sender:from_user_id ( name, avatar_url )
+            sender:from_user_id!inner ( name, avatar_url )
           `)
-          .order('created_at', { descending: true });
+          .order('created_at', { ascending: false });
 
         if (error) {
           throw error;
         }
 
-        setNotifications((data as Notification[]) || []);
+      const transformedData = data.map(n => ({
+        ...n,
+        // Ensure sender is an object, not an array with one object
+        sender: Array.isArray(n.sender) ? n.sender[0] : n.sender,
+      }));
+      
+      setNotifications((transformedData as Notification[]) || []);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
         alert("Gagal memuat notifikasi.");

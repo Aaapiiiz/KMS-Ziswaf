@@ -68,7 +68,7 @@ export default function RegisterPage() {
       // This is the call to Supabase to create a new user.
       // We pass the user's name and department in the `options.data` field.
       // Our database trigger will use this data to populate the public.users table.
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const {error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -87,10 +87,10 @@ export default function RegisterPage() {
       // If sign-up is successful, show the success message.
       setSuccess(true);
 
-    } catch (err: any) {
+    } catch (err) {
       console.error("Registration failed:", err);
       // Display a user-friendly error message.
-      setError(err.message || "Gagal melakukan pendaftaran. Silakan coba lagi.");
+      setError(err instanceof Error ? err.message : "Gagal melakukan pendaftaran. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }

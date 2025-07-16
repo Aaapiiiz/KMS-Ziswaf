@@ -21,7 +21,8 @@ export async function getDynamicBreadcrumbLabel(segment: string, prevSegment?: s
       
       if (error) return null;
       return data.title;
-    } catch (e) {
+    } 
+      catch {
       return null;
     }
   }

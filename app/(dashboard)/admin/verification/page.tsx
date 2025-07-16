@@ -1,4 +1,5 @@
-// app/(dashboard)/admin/verification/page.tsx (FINAL, CORRECTED VERSION)
+// ngejerwisokto/app/(dashboard)/admin/verification/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -161,9 +162,7 @@ export default function VerificationPage() {
                     </div>
 
                     <div className="flex flex-col space-y-2 ml-4">
-                      {/* === START OF THE FIX === */}
                       {document.document_type === 'link' ? (
-                        // If it's a LINK, use a standard `<a>` tag to open the external URL.
                         <Button variant="outline" size="sm" asChild>
                           <a href={document.external_url || '#'} target="_blank" rel="noopener noreferrer">
                             <Eye className="w-4 h-4 mr-2" />
@@ -171,7 +170,6 @@ export default function VerificationPage() {
                           </a>
                         </Button>
                       ) : (
-                        // If it's a FILE, use Next.js's <Link> to go to the internal detail page.
                         <Button variant="outline" size="sm" asChild>
                           <Link href={`/documents/${document.id}`} target="_blank">
                             <Eye className="w-4 h-4 mr-2" />
@@ -179,7 +177,6 @@ export default function VerificationPage() {
                           </Link>
                         </Button>
                       )}
-                      {/* === END OF THE FIX === */}
                       <Button variant="outline" size="sm" className="text-green-600 hover:text-green-700" onClick={() => {setSelectedDocument(document); setIsApproveOpen(true);}}><Check className="w-4 h-4 mr-2" />Setujui</Button>
                       <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" onClick={() => {setSelectedDocument(document); setIsRejectOpen(true);}}><X className="w-4 h-4 mr-2" />Tolak</Button>
                     </div>
@@ -197,7 +194,7 @@ export default function VerificationPage() {
 
       <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
           <DialogContent>
-              <DialogHeader><DialogTitle>Setujui Dokumen</DialogTitle><DialogDescription>Anda akan menyetujui dokumen "{selectedDocument?.title}". Dokumen akan dipublikasikan.</DialogDescription></DialogHeader>
+              <DialogHeader><DialogTitle>Setujui Dokumen</DialogTitle><DialogDescription>Anda akan menyetujui dokumen “{selectedDocument?.title}”. Dokumen akan dipublikasikan.</DialogDescription></DialogHeader>
               <div className="space-y-4 py-4"><Label htmlFor="approve-note" className="text-sm font-medium">Catatan Verifikasi (Opsional)</Label><Textarea id="approve-note" placeholder="Tambahkan catatan untuk persetujuan ini..." value={verificationNote} onChange={(e) => setVerificationNote(e.target.value)} className="mt-1"/></div>
               <DialogFooter><Button variant="outline" onClick={() => setIsApproveOpen(false)}>Batal</Button><Button className="bg-green-600 hover:bg-green-700" onClick={handleApprove}><Check className="w-4 h-4 mr-2" />Setujui Dokumen</Button></DialogFooter>
           </DialogContent>
@@ -205,7 +202,7 @@ export default function VerificationPage() {
       
       <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
           <DialogContent>
-              <DialogHeader><DialogTitle>Tolak Dokumen</DialogTitle><DialogDescription>Anda akan menolak dokumen "{selectedDocument?.title}". Dokumen akan dikembalikan ke pengirim.</DialogDescription></DialogHeader>
+              <DialogHeader><DialogTitle>Tolak Dokumen</DialogTitle><DialogDescription>Anda akan menolak dokumen “{selectedDocument?.title}”. Dokumen akan dikembalikan ke pengirim.</DialogDescription></DialogHeader>
               <div className="space-y-4 py-4"><Label htmlFor="reject-note" className="text-sm font-medium">Alasan Penolakan *</Label><Textarea id="reject-note" placeholder="Jelaskan alasan penolakan dan saran perbaikan..." value={verificationNote} onChange={(e) => setVerificationNote(e.target.value)} className="mt-1" required/></div>
               <DialogFooter><Button variant="outline" onClick={() => setIsRejectOpen(false)}>Batal</Button><Button variant="destructive" onClick={handleReject} disabled={!verificationNote.trim()}><X className="w-4 h-4 mr-2" />Tolak Dokumen</Button></DialogFooter>
           </DialogContent>

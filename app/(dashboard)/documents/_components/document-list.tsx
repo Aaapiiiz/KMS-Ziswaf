@@ -3,7 +3,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import Link from "next/link"
+// import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,7 @@ interface DocumentListProps {
 export function DocumentList({ initialDocuments }: DocumentListProps) {
   const [documents, setDocuments] = useState<DocumentWithUploader[]>(initialDocuments)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const { user, userRole } = useAuth()
+  const { userRole } = useAuth()
   const router = useRouter(); 
 
   const [activeFilters, setActiveFilters] = useState<DocumentFilterValues>({

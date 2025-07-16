@@ -1,6 +1,9 @@
 // lib/supabase.ts
 
-import { createClient } from "@supabase/supabase-js"
+"use client";
+
+// import { createClient } from "@supabase/supabase-js"
+import { createClient, type PostgrestError } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -71,7 +74,7 @@ export const getUsers = async (): Promise<User[] | null> => {
 }
 
 // Function to update a user's details (Admin action)
-export const updateUser = async (userId: string, updates: Partial<User>): Promise<{ data: User | null; error: any }> => {
+export const updateUser = async (userId: string, updates: Partial<User>): Promise<{ data: User | null; error: PostgrestError | null }> => {
   const { data, error } = await supabase
     .from("users")
     .update(updates)

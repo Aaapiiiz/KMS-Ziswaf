@@ -8,6 +8,8 @@ import { Plus } from "lucide-react";
 import type { Document } from "@/lib/supabase";
 import { DocumentList } from "./_components/document-list";
 
+export const dynamic = 'force-dynamic';
+
 // This type definition helps TypeScript understand the shape of our joined data.
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null;
@@ -15,9 +17,6 @@ type DocumentWithUploader = Document & {
 
 export default async function DocumentsPage() {
   const supabase = createServerComponentClient({ cookies });
-  await supabase.auth.getSession();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   await supabase.auth.getSession();
 
   // Use the direct query method. The new, correct RLS policies will allow this to work.

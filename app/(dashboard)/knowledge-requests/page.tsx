@@ -15,6 +15,11 @@ export interface KnowledgeRequest {
   users: { name: string | null; avatar_url: string | null; } | null;
   knowledge_segments: { name: string | null; } | null;
   comment_count: number;
+  // --- Start of Fix ---
+  requester_name: string;
+  requester_avatar: string | null;
+  segment_name: string;
+  // --- End of Fix ---
 }
 
 export default async function KnowledgeRequestsPage() {
@@ -25,7 +30,7 @@ export default async function KnowledgeRequestsPage() {
   const { data, error } = await supabase
     .from('knowledge_requests')
     .select(`*, users ( name, avatar_url ), knowledge_segments ( name )`)
-    .order('created_at', { descending: true });
+    .order('created_at', { ascending: false });
 
   if (error) { console.error("Error fetching knowledge requests:", error); }
 
@@ -38,6 +43,6 @@ export default async function KnowledgeRequestsPage() {
   })) || [];
   
   return (
-    <KnowledgeRequestClient initialRequests={knowledgeRequests as any} />
+    <KnowledgeRequestClient initialRequests={knowledgeRequests} />
   );
 }

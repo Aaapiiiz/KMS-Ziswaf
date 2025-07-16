@@ -1,4 +1,5 @@
-// hooks/use-auth.tsx (Final Diagnostic Version)
+// ngejerwisokto/hooks/use-auth.tsx
+
 "use client";
 
 import type React from "react";
@@ -39,13 +40,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log(`FINAL DIAGNOSTIC: Attempting to fetch profile for user ID: ${userId}`);
       
-      // Perform the query WITHOUT .single() to see the raw result.
       const { data: userArray, error: dbError } = await supabase
         .from("users")
         .select(`*`)
         .eq("id", userId);
 
-      // This is now the most important log message.
       console.log("FINAL DIAGNOSTIC: Raw query result:", { data: userArray, error: dbError });
 
       if (dbError) {
@@ -66,17 +65,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading: false,
       });
 
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("CRITICAL: Failed to fetch user profile from DB.");
       console.error("FINAL DIAGNOSTIC: Full error object:", e);
 
-      // As a last resort, sign out to prevent an invalid state.
       await supabase.auth.signOut();
       setAuthState({ user: null, userRole: null, loading: false });
     }
   }, []);
 
-  // The rest of the component is unchanged.
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       processSession(session);
