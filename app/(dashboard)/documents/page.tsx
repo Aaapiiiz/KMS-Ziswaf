@@ -1,34 +1,17 @@
-// app/(dashboard)/documents/page.tsx (FINAL, COMPLETE VERSION)
+// app/(dashboard)/documents/page.tsx (FINAL, CORRECTED VERSION)
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+// Hapus semua impor terkait Supabase dan async
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import type { Document } from "@/lib/supabase";
 import { DocumentList } from "./_components/document-list";
 
-export const dynamic = 'force-dynamic';
-
-// This type definition helps TypeScript understand the shape of our joined data.
-type DocumentWithUploader = Document & {
-  uploaded_by: { name: string; email: string } | null;
-};
-
-export default async function DocumentsPage() {
-  const supabase = createServerComponentClient({ cookies });
-  await supabase.auth.getSession();
-
-  // Use the direct query method. The new, correct RLS policies will allow this to work.
-  // Correct code for app/(dashboard)/documents/page.tsx
-const { data: documents, error } = await supabase
-  .from("documents")
-  .select(`*, uploaded_by ( name, email )`)
-  .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching documents:", error);
-  }
+// Halaman ini sekarang menjadi komponen sinkron yang sederhana.
+export default function DocumentsPage() {
+  
+  // Semua logika pengambilan data telah dipindahkan ke <DocumentList />.
+  // Komponen ini hanya bertanggung jawab untuk me-render layout halaman.
+  // Ini menghindari bug pada static analyzer Next.js v15.
 
   return (
     <div className="space-y-6">
@@ -44,7 +27,9 @@ const { data: documents, error } = await supabase
           </Link>
         </Button>
       </div>
-      <DocumentList initialDocuments={(documents as DocumentWithUploader[]) || []} />
+      
+      {/* Komponen DocumentList sekarang akan mengambil datanya sendiri di sisi klien */}
+      <DocumentList />
     </div>
   );
 }
