@@ -145,7 +145,7 @@ export function KnowledgeRequestClient({ initialRequests }: KnowledgeRequestClie
             <Card key={request.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row items-start justify-between">
-                  <div className="flex-1 space-y-2 mb-4 sm:mb-0"><CardTitle className="text-base sm:text-lg"><Link href={`/knowledge-requests/${request.id}`} className="hover:underline">{request.title}</Link></CardTitle><CardDescription className="text-sm">{request.description}</CardDescription></div>
+                  <div className="flex-1 space-y-2 mb-4 sm:mb-0"><CardTitle className="text-base sm:text-lg"><Link href="/not-implemented" className="hover:underline">{request.title}</Link></CardTitle><CardDescription className="text-sm">{request.description}</CardDescription></div>
                   <div className="flex items-center gap-2 ml-0 sm:ml-4">{getPriorityBadge(request.priority)}{getStatusBadge(request.status)}</div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 pt-4 border-t">
@@ -156,7 +156,7 @@ export function KnowledgeRequestClient({ initialRequests }: KnowledgeRequestClie
                   </div>
                   <div className="flex items-center gap-2 sm:gap-4 mt-4 sm:mt-0">
                     <Badge variant="outline">{request.segment_name || 'Lainnya'}</Badge>
-                    <Button variant="outline" size="sm" asChild><Link href={`/knowledge-requests/${request.id}`}><Eye className="mr-0 sm:mr-2 h-4 w-4" /><span className="hidden sm:inline">Detail</span></Link></Button>
+                    <Button variant="outline" size="sm" asChild><Link href="/not-implemented"><Eye className="mr-0 sm:mr-2 h-4 w-4" /><span className="hidden sm:inline">Detail</span></Link></Button>
                   </div>
                 </div>
               </CardContent>

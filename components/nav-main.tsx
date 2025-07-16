@@ -1,5 +1,8 @@
+// ngejerwisokto/components/nav-main.tsx
+
 "use client"
 
+import Link from "next/link"
 import { ChevronRight, type LucideIcon } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
@@ -12,6 +15,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
 
 export function NavMain({
   items,
@@ -35,15 +39,23 @@ export function NavMain({
           // If an item has a sub-menu, render it as a Collapsible
           if (item.items && item.items.length > 0) {
             return (
-              <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+              <SidebarMenuItem key={item.title}>
+                <Collapsible defaultOpen={item.isActive} className="group/collapsible">
+                  <div className="flex items-center">
+                    <SidebarMenuButton asChild className="flex-1 justify-start">
+                      <Link href={item.url}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                      </Link>
                     </SidebarMenuButton>
-                  </CollapsibleTrigger>
+                    
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                         <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
+
                   <CollapsibleContent>
                     <SidebarMenuSub>
                       {item.items.map((subItem) => (
@@ -57,19 +69,19 @@ export function NavMain({
                       ))}
                     </SidebarMenuSub>
                   </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+                </Collapsible>
+              </SidebarMenuItem>
             )
           }
 
-          // Otherwise, render a simple link
+          // Otherwise, render a simple link using asChild with a nested Link
           return (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton href={item.url} asChild>
-                <a href={item.url}>
+              <SidebarMenuButton asChild>
+                <Link href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )

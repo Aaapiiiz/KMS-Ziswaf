@@ -89,9 +89,11 @@ export default function ScholarshipsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Program Beasiswa</h1>
           <p className="text-muted-foreground">Kelola dan pantau program beasiswa untuk penerima manfaat</p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Program
+        <Button asChild>
+          <Link href="/not-implemented">
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah Program
+          </Link>
         </Button>
       </div>
 
@@ -158,7 +160,7 @@ export default function ScholarshipsPage() {
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <CardTitle className="text-lg">
-                      <Link href={`/programs/scholarships/${program.id}`} className="hover:underline">
+                      <Link href="/not-implemented" className="hover:underline">
                         {program.title}
                       </Link>
                     </CardTitle>
@@ -204,7 +206,7 @@ export default function ScholarshipsPage() {
                   <div className="flex items-center justify-between">
                     <Badge variant="outline">{program.category}</Badge>
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/programs/scholarships/${program.id}`}>
+                      <Link href="/not-implemented">
                         <Eye className="mr-2 h-4 w-4" />
                         Detail
                       </Link>

@@ -36,6 +36,7 @@ import {
   Grid,
   List,
 } from "lucide-react"
+import Link from "next/link"
 
 // Define interfaces for our data structures
 interface Participant {
@@ -441,9 +442,11 @@ export default function ActivitiesPage() {
               <Filter className="w-5 h-5" />
               <span>Filter & Pencarian</span>
             </div>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Buat Aktivitas Baru
+            <Button asChild>
+              <Link href="/not-implemented">
+                <Plus className="w-4 h-4 mr-2" />
+                Buat Aktivitas Baru
+              </Link>
             </Button>
           </CardTitle>
         </CardHeader>
@@ -458,9 +461,7 @@ export default function ActivitiesPage() {
             />
           </div>
 
-          {/* --- START OF FIX --- */}
           <div className="flex flex-col sm:flex-row gap-4 items-center">
-            {/* This div wraps the dropdowns and makes them grow */}
             <div className="flex flex-1 flex-col sm:flex-row gap-4 w-full">
               <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                 <SelectTrigger className="w-full">
@@ -516,7 +517,6 @@ export default function ActivitiesPage() {
               </Select>
             </div>
             
-            {/* This div wraps the view controls */}
             <div className="flex items-center space-x-2">
               <Button
                 variant={viewMode === "grid" ? "default" : "outline"}
@@ -737,26 +737,32 @@ export default function ActivitiesPage() {
                           <div className="text-center py-8">
                             <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                             <p className="text-gray-600">{selectedActivity?.documents} dokumen terkait aktivitas ini</p>
-                            <Button className="mt-4">Lihat Semua Dokumen</Button>
+                            <Button className="mt-4" asChild><Link href="/not-implemented">Lihat Semua Dokumen</Link></Button>
                           </div>
                         </TabsContent>
                       </Tabs>
 
                       <DialogFooter>
-                        <Button variant="outline">
-                          <UserPlus className="w-4 h-4 mr-2" />
-                          Bergabung
+                        <Button variant="outline" asChild>
+                          <Link href="/not-implemented">
+                            <UserPlus className="w-4 h-4 mr-2" />
+                            Bergabung
+                          </Link>
                         </Button>
-                        <Button>
-                          <MessageSquare className="w-4 h-4 mr-2" />
-                          Diskusi
+                        <Button asChild>
+                          <Link href="/not-implemented">
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Diskusi
+                          </Link>
                         </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-                  <Button size="sm" variant="outline">
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Gabung
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href="/not-implemented">
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Gabung
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
@@ -790,12 +796,14 @@ export default function ActivitiesPage() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2 ml-4">
-                      <Button size="sm" variant="outline">
-                        Lihat Detail
+                      <Button size="sm" variant="outline" asChild>
+                        <Link href="/not-implemented">Lihat Detail</Link>
                       </Button>
-                      <Button size="sm" variant="outline">
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        Gabung
+                      <Button size="sm" variant="outline" asChild>
+                         <Link href="/not-implemented">
+                           <UserPlus className="w-4 h-4 mr-2" />
+                           Gabung
+                         </Link>
                       </Button>
                     </div>
                   </div>
@@ -812,9 +820,11 @@ export default function ActivitiesPage() {
             <Target className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada aktivitas ditemukan</h3>
             <p className="text-gray-600 mb-4">Coba ubah filter atau kata kunci pencarian</p>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Buat Aktivitas Baru
+            <Button asChild>
+              <Link href="/not-implemented">
+                <Plus className="w-4 h-4 mr-2" />
+                Buat Aktivitas Baru
+              </Link>
             </Button>
           </CardContent>
         </Card>

@@ -1,5 +1,3 @@
-// components/breadcrumb-nav.tsx
-
 "use client";
 
 import React from "react";
@@ -37,7 +35,8 @@ const staticLabels: Record<string, string> = {
   notifications: "Notifikasi",
   verification: "Verifikasi",
   "social-aid": "Bantuan Sosial",
-  scholarships: "Beasiswa"
+  scholarships: "Beasiswa",
+  programs: "Program",
 };
 
 export function BreadcrumbNav() {

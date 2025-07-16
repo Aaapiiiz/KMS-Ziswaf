@@ -33,12 +33,12 @@ export default function PasswordPage() {
 
   const passwordStrength = getPasswordStrength(newPassword)
 
-  const getStrengthColor = (strength: number) => {
-    if (strength < 25) return "bg-red-500"
-    if (strength < 50) return "bg-orange-500"
-    if (strength < 75) return "bg-yellow-500"
-    return "bg-green-500"
-  }
+  // const getStrengthColor = (strength: number) => {
+  //   if (strength < 25) return "bg-red-500"
+  //   if (strength < 50) return "bg-orange-500"
+  //   if (strength < 75) return "bg-yellow-500"
+  //   return "bg-green-500"
+  // }
 
   const getStrengthText = (strength: number) => {
     if (strength < 25) return "Lemah"

@@ -1,4 +1,4 @@
-// app/(dashboard)/departments/[department]/page.tsx
+// ngejerwisokto/app/(dashboard)/departments/[department]/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -18,8 +18,6 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
-// This allows Next.js to infer the correct type during build.
 export default async function DepartmentDetailPage({ params }: { params: { department: string } }) {
   const { department } = params;
   const departmentSlug = department.toLowerCase();
@@ -32,7 +30,8 @@ export default async function DepartmentDetailPage({ params }: { params: { depar
   const departmentNameForDB = departmentData.name;
 
   const supabase = createServerComponentClient({ cookies });
-  await supabase.auth.getSession();
+
+  // The problematic "await supabase.auth.getSession()" line has been removed.
 
   const { data: documents, error } = await supabase
     .from("documents")

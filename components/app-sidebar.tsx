@@ -1,20 +1,16 @@
-// components/app-sidebar.tsx
-
 "use client"
 
 import type * as React from "react"
 import {
   BookOpen,
-  // Home,
   Users,
   CheckCircle,
   GalleryVerticalEnd,
-  // Settings,
   PieChart,
   Bell,
   Shield,
   FileText,
-  // Activity, // Used for 'Aktivitas' now
+  GraduationCap, // Added Icon
 } from "lucide-react"
 
 import { useAuth } from "@/hooks/use-auth"
@@ -43,11 +39,6 @@ const data = {
     },
   ],
   navMain: [
-    // {
-    //   title: "Dashboard",
-    //   url: "/dashboard",
-    //   icon: Home,
-    // },
     {
       title: "Dokumen",
       url: "/documents",
@@ -55,22 +46,24 @@ const data = {
       items: [
         { title: "Semua Dokumen", url: "/documents" },
         { title: "Dokumen Terbaru", url: "/documents/recent" },
-        // { title: "Tambah Dokumen", url: "/documents/add" },
       ],
     },
+    // *** NEW MENU ITEM FOR PROGRAMS ***
     {
-      // *** THE FIX IS HERE ***
-      // This is now a direct link, not a collapsible menu.
-      title: "Departemen",
-      url: "/departments", // Points directly to the main departments page
-      icon: BookOpen,
-      // The 'items' array has been removed.
+      title: "Program",
+      url: "/programs",
+      icon: GraduationCap,
+      // items: [
+      //   { title: "Ikhtisar Program", url: "/programs" },
+      //   { title: "Beasiswa", url: "/programs/scholarships" },
+      //   { title: "Bantuan Sosial", url: "/programs/social-aid" },
+      // ],
     },
-    // {
-    //   title: "Aktivitas",
-    //   url: "/activities",
-    //   icon: Activity, // More appropriate icon
-    // },
+    {
+      title: "Departemen",
+      url: "/departments", 
+      icon: BookOpen,
+    },
     { title: "Permintaan Pengetahuan", url: "/knowledge-requests", icon: PieChart },
     { title: "Notifikasi", url: "/notifications", icon: Bell },
   ],
