@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Search, Plus, MoreHorizontal, Edit, Trash2, Mail, UserCheck, UserX, Loader2 } from "lucide-react"
+import { Search, Plus, MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react"
 import { AdminRouteGuard } from "@/components/admin-route-guard"
 import { getUsers, supabase, updateUser } from "@/lib/supabase" // MODIFIED: import updateUser
 import type { User } from "@/lib/supabase"

@@ -22,13 +22,9 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-// This is the full, explicit type for Next.js page props.
-type PageProps = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function DocumentDetailPage({ params, searchParams }: PageProps) {
+// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
+// This allows Next.js to infer the correct type during build.
+export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 

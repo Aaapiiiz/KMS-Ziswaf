@@ -17,13 +17,9 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-// This is the full, explicit type for Next.js page props.
-type PageProps = {
-  params: { department: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function DepartmentDetailPage({ params, searchParams }: PageProps) {
+// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
+// This allows Next.js to infer the correct type during build.
+export default async function DepartmentDetailPage({ params }: { params: { department: string } }) {
   const departmentSlug = params.department.toLowerCase();
   const departmentData = departmentInfo[departmentSlug];
 
