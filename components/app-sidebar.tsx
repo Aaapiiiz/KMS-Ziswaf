@@ -5,16 +5,16 @@
 import type * as React from "react"
 import {
   BookOpen,
-  Home,
+  // Home,
   Users,
   CheckCircle,
   GalleryVerticalEnd,
-  Settings,
+  // Settings,
   PieChart,
   Bell,
   Shield,
   FileText,
-  Activity, // Used for 'Aktivitas' now
+  // Activity, // Used for 'Aktivitas' now
 } from "lucide-react"
 
 import { useAuth } from "@/hooks/use-auth"
