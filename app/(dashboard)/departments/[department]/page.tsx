@@ -17,13 +17,13 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-// The props for a Next.js page with dynamic segments.
-// We type them inline to avoid potential type conflicts from custom type names.
-export default async function DepartmentDetailPage({
-  params,
-}: {
+// This is the full, explicit type for Next.js page props.
+type PageProps = {
   params: { department: string };
-}) {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export default async function DepartmentDetailPage({ params, searchParams }: PageProps) {
   const departmentSlug = params.department.toLowerCase();
   const departmentData = departmentInfo[departmentSlug];
 

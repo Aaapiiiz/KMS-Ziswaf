@@ -22,13 +22,13 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-// The props for a Next.js page with dynamic segments.
-// We type them inline to avoid potential type conflicts from custom type names.
-export default async function DocumentDetailPage({
-  params,
-}: {
+// This is the full, explicit type for Next.js page props.
+type PageProps = {
   params: { id: string };
-}) {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export default async function DocumentDetailPage({ params, searchParams }: PageProps) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
