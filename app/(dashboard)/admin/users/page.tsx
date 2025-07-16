@@ -197,11 +197,11 @@ export default function UsersPage() {
                         <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end"><DropdownMenuLabel>Aksi</DropdownMenuLabel>
                             <DropdownMenuItem onSelect={() => setEditingUser(user)}><Edit className="mr-2 h-4 w-4" />Edit Pengguna</DropdownMenuItem>
-                            <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Kirim Email</DropdownMenuItem>
+                            {/* <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Kirim Email</DropdownMenuItem> */}
                             <DropdownMenuSeparator />
-                            {user.status === "active" ? (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'inactive' })}><UserX className="mr-2 h-4 w-4" />Nonaktifkan</DropdownMenuItem>) 
-                            : (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'active' })}><UserCheck className="mr-2 h-4 w-4" />Aktifkan</DropdownMenuItem>)}
-                            <DropdownMenuSeparator />
+                            {/* {user.status === "active" ? (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'inactive' })}><UserX className="mr-2 h-4 w-4" />Nonaktifkan</DropdownMenuItem>) 
+                            : (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'active' })}><UserCheck className="mr-2 h-4 w-4" />Aktifkan</DropdownMenuItem>)} */}
+                            {/* <DropdownMenuSeparator /> */}
                             <DropdownMenuItem className="text-red-600"><Trash2 className="mr-2 h-4 w-4" />Hapus Pengguna</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
