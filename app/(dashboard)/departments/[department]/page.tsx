@@ -29,8 +29,7 @@ export default async function DepartmentDetailPage({ params }: { params: { depar
   
   const departmentNameForDB = departmentData.name;
 
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const supabase = createServerComponentClient({ cookies });
 
   const { data: documents, error } = await supabase
     .from("documents")

@@ -1,3 +1,31 @@
+# .gitattributes
+
+```
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto eol=lf
+
+# Explicitly declare text files you want to always be LF
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.css text eol=lf
+*.mjs text eol=lf
+*.sql text eol=lf
+
+# Declare files that will always have CRLF line endings
+*.bat text eol=crlf
+
+# Denote all files that are truly binary and should not be modified
+*.ico binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.svg binary
+```
+
 # .gitignore
 
 ```
@@ -2067,7 +2095,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Search, Plus, MoreHorizontal, Edit, Trash2, Mail, UserCheck, UserX, Loader2 } from "lucide-react"
+import { Search, Plus, MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react"
 import { AdminRouteGuard } from "@/components/admin-route-guard"
 import { getUsers, supabase, updateUser } from "@/lib/supabase" // MODIFIED: import updateUser
 import type { User } from "@/lib/supabase"
@@ -2252,11 +2280,11 @@ export default function UsersPage() {
                         <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end"><DropdownMenuLabel>Aksi</DropdownMenuLabel>
                             <DropdownMenuItem onSelect={() => setEditingUser(user)}><Edit className="mr-2 h-4 w-4" />Edit Pengguna</DropdownMenuItem>
-                            <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Kirim Email</DropdownMenuItem>
+                            {/* <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Kirim Email</DropdownMenuItem> */}
                             <DropdownMenuSeparator />
-                            {user.status === "active" ? (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'inactive' })}><UserX className="mr-2 h-4 w-4" />Nonaktifkan</DropdownMenuItem>) 
-                            : (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'active' })}><UserCheck className="mr-2 h-4 w-4" />Aktifkan</DropdownMenuItem>)}
-                            <DropdownMenuSeparator />
+                            {/* {user.status === "active" ? (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'inactive' })}><UserX className="mr-2 h-4 w-4" />Nonaktifkan</DropdownMenuItem>) 
+                            : (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'active' })}><UserCheck className="mr-2 h-4 w-4" />Aktifkan</DropdownMenuItem>)} */}
+                            {/* <DropdownMenuSeparator /> */}
                             <DropdownMenuItem className="text-red-600"><Trash2 className="mr-2 h-4 w-4" />Hapus Pengguna</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -3022,7 +3050,7 @@ export function DepartmentDetailView({ departmentData, documents }: DepartmentDe
 # app\(dashboard)\departments\[department]\page.tsx
 
 ```tsx
-// app/(dashboard)/departments/[department]/page.tsx (FINAL, CORRECTED VERSION)
+// app/(dashboard)/departments/[department]/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -3041,14 +3069,9 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-// --- THIS IS THE DEFINITIVE FIX ---
-// This is the standard way to type props for dynamic pages in Next.js
-type DepartmentPageProps = {
-  params: { department: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function DepartmentDetailPage({ params }: DepartmentPageProps) {
+// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
+// This allows Next.js to infer the correct type during build.
+export default async function DepartmentDetailPage({ params }: { params: { department: string } }) {
   const departmentSlug = params.department.toLowerCase();
   const departmentData = departmentInfo[departmentSlug];
 
@@ -3534,13 +3557,9 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-// The props for a Next.js page with dynamic segments.
-// We type them inline to avoid potential type conflicts from custom type names.
-export default async function DocumentDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
+// This allows Next.js to infer the correct type during build.
+export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 

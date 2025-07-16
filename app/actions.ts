@@ -11,8 +11,7 @@ export async function getDynamicBreadcrumbLabel(segment: string, prevSegment?: s
   // We can expand this function to handle different types of dynamic routes
   if (prevSegment === 'documents' && segment.length > 20) {
     try {
-      const cookieStore = cookies();
-      const supabase = createServerComponentClient({ cookies: () => cookieStore });
+      const supabase = createServerComponentClient({ cookies });
       const { data, error } = await supabase
         .from('documents')
         .select('title')

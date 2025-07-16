@@ -18,8 +18,7 @@ export interface KnowledgeRequest {
 }
 
 export default async function KnowledgeRequestsPage() {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const supabase = createServerComponentClient({ cookies });
 
   // ABANDON RPC. Use the direct query method, which is more reliable.
   const { data, error } = await supabase

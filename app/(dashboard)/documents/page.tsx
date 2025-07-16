@@ -14,8 +14,7 @@ type DocumentWithUploader = Document & {
 };
 
 export default async function DocumentsPage() {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const supabase = createServerComponentClient({ cookies });
 
   // Use the direct query method. The new, correct RLS policies will allow this to work.
   // Correct code for app/(dashboard)/documents/page.tsx

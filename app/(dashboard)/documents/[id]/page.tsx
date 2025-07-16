@@ -25,8 +25,7 @@ type DocumentWithUploader = Document & {
 // REMOVED THE TYPE ANNOTATION FROM THE PROPS.
 // This allows Next.js to infer the correct type during build.
 export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const supabase = createServerComponentClient({ cookies });
 
   const { data: document, error } = await supabase
     .from("documents")
