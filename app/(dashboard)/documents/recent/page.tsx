@@ -1,11 +1,12 @@
-// app/(dashboard)/documents/recent/page.tsx (FINAL, COMPLETE VERSION)
+// app/(dashboard)/documents/recent/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import type { Document } from "@/lib/supabase";
 import { RecentDocumentList } from "./_components/recent-document-list";
 
-// This type definition helps TypeScript understand the shape of our joined data.
+export const dynamic = 'force-dynamic';
+
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null;
 };
@@ -15,14 +16,14 @@ export default async function RecentDocumentsPage() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  // Use the direct query method with a date filter.
-  // The RLS policies we set up will allow this to work correctly.
-  // Correct code for app/(dashboard)/documents/recent/page.tsx
-const { data: documents, error } = await supabase
-  .from("documents")
-  .select(`*, uploaded_by ( name, email )`)
-  .gte('created_at', thirtyDaysAgo.toISOString())
-  .order("created_at", { ascending: false });
+  // --- FIX IS HERE ---
+  await supabase.auth.getSession();
+
+  const { data: documents, error } = await supabase
+    .from("documents")
+    .select(`*, uploaded_by ( name, email )`)
+    .gte('created_at', thirtyDaysAgo.toISOString())
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching recent documents:", error);

@@ -1,18 +1,28 @@
 // app/(dashboard)/layout.tsx
 
 import type React from "react";
-import { Providers } from "./providers"; // Import the Providers component
+import { Providers } from "./providers";
 import { AppSidebar } from "@/components/app-sidebar";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
-export default function DashboardLayout({
+// Jadikan layout ini async untuk bisa mengambil data
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createServerComponentClient({ cookies });
+  
+  // Ambil sesi di sini, di sisi server. Ini adalah cara yang aman.
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   return (
-    // The Providers component creates the "use client" boundary.
-    <Providers>
+    // Kirim sesi dari server ini ke komponen Providers di client
+    <Providers initialSession={session}>
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <main className="flex flex-1 flex-col">

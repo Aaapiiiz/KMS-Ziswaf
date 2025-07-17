@@ -1,4 +1,4 @@
-// app/(dashboard)/documents/page.tsx (FINAL, COMPLETE VERSION)
+// app/(dashboard)/documents/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -10,21 +10,21 @@ import { DocumentList } from "./_components/document-list";
 
 export const dynamic = 'force-dynamic';
 
-// This type definition helps TypeScript understand the shape of our joined data.
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null;
 };
 
 export default async function DocumentsPage() {
   const supabase = createServerComponentClient({ cookies });
+  
+  // --- FIX IS HERE ---
+  // Pastikan sesi diambil SEBELUM melakukan query lain.
   await supabase.auth.getSession();
 
-  // Use the direct query method. The new, correct RLS policies will allow this to work.
-  // Correct code for app/(dashboard)/documents/page.tsx
-const { data: documents, error } = await supabase
-  .from("documents")
-  .select(`*, uploaded_by ( name, email )`)
-  .order("created_at", { ascending: false });
+  const { data: documents, error } = await supabase
+    .from("documents")
+    .select(`*, uploaded_by ( name, email )`)
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching documents:", error);

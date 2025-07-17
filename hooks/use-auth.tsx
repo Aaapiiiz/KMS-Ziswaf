@@ -1,4 +1,4 @@
-// ngejerwisokto/hooks/use-auth.tsx
+// hooks/use-auth.tsx
 
 "use client";
 
@@ -8,99 +8,101 @@ import { supabase } from "@/lib/supabase";
 import type { User as AppUser } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
 
-interface AuthState {
+interface AuthContextType {
   user: AppUser | null;
   userRole: "admin" | "user" | null;
   loading: boolean;
-}
-
-interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [authState, setAuthState] = useState<AuthState>({
-    user: null,
-    userRole: null,
-    loading: true,
-  });
+export function AuthProvider({
+  children,
+  initialSession, // Terima sesi yang sudah diambil oleh server
+}: {
+  children: React.ReactNode;
+  initialSession: Session | null;
+}) {
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [userRole, setUserRole] = useState<"admin" | "user" | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const processSession = useCallback(async (session: Session | null) => {
+  // Fungsi terpadu untuk memproses sesi dan mengambil profil dari DB
+  const processSessionAndProfile = useCallback(async (session: Session | null) => {
     if (!session?.user) {
-      setAuthState({ user: null, userRole: null, loading: false });
+      setUser(null);
+      setUserRole(null);
+      setLoading(false); // Selesai loading, tidak ada user
       return;
     }
 
-    const roleFromToken = session.user.app_metadata?.user_role as "admin" | "user" | null;
-    const userId = session.user.id;
-
     try {
-      console.log(`FINAL DIAGNOSTIC: Attempting to fetch profile for user ID: ${userId}`);
-      
-      const { data: userArray, error: dbError } = await supabase
+      // Ambil profil dari tabel 'users' berdasarkan ID dari sesi
+      const { data: profile, error } = await supabase
         .from("users")
         .select(`*`)
-        .eq("id", userId);
+        .eq("id", session.user.id)
+        .single();
+      
+      if (error) throw error; // Jika query gagal, lempar error
 
-      console.log("FINAL DIAGNOSTIC: Raw query result:", { data: userArray, error: dbError });
-
-      if (dbError) {
-          console.error("FINAL DIAGNOSTIC: The database returned a direct error.");
-          throw dbError;
+      if (profile) {
+        setUser(profile as AppUser);
+        setUserRole(profile.role);
+      } else {
+        // Kasus penting: Sesi ada tapi profil tidak ditemukan di DB.
+        // Anggap sebagai tidak terotentikasi.
+        setUser(null);
+        setUserRole(null);
       }
-
-      if (!userArray || userArray.length === 0) {
-        console.error("FINAL DIAGNOSTIC: Query succeeded but returned 0 rows. This means RLS is blocking the SELECT or the user row does not exist.");
-        throw new Error("No profile found for this user ID.");
-      }
-
-      const profile = userArray[0];
-      console.log("FINAL DIAGNOSTIC: Profile fetched successfully.");
-      setAuthState({
-        user: profile as AppUser,
-        userRole: roleFromToken || (profile.role as "admin" | "user"),
-        loading: false,
-      });
-
-    } catch (e: unknown) {
-      console.error("CRITICAL: Failed to fetch user profile from DB.");
-      console.error("FINAL DIAGNOSTIC: Full error object:", e);
-
-      await supabase.auth.signOut();
-      setAuthState({ user: null, userRole: null, loading: false });
+    } catch (e) {
+      console.error("Gagal mengambil profil pengguna:", e);
+      setUser(null);
+      setUserRole(null);
+    } finally {
+      // Pastikan loading selalu selesai, apa pun hasilnya.
+      setLoading(false);
     }
   }, []);
 
+  // Di sisi client, hanya proses sesi awal dari server SEKALI SAJA.
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      processSession(session);
-    });
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      processSession(session);
-    });
+    processSessionAndProfile(initialSession);
+  }, [initialSession, processSessionAndProfile]);
+
+  // Kemudian, pasang listener untuk memantau perubahan login/logout di client.
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        // Jika ada perubahan, proses lagi sesi yang baru.
+        processSessionAndProfile(session);
+      }
+    );
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [processSession]);
+  }, [processSessionAndProfile]);
 
-  const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      console.error("Supabase login error:", error);
-      throw error;
-    }
+  const value = {
+    user,
+    userRole,
+    loading,
+    login: async (email: string, password: string) => {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    },
+    logout: async () => {
+      await supabase.auth.signOut();
+      setUser(null);
+      setUserRole(null);
+    },
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/login";
-  };
-
-  const value = { ...authState, login, logout };
-
+  // Hilangkan logika `if (loading) return null`.
+  // Biarkan komponen anak yang memutuskan apa yang ditampilkan saat loading.
+  // Ini akan menghilangkan masalah "layar putih".
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

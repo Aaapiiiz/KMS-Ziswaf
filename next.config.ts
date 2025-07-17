@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ydxfwvmmdpontziiebbc.supabase.co', // <<< ADD THIS LINE FROM YOUR ERROR MESSAGE
+        hostname: 'ydxfwvmmdpontziiebbc.supabase.co', // <<< THIS IS THE CRUCIAL ADDITION
         port: '',
         pathname: '/storage/v1/object/public/**',
       },

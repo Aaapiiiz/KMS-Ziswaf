@@ -1,4 +1,4 @@
-// ngejerwisokto/app/(dashboard)/departments/[department]/page.tsx
+// app/(dashboard)/departments/[department]/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -18,7 +18,11 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-export default async function DepartmentDetailPage({ params }: { params: { department: string } }) {
+interface PageProps {
+  params: { department: string }
+}
+
+export default async function DepartmentDetailPage({ params }: PageProps) {
   const { department } = params;
   const departmentSlug = department.toLowerCase();
   const departmentData = departmentInfo[departmentSlug];
@@ -28,10 +32,10 @@ export default async function DepartmentDetailPage({ params }: { params: { depar
   }
   
   const departmentNameForDB = departmentData.name;
-
   const supabase = createServerComponentClient({ cookies });
-
-  // The problematic "await supabase.auth.getSession()" line has been removed.
+  
+  // --- FIX IS HERE ---
+  await supabase.auth.getSession();
 
   const { data: documents, error } = await supabase
     .from("documents")

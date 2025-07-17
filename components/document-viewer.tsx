@@ -113,4 +113,4 @@ export function DocumentViewer({ document }: DocumentViewerProps) {
       {renderViewerContent()}
     </div>
   );
-}
+} 

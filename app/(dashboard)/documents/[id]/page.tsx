@@ -22,12 +22,14 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
-// This allows Next.js to infer the correct type during build.
-export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
+// The props signature is correct. The fix is awaiting the session.
+export default async function DocumentDetailPage({ params }: { params: { id:string } }) {
   const { id } = params;
   const supabase = createServerComponentClient({ cookies });
-  await supabase.auth.getSession(); // Explicitly await session
+  
+  // --- FIX IS HERE ---
+  // Explicitly await the session to resolve the async cookie access.
+  await supabase.auth.getSession();
 
   const { data: document, error } = await supabase
     .from("documents")

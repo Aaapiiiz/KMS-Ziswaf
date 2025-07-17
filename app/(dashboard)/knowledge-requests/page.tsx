@@ -1,8 +1,10 @@
-// app/(dashboard)/knowledge-requests/page.tsx (FINAL CORRECTED VERSION)
+// app/(dashboard)/knowledge-requests/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { KnowledgeRequestClient } from "./_components/knowledge-request-client";
+
+export const dynamic = 'force-dynamic';
 
 export interface KnowledgeRequest {
   id: string;
@@ -15,18 +17,17 @@ export interface KnowledgeRequest {
   users: { name: string | null; avatar_url: string | null; } | null;
   knowledge_segments: { name: string | null; } | null;
   comment_count: number;
-  // --- Start of Fix ---
   requester_name: string;
   requester_avatar: string | null;
   segment_name: string;
-  // --- End of Fix ---
 }
 
 export default async function KnowledgeRequestsPage() {
   const supabase = createServerComponentClient({ cookies });
+
+  // --- FIX IS HERE ---
   await supabase.auth.getSession();
 
-  // ABANDON RPC. Use the direct query method, which is more reliable.
   const { data, error } = await supabase
     .from('knowledge_requests')
     .select(`*, users ( name, avatar_url ), knowledge_segments ( name )`)

@@ -3077,9 +3077,11 @@ const departmentInfo: { [key: string]: { name: string; description: string; head
   audit: { name: "Audit", description: "Melakukan audit internal untuk memastikan kepatuhan dan transparansi.", head: "Admin Ziswaf", headAvatar: "/placeholder.svg?height=40&width=40", members: 3 },
 };
 
-// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
-// This allows Next.js to infer the correct type during build.
-export default async function DepartmentDetailPage({ params }: { params: { department: string } }) {
+interface PageProps {
+  params: { department: string }
+}
+
+export default async function DepartmentDetailPage({ params }: PageProps) {
   const { department } = params;
   const departmentSlug = department.toLowerCase();
   const departmentData = departmentInfo[departmentSlug];
@@ -3089,9 +3091,10 @@ export default async function DepartmentDetailPage({ params }: { params: { depar
   }
   
   const departmentNameForDB = departmentData.name;
-
   const supabase = createServerComponentClient({ cookies });
-  // await supabase.auth.getSession();
+  
+  // --- FIX IS HERE ---
+  await supabase.auth.getSession();
 
   const { data: documents, error } = await supabase
     .from("documents")
@@ -3566,12 +3569,14 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
-// This allows Next.js to infer the correct type during build.
-export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
+// The props signature is correct. The fix is awaiting the session.
+export default async function DocumentDetailPage({ params }: { params: { id:string } }) {
   const { id } = params;
   const supabase = createServerComponentClient({ cookies });
-  await supabase.auth.getSession(); // Explicitly await session
+  
+  // --- FIX IS HERE ---
+  // Explicitly await the session to resolve the async cookie access.
+  await supabase.auth.getSession();
 
   const { data: document, error } = await supabase
     .from("documents")
@@ -3970,7 +3975,7 @@ export default function Loading() {
 # app\(dashboard)\documents\page.tsx
 
 ```tsx
-// app/(dashboard)/documents/page.tsx (FINAL, COMPLETE VERSION)
+// app/(dashboard)/documents/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -3982,21 +3987,21 @@ import { DocumentList } from "./_components/document-list";
 
 export const dynamic = 'force-dynamic';
 
-// This type definition helps TypeScript understand the shape of our joined data.
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null;
 };
 
 export default async function DocumentsPage() {
   const supabase = createServerComponentClient({ cookies });
+  
+  // --- FIX IS HERE ---
+  // Pastikan sesi diambil SEBELUM melakukan query lain.
   await supabase.auth.getSession();
 
-  // Use the direct query method. The new, correct RLS policies will allow this to work.
-  // Correct code for app/(dashboard)/documents/page.tsx
-const { data: documents, error } = await supabase
-  .from("documents")
-  .select(`*, uploaded_by ( name, email )`)
-  .order("created_at", { ascending: false });
+  const { data: documents, error } = await supabase
+    .from("documents")
+    .select(`*, uploaded_by ( name, email )`)
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching documents:", error);
@@ -4253,14 +4258,15 @@ export default function RecentDocumentsLoading() {
 # app\(dashboard)\documents\recent\page.tsx
 
 ```tsx
-// app/(dashboard)/documents/recent/page.tsx (FINAL, COMPLETE VERSION)
+// app/(dashboard)/documents/recent/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import type { Document } from "@/lib/supabase";
 import { RecentDocumentList } from "./_components/recent-document-list";
 
-// This type definition helps TypeScript understand the shape of our joined data.
+export const dynamic = 'force-dynamic';
+
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null;
 };
@@ -4270,14 +4276,14 @@ export default async function RecentDocumentsPage() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  // Use the direct query method with a date filter.
-  // The RLS policies we set up will allow this to work correctly.
-  // Correct code for app/(dashboard)/documents/recent/page.tsx
-const { data: documents, error } = await supabase
-  .from("documents")
-  .select(`*, uploaded_by ( name, email )`)
-  .gte('created_at', thirtyDaysAgo.toISOString())
-  .order("created_at", { ascending: false });
+  // --- FIX IS HERE ---
+  await supabase.auth.getSession();
+
+  const { data: documents, error } = await supabase
+    .from("documents")
+    .select(`*, uploaded_by ( name, email )`)
+    .gte('created_at', thirtyDaysAgo.toISOString())
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Error fetching recent documents:", error);
@@ -4504,11 +4510,13 @@ export default function Loading() {
 # app\(dashboard)\knowledge-requests\page.tsx
 
 ```tsx
-// app/(dashboard)/knowledge-requests/page.tsx (FINAL CORRECTED VERSION)
+// app/(dashboard)/knowledge-requests/page.tsx
 
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { KnowledgeRequestClient } from "./_components/knowledge-request-client";
+
+export const dynamic = 'force-dynamic';
 
 export interface KnowledgeRequest {
   id: string;
@@ -4521,18 +4529,17 @@ export interface KnowledgeRequest {
   users: { name: string | null; avatar_url: string | null; } | null;
   knowledge_segments: { name: string | null; } | null;
   comment_count: number;
-  // --- Start of Fix ---
   requester_name: string;
   requester_avatar: string | null;
   segment_name: string;
-  // --- End of Fix ---
 }
 
 export default async function KnowledgeRequestsPage() {
   const supabase = createServerComponentClient({ cookies });
+
+  // --- FIX IS HERE ---
   await supabase.auth.getSession();
 
-  // ABANDON RPC. Use the direct query method, which is more reliable.
   const { data, error } = await supabase
     .from('knowledge_requests')
     .select(`*, users ( name, avatar_url ), knowledge_segments ( name )`)
@@ -4560,18 +4567,28 @@ export default async function KnowledgeRequestsPage() {
 // app/(dashboard)/layout.tsx
 
 import type React from "react";
-import { Providers } from "./providers"; // Import the Providers component
+import { Providers } from "./providers";
 import { AppSidebar } from "@/components/app-sidebar";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
-export default function DashboardLayout({
+// Jadikan layout ini async untuk bisa mengambil data
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createServerComponentClient({ cookies });
+  
+  // Ambil sesi di sini, di sisi server. Ini adalah cara yang aman.
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   return (
-    // The Providers component creates the "use client" boundary.
-    <Providers>
+    // Kirim sesi dari server ini ke komponen Providers di client
+    <Providers initialSession={session}>
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <main className="flex flex-1 flex-col">
@@ -5968,11 +5985,18 @@ export default function SocialAidPage() {
 import { AuthProvider } from "@/hooks/use-auth";
 import { NotificationProvider } from "@/hooks/use-notifications";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import type { Session } from "@supabase/supabase-js";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  initialSession, // Terima prop sesi
+}: {
+  children: React.ReactNode;
+  initialSession: Session | null;
+}) {
   return (
-    // The AuthProvider here gives auth context to all dashboard pages.
-    <AuthProvider>
+    // Teruskan sesi ke AuthProvider
+    <AuthProvider initialSession={initialSession}>
       <NotificationProvider>
         <SidebarProvider>{children}</SidebarProvider>
       </NotificationProvider>
@@ -5998,7 +6022,11 @@ export async function getDynamicBreadcrumbLabel(segment: string, prevSegment?: s
   if (prevSegment === 'documents' && segment.length > 20) {
     try {
       const supabase = createServerComponentClient({ cookies });
+      
+      // --- FIX IS HERE ---
+      // Add this await to resolve the cookie access before querying data.
       await supabase.auth.getSession();
+
       const { data, error } = await supabase
         .from('documents')
         .select('title')
@@ -6022,7 +6050,6 @@ export async function getDynamicBreadcrumbLabel(segment: string, prevSegment?: s
 
   return null; // Return null if no match
 }
-
 ```
 
 # app\favicon.ico
@@ -7333,7 +7360,7 @@ export function DocumentViewer({ document }: DocumentViewerProps) {
       {renderViewerContent()}
     </div>
   );
-}
+} 
 ```
 
 # components\nav-main.tsx
@@ -7357,7 +7384,6 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-// import { cn } from "@/lib/utils"
 
 export function NavMain({
   items,
@@ -7384,15 +7410,13 @@ export function NavMain({
               <SidebarMenuItem key={item.title}>
                 <Collapsible defaultOpen={item.isActive} className="group/collapsible">
                   <div className="flex items-center">
-                    {/* Main part is a simple link, taking up most space */}
                     <SidebarMenuButton asChild className="flex-1 justify-start">
                       <Link href={item.url}>
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
-
-                    {/* The trigger is now a separate, smaller button for the chevron */}
+                    
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
                          <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -11245,7 +11269,7 @@ export default eslintConfig;
 # hooks\use-auth.tsx
 
 ```tsx
-// ngejerwisokto/hooks/use-auth.tsx
+// hooks/use-auth.tsx
 
 "use client";
 
@@ -11255,99 +11279,101 @@ import { supabase } from "@/lib/supabase";
 import type { User as AppUser } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
 
-interface AuthState {
+interface AuthContextType {
   user: AppUser | null;
   userRole: "admin" | "user" | null;
   loading: boolean;
-}
-
-interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [authState, setAuthState] = useState<AuthState>({
-    user: null,
-    userRole: null,
-    loading: true,
-  });
+export function AuthProvider({
+  children,
+  initialSession, // Terima sesi yang sudah diambil oleh server
+}: {
+  children: React.ReactNode;
+  initialSession: Session | null;
+}) {
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [userRole, setUserRole] = useState<"admin" | "user" | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const processSession = useCallback(async (session: Session | null) => {
+  // Fungsi terpadu untuk memproses sesi dan mengambil profil dari DB
+  const processSessionAndProfile = useCallback(async (session: Session | null) => {
     if (!session?.user) {
-      setAuthState({ user: null, userRole: null, loading: false });
+      setUser(null);
+      setUserRole(null);
+      setLoading(false); // Selesai loading, tidak ada user
       return;
     }
 
-    const roleFromToken = session.user.app_metadata?.user_role as "admin" | "user" | null;
-    const userId = session.user.id;
-
     try {
-      console.log(`FINAL DIAGNOSTIC: Attempting to fetch profile for user ID: ${userId}`);
-      
-      const { data: userArray, error: dbError } = await supabase
+      // Ambil profil dari tabel 'users' berdasarkan ID dari sesi
+      const { data: profile, error } = await supabase
         .from("users")
         .select(`*`)
-        .eq("id", userId);
+        .eq("id", session.user.id)
+        .single();
+      
+      if (error) throw error; // Jika query gagal, lempar error
 
-      console.log("FINAL DIAGNOSTIC: Raw query result:", { data: userArray, error: dbError });
-
-      if (dbError) {
-          console.error("FINAL DIAGNOSTIC: The database returned a direct error.");
-          throw dbError;
+      if (profile) {
+        setUser(profile as AppUser);
+        setUserRole(profile.role);
+      } else {
+        // Kasus penting: Sesi ada tapi profil tidak ditemukan di DB.
+        // Anggap sebagai tidak terotentikasi.
+        setUser(null);
+        setUserRole(null);
       }
-
-      if (!userArray || userArray.length === 0) {
-        console.error("FINAL DIAGNOSTIC: Query succeeded but returned 0 rows. This means RLS is blocking the SELECT or the user row does not exist.");
-        throw new Error("No profile found for this user ID.");
-      }
-
-      const profile = userArray[0];
-      console.log("FINAL DIAGNOSTIC: Profile fetched successfully.");
-      setAuthState({
-        user: profile as AppUser,
-        userRole: roleFromToken || (profile.role as "admin" | "user"),
-        loading: false,
-      });
-
-    } catch (e: unknown) {
-      console.error("CRITICAL: Failed to fetch user profile from DB.");
-      console.error("FINAL DIAGNOSTIC: Full error object:", e);
-
-      await supabase.auth.signOut();
-      setAuthState({ user: null, userRole: null, loading: false });
+    } catch (e) {
+      console.error("Gagal mengambil profil pengguna:", e);
+      setUser(null);
+      setUserRole(null);
+    } finally {
+      // Pastikan loading selalu selesai, apa pun hasilnya.
+      setLoading(false);
     }
   }, []);
 
+  // Di sisi client, hanya proses sesi awal dari server SEKALI SAJA.
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      processSession(session);
-    });
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      processSession(session);
-    });
+    processSessionAndProfile(initialSession);
+  }, [initialSession, processSessionAndProfile]);
+
+  // Kemudian, pasang listener untuk memantau perubahan login/logout di client.
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        // Jika ada perubahan, proses lagi sesi yang baru.
+        processSessionAndProfile(session);
+      }
+    );
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [processSession]);
+  }, [processSessionAndProfile]);
 
-  const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      console.error("Supabase login error:", error);
-      throw error;
-    }
+  const value = {
+    user,
+    userRole,
+    loading,
+    login: async (email: string, password: string) => {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    },
+    logout: async () => {
+      await supabase.auth.signOut();
+      setUser(null);
+      setUserRole(null);
+    },
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/login";
-  };
-
-  const value = { ...authState, login, logout };
-
+  // Hilangkan logika `if (loading) return null`.
+  // Biarkan komponen anak yang memutuskan apa yang ditampilkan saat loading.
+  // Ini akan menghilangkan masalah "layar putih".
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
@@ -11676,7 +11702,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ydxfwvmmdpontziiebbc.supabase.co', // <<< ADD THIS LINE FROM YOUR ERROR MESSAGE
+        hostname: 'ydxfwvmmdpontziiebbc.supabase.co', // <<< THIS IS THE CRUCIAL ADDITION
         port: '',
         pathname: '/storage/v1/object/public/**',
       },
