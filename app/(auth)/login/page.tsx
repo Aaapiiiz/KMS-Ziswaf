@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation" // <<< 1. IMPORT useRouter
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,28 +14,18 @@ import {
   EyeOff,
   BookOpen,
   Users,
-  // FileText,
   Shield,
   Zap,
   TrendingUp,
   Sparkles,
-  // Star,
   CheckCircle,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
-// FIX: Component for client-side only rendering to prevent hydration mismatch
 const FloatingParticles = () => {
   const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  if (!isMounted) {
-    return null
-  }
-
+  useEffect(() => { setIsMounted(true) }, [])
+  if (!isMounted) return null
   return (
     <div className="absolute inset-0">
       {[...Array(20)].map((_, i) => (
@@ -54,6 +45,7 @@ const FloatingParticles = () => {
 }
 
 export default function LoginPage() {
+  const router = useRouter() // <<< 2. INISIALISASI ROUTER
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -68,10 +60,10 @@ export default function LoginPage() {
 
     try {
       await login(email, password)
-      window.location.href = "/dashboard"
+      // <<< 3. GANTI window.location.href DENGAN router.push
+      router.push("/dashboard") 
     } catch (err) {
-      // --- FIX IS HERE ---
-      console.error("Login failed:", err) // Log the actual error for debugging
+      console.error("Login failed:", err)
       setError("Email atau password tidak valid")
     } finally {
       setIsLoading(false)
@@ -80,23 +72,16 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Enhanced Background Effects */}
+      {/* ... sisa kode JSX Anda tetap sama ... */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Animated gradient orbs */}
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-
-        {/* Floating particles */}
         <FloatingParticles />
-
-        {/* Grid pattern overlay */}
         <div className="absolute inset-0 grid-pattern-overlay opacity-40"></div>
       </div>
-
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - Enhanced Branding */}
           <div className="hidden lg:block space-y-8">
             <div className="space-y-6">
               <div className="flex items-center space-x-4">
@@ -113,17 +98,8 @@ export default function LoginPage() {
                     Ziswaf KMS
                   </h1>
                   <p className="text-xl text-cyan-200 font-medium">Knowledge Management System</p>
-                  {/* <div className="flex items-center space-x-2 mt-2">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-gray-300 ml-2">Trusted by 500+ users</span>
-                  </div> */}
                 </div>
               </div>
-
               <div className="space-y-4">
                 <p className="text-lg text-gray-200 leading-relaxed">
                   Platform revolusioner untuk mengelola pengetahuan ziswaf dengan interface
@@ -149,22 +125,7 @@ export default function LoginPage() {
                 </div>
               </div>
             </div>
-
             <div className="grid grid-cols-1 gap-6">
-              {/* <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
-                <div className="flex items-start space-x-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <FileText className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-white text-xl mb-3">Smart Document Management</h3>
-                    <p className="text-gray-300 leading-relaxed">
-                      Kelola dokumen dengan AI-powered search, auto-categorization, dan version control yang canggih
-                    </p>
-                  </div>
-                </div>
-              </div> */}
-
               <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
                 <div className="flex items-start space-x-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -178,7 +139,6 @@ export default function LoginPage() {
                   </div>
                 </div>
               </div>
-
               <div className="group p-8 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 hover:bg-white/15 transition-all duration-500 hover:scale-105 hover:shadow-2xl">
                 <div className="flex items-start space-x-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -194,8 +154,6 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-
-          {/* Right Side - Enhanced Login Form */}
           <div className="w-full max-w-md mx-auto">
             <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
               <CardHeader className="space-y-4 text-center pb-8">
@@ -222,7 +180,6 @@ export default function LoginPage() {
                       <AlertDescription className="text-red-700">{error}</AlertDescription>
                     </Alert>
                   )}
-
                   <div className="space-y-3">
                     <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
                       Email Address
@@ -237,7 +194,6 @@ export default function LoginPage() {
                       className="h-12 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500 rounded-xl"
                     />
                   </div>
-
                   <div className="space-y-3">
                     <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
                       Password
@@ -267,7 +223,6 @@ export default function LoginPage() {
                       </Button>
                     </div>
                   </div>
-
                   <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
                     <p className="font-semibold text-emerald-800 mb-3 text-sm flex items-center">
                       <Sparkles className="w-4 h-4 mr-2" />🚀 Demo Credentials:
@@ -284,7 +239,6 @@ export default function LoginPage() {
                     </div>
                   </div>
                 </CardContent>
-
                 <CardFooter className="flex flex-col space-y-4 pt-6">
                   <Button
                     type="submit"
@@ -299,11 +253,9 @@ export default function LoginPage() {
                     ) : (
                       <div className="flex items-center space-x-2">
                         <span>Masuk ke Dashboard</span>
-                        {/* <Sparkles className="w-4 h-4" /> */}
                       </div>
                     )}
                   </Button>
-
                   <div className="text-center text-sm text-gray-600">
                     Belum memiliki akun?{" "}
                     <Link
@@ -319,46 +271,25 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
       <style jsx>{`
+        /* ... sisa kode style Anda tetap sama ... */
         .grid-pattern-overlay {
           background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
         }
         @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
         }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
       `}</style>
     </div>
   )

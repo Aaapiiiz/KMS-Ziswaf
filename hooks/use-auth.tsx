@@ -4,6 +4,7 @@
 
 import type React from "react";
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation"; // Pastikan diimpor dari 'next/navigation'
 import { supabase } from "@/lib/supabase";
 import type { User as AppUser } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
@@ -20,89 +21,83 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({
   children,
-  initialSession, // Terima sesi yang sudah diambil oleh server
+  initialSession,
 }: {
   children: React.ReactNode;
   initialSession: Session | null;
 }) {
+  const router = useRouter(); // Inisialisasi router di sini
   const [user, setUser] = useState<AppUser | null>(null);
-  const [userRole, setUserRole] = useState<"admin" | "user" | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Fungsi terpadu untuk memproses sesi dan mengambil profil dari DB
+  // Dibuat dengan useCallback agar tidak dibuat ulang di setiap render
   const processSessionAndProfile = useCallback(async (session: Session | null) => {
     if (!session?.user) {
       setUser(null);
-      setUserRole(null);
-      setLoading(false); // Selesai loading, tidak ada user
+      setLoading(false);
       return;
     }
 
     try {
-      // Ambil profil dari tabel 'users' berdasarkan ID dari sesi
       const { data: profile, error } = await supabase
         .from("users")
         .select(`*`)
         .eq("id", session.user.id)
         .single();
       
-      if (error) throw error; // Jika query gagal, lempar error
-
-      if (profile) {
-        setUser(profile as AppUser);
-        setUserRole(profile.role);
-      } else {
-        // Kasus penting: Sesi ada tapi profil tidak ditemukan di DB.
-        // Anggap sebagai tidak terotentikasi.
-        setUser(null);
-        setUserRole(null);
+      if (error) {
+        // Jika profil tidak ditemukan, logout paksa
+        console.error("Gagal mengambil profil, melakukan logout:", error);
+        await supabase.auth.signOut();
+        return;
       }
+      
+      setUser(profile as AppUser);
+
     } catch (e) {
-      console.error("Gagal mengambil profil pengguna:", e);
+      console.error("Error saat memproses sesi:", e);
       setUser(null);
-      setUserRole(null);
     } finally {
-      // Pastikan loading selalu selesai, apa pun hasilnya.
       setLoading(false);
     }
   }, []);
 
-  // Di sisi client, hanya proses sesi awal dari server SEKALI SAJA.
+  // Proses sesi dari server sekali saja saat komponen pertama kali dimuat
   useEffect(() => {
     processSessionAndProfile(initialSession);
   }, [initialSession, processSessionAndProfile]);
 
-  // Kemudian, pasang listener untuk memantau perubahan login/logout di client.
+  // Pasang listener untuk memantau perubahan login/logout di sisi client
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         // Jika ada perubahan, proses lagi sesi yang baru.
+        // Ini akan menangani login/logout secara otomatis.
         processSessionAndProfile(session);
       }
     );
     return () => {
-      authListener?.subscription.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, [processSessionAndProfile]);
 
   const value = {
     user,
-    userRole,
+    userRole: user?.role ?? null,
     loading,
     login: async (email: string, password: string) => {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      // Tidak perlu redirect di sini, onAuthStateChange akan menanganinya
     },
     logout: async () => {
       await supabase.auth.signOut();
-      setUser(null);
-      setUserRole(null);
+      // Navigasi ke halaman login setelah logout berhasil
+      router.push('/login');
     },
   };
 
-  // Hilangkan logika `if (loading) return null`.
-  // Biarkan komponen anak yang memutuskan apa yang ditampilkan saat loading.
-  // Ini akan menghilangkan masalah "layar putih".
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
