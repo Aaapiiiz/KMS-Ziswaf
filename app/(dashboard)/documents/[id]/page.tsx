@@ -18,16 +18,20 @@ const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("id-ID", { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
+// --- PERBAIKAN: Definisikan tipe props dengan benar ---
+interface DocumentDetailPageProps {
+  params: { id: string };
+}
+
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-// REMOVED THE TYPE ANNOTATION FROM THE PROPS.
-// This allows Next.js to infer the correct type during build.
-export default async function DocumentDetailPage({ params }: { params: { id: string } }) {
+// Pastikan fungsi ini sudah 'async' dan menggunakan tipe props yang benar
+export default async function DocumentDetailPage({ params }: DocumentDetailPageProps) {
   const { id } = params;
   const supabase = createServerComponentClient({ cookies });
-  await supabase.auth.getSession(); // Explicitly await session
+  await supabase.auth.getSession();
 
   const { data: document, error } = await supabase
     .from("documents")
@@ -44,6 +48,7 @@ export default async function DocumentDetailPage({ params }: { params: { id: str
   const safePreviewUrl = doc.document_type === 'link' ? (doc.external_url || '#') : (doc.file_url || '#');
 
   return (
+    // ... sisa JSX tidak berubah
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-4">

@@ -9,6 +9,10 @@ import { Users, FileText, Activity, TrendingUp, Building2, Plus, Eye } from "luc
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+// Hapus baris import yang menyebabkan error di bawah ini.
+// import { DepartmentDetailView } from "./_components/department-detail-view"; 
+// ^^^ BARIS INI DIHAPUS
+
 // Mock data - now with avatar and more distinct colors
 const departments = [
   {

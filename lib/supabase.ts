@@ -1,6 +1,6 @@
 // lib/supabase.ts
 
-"use client";
+// "use client";
 
 import { createClient, type PostgrestError } from "@supabase/supabase-js";
 
