@@ -1,27 +1,22 @@
+// ngejerwisokto/app/(auth)/login/page.tsx (DEBUGGING VERSION)
 "use client"
 
 import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation" 
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  Eye,
-  EyeOff,
-  BookOpen,
-  Users,
-  Shield,
-  Zap,
-  TrendingUp,
-  Sparkles,
-  CheckCircle,
-} from "lucide-react"
+import { Eye, EyeOff, BookOpen, Sparkles, CheckCircle, Shield, Zap, TrendingUp, Users } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
+// --- KITA AKAN IMPORT SUPABASE CLIENT LANGSUNG UNTUK DEBUGGING ---
+import { supabase } from "@/lib/supabase/client";
+
+// FloatingParticles component remains the same
 const FloatingParticles = () => {
   const [isMounted, setIsMounted] = useState(false)
   useEffect(() => { setIsMounted(true) }, [])
@@ -45,35 +40,63 @@ const FloatingParticles = () => {
 }
 
 export default function LoginPage() {
-  const router = useRouter() // <<< 2. INISIALISASI ROUTER
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const { login } = useAuth()
+  const { user, loading } = useAuth(); // Kita tetap gunakan ini untuk redirect
 
+  // --- INI FUNGSI LOGIN YANG TELAH DIMODIFIKASI UNTUK DEBUGGING ---
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
+    console.log("--- [LOGIN DEBUG] ---");
+    console.log("1. Memulai proses login untuk email:", email);
+    
     try {
-      await login(email, password)
-      // router.push("/dashboard") 
+      // Kita panggil supabase.auth.signInWithPassword langsung di sini
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      console.log("2. Hasil dari supabase.auth.signInWithPassword:");
+      console.log("   - Error:", signInError);
+      console.log("   - Data:", data);
+
+      if (signInError) {
+        console.error("3. Terjadi error saat login:", signInError.message);
+        throw signInError;
+      }
+
+      if (!data.session) {
+        console.error("3. LOGIN GAGAL: Tidak ada session yang dikembalikan oleh Supabase.");
+        setError("Login berhasil, tetapi tidak ada sesi yang dibuat. Hubungi admin.");
+      } else {
+        console.log("3. LOGIN BERHASIL: Session dibuat.", data.session);
+        // Biarkan onAuthStateChange yang menangani redirect
+        // router.push("/dashboard"); // Kita tidak redirect manual lagi
+      }
+
     } catch (err) {
-      console.error("Login failed:", err)
-      setError("Email atau password tidak valid")
+      console.error("4. Terjadi kesalahan di dalam blok catch:", err)
+      const errorMessage = err instanceof Error ? err.message : "Email atau password tidak valid";
+      setError(errorMessage);
     } finally {
       setIsLoading(false)
+      console.log("5. Proses login selesai.");
+      console.log("--- [SELESAI LOGIN DEBUG] ---");
     }
   };
-
-  const { user, loading } = useAuth();
+  
+  // Efek ini untuk redirect setelah login berhasil (dideteksi oleh useAuth)
   useEffect(() => {
-    // Jika proses loading selesai dan user sudah terdeteksi,
-    // maka navigasikan ke dashboard.
     if (!loading && user) {
+      console.log("[Redirect Effect] User terdeteksi, mengarahkan ke /dashboard");
       router.push("/dashboard");
     }
   }, [user, loading, router]);
@@ -180,7 +203,6 @@ export default function LoginPage() {
                   </CardDescription>
                 </div>
               </CardHeader>
-
               <form onSubmit={handleLogin}>
                 <CardContent className="space-y-6">
                   {error && (
@@ -231,21 +253,6 @@ export default function LoginPage() {
                       </Button>
                     </div>
                   </div>
-                  {/* <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
-                    <p className="font-semibold text-emerald-800 mb-3 text-sm flex items-center">
-                      <Sparkles className="w-4 h-4 mr-2" />🚀 Demo Credentials:
-                    </p>
-                    <div className="space-y-2 text-sm text-emerald-700">
-                      <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                        <span className="font-medium">Admin:</span>
-                        <span className="text-xs">admin@ziswaf.com / admin123</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
-                        <span className="font-medium">User:</span>
-                        <span className="text-xs">user@ziswaf.com / user123</span>
-                      </div>
-                    </div>
-                  </div> */}
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4 pt-6">
                   <Button
@@ -253,16 +260,7 @@ export default function LoginPage() {
                     className="w-full h-14 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 hover:from-emerald-700 hover:via-cyan-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-base"
                     disabled={isLoading}
                   >
-                    {isLoading ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Memproses...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <span>Masuk ke Dashboard</span>
-                      </div>
-                    )}
+                    {isLoading ? "Memproses..." : "Masuk ke Dashboard"}
                   </Button>
                   <div className="text-center text-sm text-gray-600">
                     Belum memiliki akun?{" "}

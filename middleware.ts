@@ -1,41 +1,42 @@
-// middleware.ts (No changes needed, it's correct)
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+// ngejerwisokto/middleware.ts (ESLint fix)
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
+  console.log(`[Middleware] Running for: ${request.method} ${request.nextUrl.pathname}`);
+  
+  // FIX: Ganti 'let' menjadi 'const' sesuai saran ESLint
+  const response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
+  // Buat Supabase client yang terikat pada request dan response ini
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
+        get(name) {
           return request.cookies.get(name)?.value
         },
-        set(name: string, value: string, options: CookieOptions) {
+        set(name, value, options) {
+          // Middleware dapat memodifikasi cookie pada request dan response
           request.cookies.set({ name, value, ...options })
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          })
           response.cookies.set({ name, value, ...options })
         },
-        remove(name: string, options: CookieOptions) {
+        remove(name, options) {
+          // Middleware dapat memodifikasi cookie pada request dan response
           request.cookies.set({ name, value: '', ...options })
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          })
           response.cookies.set({ name, value: '', ...options })
         },
       },
     }
   )
 
-  // This refreshes the session cookie
+  // Sangat penting: refresh session cookie jika sudah kedaluwarsa.
+  // Ini akan menulis ulang cookie di 'response' jika perlu.
   await supabase.auth.getUser()
 
   return response

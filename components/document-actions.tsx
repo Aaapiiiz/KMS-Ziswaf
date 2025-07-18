@@ -1,17 +1,15 @@
-// components/document-actions.tsx
+// components/document-actions.tsx (Corrected and Final Version)
 
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import type { Document } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { deleteDocument } from "@/app/(dashboard)/documents/actions"; // <-- Import the new Server Action
+import { deleteDocument } from "@/app/(dashboard)/documents/actions"; // Import the Server Action
 
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -30,7 +28,6 @@ interface DocumentActionsProps {
 }
 
 export function DocumentActions({ document }: DocumentActionsProps) {
-  const router = useRouter();
   const { user, userRole } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -38,32 +35,30 @@ export function DocumentActions({ document }: DocumentActionsProps) {
   // Determine if the current user has permission to delete this document
   const canDelete = user?.id === document.uploaded_by || userRole === 'admin';
 
-  const handleDelete = async () => {
+  // This function will be called when the form is submitted.
+  // We use this to manage the loading state.
+  const handleFormSubmit = async (formData: FormData) => {
     if (!canDelete) {
       alert("Anda tidak memiliki izin untuk menghapus dokumen ini.");
       return;
     }
-    
-    setIsDeleting(true);
 
+    setIsDeleting(true);
+    
     try {
-      // Call the server action
-      const result = await deleteDocument(document.id, document.file_url);
-      
+      // The server action handles everything else (auth, deletion, redirect)
+      const result = await deleteDocument(formData);
+
+      // If the server action returns an error message, display it.
       if (result?.error) {
-        // If the server action returns an error, show it
         throw new Error(result.error);
       }
       
-      // The server action handles redirection, but we can refresh just in case
-      // and close the dialog. The alert is no longer needed as the user will be navigated away.
-      router.refresh();
-
+      // Note: A successful deletion will redirect, so this part might not even be reached.
     } catch (error) {
-      console.error("Error deleting document:", error);
-      alert(error instanceof Error ? error.message : "Gagal menghapus dokumen. Silakan coba lagi.");
-      setIsDeleting(false); // Stop loading on error
-      setIsAlertOpen(false); // Close the dialog on error
+      alert(error instanceof Error ? error.message : "Gagal menghapus dokumen.");
+      // Stop loading state on error so the user can try again
+      setIsDeleting(false); 
     }
   };
 
@@ -82,22 +77,30 @@ export function DocumentActions({ document }: DocumentActionsProps) {
           </Button>
           
           <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Apakah Anda Yakin?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Tindakan ini tidak dapat dibatalkan. Ini akan menghapus dokumen <strong>{document.title}</strong> secara permanen dari server dan penyimpanan file.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setIsAlertOpen(false)} disabled={isDeleting}>Batal</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-red-600 hover:bg-red-700">
-                {isDeleting ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menghapus...</>
-                ) : (
-                  "Ya, Hapus Dokumen"
-                )}
-              </AlertDialogAction>
-            </AlertDialogFooter>
+            {/* The form calls the server action directly. This is the key fix. */}
+            <form action={handleFormSubmit}>
+              <input type="hidden" name="documentId" value={document.id} />
+              <input type="hidden" name="fileUrl" value={document.file_url || ''} />
+
+              <AlertDialogHeader>
+                <AlertDialogTitle>Apakah Anda Yakin?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tindakan ini tidak dapat dibatalkan. Ini akan menghapus dokumen <strong>{document.title}</strong> secara permanen dari server.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel type="button" disabled={isDeleting}>Batal</AlertDialogCancel>
+                
+                {/* This button now submits the form */}
+                <Button type="submit" variant="destructive" disabled={isDeleting}>
+                  {isDeleting ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menghapus...</>
+                  ) : (
+                    "Ya, Hapus Dokumen"
+                  )}
+                </Button>
+              </AlertDialogFooter>
+            </form>
           </AlertDialogContent>
         </AlertDialog>
       )}

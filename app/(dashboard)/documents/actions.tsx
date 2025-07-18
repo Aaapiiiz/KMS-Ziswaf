@@ -1,63 +1,40 @@
-// ngejerwisokto/app/(dashboard)/documents/actions.tsx (Corrected)
+// ngejerwisokto/app/(dashboard)/documents/actions.tsx (VERIFY THIS CODE)
 "use server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function deleteDocument(documentId: string, fileUrl: string | null | undefined) {
-  const supabase = await createSupabaseServerClient(); // <-- FIX: Add 'await' here
+export async function deleteDocument(formData: FormData) {
+  const documentId = formData.get('documentId') as string;
+  const fileUrl = formData.get('fileUrl') as string | null | undefined;
 
-  // 1. Autentikasi user
+  console.log(`[Server Action] deleteDocument started for ID: ${documentId}`);
+  
+  const supabase = await createSupabaseServerClient();
+
   const { data: { user } } = await supabase.auth.getUser();
+  
   if (!user) {
+    console.error("[Server Action] FAILED: User is not authenticated.");
     return { error: "Authentication required." };
   }
-  
-  // ... rest of the function is unchanged
-  const { data: document, error: docError } = await supabase
-    .from('documents')
-    .select('uploaded_by')
-    .eq('id', documentId)
-    .single();
 
-  const { data: userProfile, error: profileError } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+  console.log(`[Server Action] SUCCESS: Authenticated as ${user.email}. Proceeding with deletion.`);
 
-  if (docError || profileError || !document || !userProfile) {
-    return { error: "Failed to verify permissions." };
-  }
-
-  const isOwner = document.uploaded_by === user.id;
-  const isAdmin = userProfile.role === 'admin';
-
-  if (!isOwner && !isAdmin) {
-    return { error: "You do not have permission to delete this document." };
-  }
-
+  // ... sisa logika penghapusan ...
   try {
-    if (fileUrl) {
+    if (fileUrl && fileUrl.includes('/documents/')) {
       const filePath = fileUrl.split('/documents/').pop();
       if (filePath) {
         await supabase.storage.from('documents').remove([filePath]);
       }
     }
-
-    const { error: dbError } = await supabase
-      .from('documents')
-      .delete()
-      .eq('id', documentId);
-
-    if (dbError) {
-      throw dbError;
-    }
-
+    const { error: dbError } = await supabase.from('documents').delete().eq('id', documentId);
+    if (dbError) throw dbError;
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
-    console.error("Error during document deletion:", errorMessage);
+    console.error("[Server Action] Error during deletion process:", errorMessage);
     return { error: `Failed to delete document: ${errorMessage}` };
   }
 

@@ -1,16 +1,22 @@
-// lib/supabase.ts
+// lib/supabase/client.ts (FINAL CORRECTED VERSION)
 
 "use client";
 
-// import { createClient } from "@supabase/supabase-js"
-import { createClient, type PostgrestError } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr"; // <-- GANTI IMPORT INI
+import type { PostgrestError } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// GUNAKAN createBrowserClient, BUKAN createClient
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
 
-// Types for our database tables (Aligned with the new SQL script)
+// =================================================================
+// Tipe dan fungsi helper lainnya tidak perlu diubah.
+// Kode di bawah ini sudah benar.
+// =================================================================
+
+// Types for our database tables
 export interface User {
   id: string
   email: string
@@ -57,13 +63,8 @@ export interface Document {
   updated_at: string
 }
 
-// ... other types like Activity, Notification etc. can be added here if needed
-
-// =================================================================
 // HELPER FUNCTIONS
-// =================================================================
 
-// Function to fetch all users (Admin action)
 export const getUsers = async (): Promise<User[] | null> => {
   const { data, error } = await supabase.from("users").select("*").order("created_at", { ascending: false })
   if (error) {
@@ -73,7 +74,6 @@ export const getUsers = async (): Promise<User[] | null> => {
   return data
 }
 
-// Function to update a user's details (Admin action)
 export const updateUser = async (userId: string, updates: Partial<User>): Promise<{ data: User | null; error: PostgrestError | null }> => {
   const { data, error } = await supabase
     .from("users")
@@ -88,8 +88,6 @@ export const updateUser = async (userId: string, updates: Partial<User>): Promis
   return { data, error };
 }
 
-
-// Function to get documents that need verification (Admin action)
 export const getDocumentsForVerification = async () => {
   const { data, error } = await supabase
     .from("documents")
@@ -104,14 +102,12 @@ export const getDocumentsForVerification = async () => {
   return data
 }
 
-// Function to update a document's verification status (Admin action)
 export const updateDocumentVerificationStatus = async (
   documentId: string,
   status: "approved" | "rejected",
   verifiedBy: string,
   comment?: string
 ) => {
-  // Step 1: Update the document status
   const { error: updateError } = await supabase
     .from("documents")
     .update({
@@ -126,7 +122,6 @@ export const updateDocumentVerificationStatus = async (
     throw updateError
   }
 
-  // Step 2: Add a comment if one is provided
   if (comment && comment.trim() !== "") {
     const { error: commentError } = await supabase.from("document_comments").insert({
       document_id: documentId,
@@ -134,11 +129,8 @@ export const updateDocumentVerificationStatus = async (
       comment: comment,
       comment_type: status === "approved" ? "approval_note" : "revision_request",
     })
-
     if (commentError) {
-      // // Log the error but don't throw, as the main action succeeded.
-      // console.error("Error adding verification comment:", commentError);
-      // throw commentError; 
+       console.error("Error adding verification comment:", commentError);
     }
   }
 }
