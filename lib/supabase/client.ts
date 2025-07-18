@@ -136,8 +136,9 @@ export const updateDocumentVerificationStatus = async (
     })
 
     if (commentError) {
-      // Log the error but don't throw, as the main action succeeded.
-      console.error("Error adding verification comment:", commentError)
+      // // Log the error but don't throw, as the main action succeeded.
+      // console.error("Error adding verification comment:", commentError);
+      // throw commentError; 
     }
   }
 }
