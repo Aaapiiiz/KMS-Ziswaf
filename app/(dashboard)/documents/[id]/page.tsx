@@ -1,6 +1,7 @@
-// ngejerwisokto/app/(dashboard)/documents/[id]/page.tsx (Corrected)
+"use client";
 
-import { notFound } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,9 @@ import { Separator } from "@/components/ui/separator";
 import { DocumentViewer } from "@/components/document-viewer";
 import { DocumentActions } from "@/components/document-actions";
 import { FileText, Eye, Download, Link as LinkIcon } from "lucide-react";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { supabase } from "@/lib/supabase/client"; // Gunakan client-side supabase
 import type { Document } from "@/lib/supabase/client";
-
-export const dynamic = 'force-dynamic';
+import DocumentDetailLoading from "./loading"; // Import loading skeleton
 
 const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
@@ -23,27 +23,48 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-async function getDocumentData(id: string) {
-  const supabase = await createSupabaseServerClient(); // <-- FIX: Add 'await' here
+export default function DocumentDetailPage() {
+  const params = useParams();
+  const id = params.id as string; // Dapatkan ID dari URL
 
-  const { data: document, error } = await supabase
-    .from("documents")
-    .select(`*, uploaded_by (name, email, avatar_url)`)
-    .eq('id', id)
-    .single();
+  const [doc, setDoc] = useState<DocumentWithUploader | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (error || !document) {
-    console.error("Error fetching document or document not found:", error);
-    return null;
+  useEffect(() => {
+    if (!id) return;
+
+    const getDocumentData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      const { data: document, error: dbError } = await supabase
+        .from("documents")
+        .select(`*, uploaded_by (name, email, avatar_url)`)
+        .eq('id', id)
+        .single();
+
+      if (dbError || !document) {
+        console.error("Error fetching document:", dbError);
+        setError("Gagal memuat dokumen atau dokumen tidak ditemukan.");
+        setLoading(false);
+        return;
+      }
+      
+      setDoc(document as DocumentWithUploader);
+      setLoading(false);
+    };
+
+    getDocumentData();
+  }, [id]); // Jalankan efek ini setiap kali 'id' berubah
+
+  if (loading) {
+    // Gunakan komponen skeleton loading Anda
+    return <DocumentDetailLoading />;
   }
-  
-  return document as DocumentWithUploader;
-}
 
-export default async function DocumentDetailPage({ params }: { params: { id:string } }) {
-  const doc = await getDocumentData(params.id);
-
-  if (!doc) {
+  if (error || !doc) {
+    // Jika ada error atau dokumen tidak ditemukan setelah loading selesai, arahkan ke halaman notFound
     notFound();
   }
   
