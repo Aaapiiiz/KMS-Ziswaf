@@ -1,7 +1,5 @@
-// app/(dashboard)/documents/[id]/page.tsx
+// ngejerwisokto/app/(dashboard)/documents/[id]/page.tsx (Corrected)
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,25 +9,22 @@ import { Separator } from "@/components/ui/separator";
 import { DocumentViewer } from "@/components/document-viewer";
 import { DocumentActions } from "@/components/document-actions";
 import { FileText, Eye, Download, Link as LinkIcon } from "lucide-react";
-import type { Document } from "@/lib/supabase";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Document } from "@/lib/supabase/client";
+
+export const dynamic = 'force-dynamic';
 
 const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString("id-ID", { year: 'numeric', month: 'long', day: 'numeric' });
+    return new Date(dateString).toLocaleString("id-ID", { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
 
-// The props signature is correct. The fix is awaiting the session.
-export default async function DocumentDetailPage({ params }: { params: { id:string } }) {
-  const { id } = params;
-  const supabase = createServerComponentClient({ cookies });
-  
-  // --- FIX IS HERE ---
-  // Explicitly await the session to resolve the async cookie access.
-  await supabase.auth.getSession();
+async function getDocumentData(id: string) {
+  const supabase = await createSupabaseServerClient(); // <-- FIX: Add 'await' here
 
   const { data: document, error } = await supabase
     .from("documents")
@@ -39,10 +34,19 @@ export default async function DocumentDetailPage({ params }: { params: { id:stri
 
   if (error || !document) {
     console.error("Error fetching document or document not found:", error);
+    return null;
+  }
+  
+  return document as DocumentWithUploader;
+}
+
+export default async function DocumentDetailPage({ params }: { params: { id:string } }) {
+  const doc = await getDocumentData(params.id);
+
+  if (!doc) {
     notFound();
   }
   
-  const doc = document as DocumentWithUploader;
   const safePreviewUrl = doc.document_type === 'link' ? (doc.external_url || '#') : (doc.file_url || '#');
 
   return (

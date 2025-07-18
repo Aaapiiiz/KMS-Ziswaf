@@ -18,12 +18,14 @@ import { LogOut, User, Lock, Settings } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth" // Import the useAuth hook
 
 export function UserNav() {
-  const { user, logout } = useAuth()
+  const { user, logout, loading } = useAuth()
 
-  if (!user) {
-    // Show a loading skeleton while the user object is being fetched.
-    return <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
+  if (loading) {
+    return <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
   }
+  if (!user) {
+    return null;
+  } 
 
   return (
     <DropdownMenu>

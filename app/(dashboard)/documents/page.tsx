@@ -1,11 +1,10 @@
-// app/(dashboard)/documents/page.tsx
+// ngejerwisokto/app/(dashboard)/documents/page.tsx (Corrected)
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import type { Document } from "@/lib/supabase";
+import type { Document } from "@/lib/supabase/client";
 import { DocumentList } from "./_components/document-list";
 
 export const dynamic = 'force-dynamic';
@@ -14,12 +13,8 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null;
 };
 
-export default async function DocumentsPage() {
-  const supabase = createServerComponentClient({ cookies });
-  
-  // --- FIX IS HERE ---
-  // Pastikan sesi diambil SEBELUM melakukan query lain.
-  await supabase.auth.getSession();
+async function getAllDocuments() {
+  const supabase = await createSupabaseServerClient(); // <-- FIX: Add 'await' here
 
   const { data: documents, error } = await supabase
     .from("documents")
@@ -28,7 +23,13 @@ export default async function DocumentsPage() {
 
   if (error) {
     console.error("Error fetching documents:", error);
+    return [];
   }
+  return documents || [];
+}
+
+export default async function DocumentsPage() {
+  const documents = await getAllDocuments();
 
   return (
     <div className="space-y-6">
@@ -44,6 +45,7 @@ export default async function DocumentsPage() {
           </Link>
         </Button>
       </div>
+      
       <DocumentList initialDocuments={(documents as DocumentWithUploader[]) || []} />
     </div>
   );

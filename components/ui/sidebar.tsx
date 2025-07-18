@@ -606,7 +606,7 @@ function SidebarMenuSkeleton({
   showIcon?: boolean
 }) {
   // --- FIX IS HERE: Removed Math.random() ---
-  const width = "75%"; // Use a consistent width to prevent hydration errors
+  const width = "75%"; // Gunakan lebar yang konsisten untuk mencegah hydration error
 
   return (
     <div

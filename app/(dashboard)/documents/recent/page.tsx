@@ -1,8 +1,7 @@
 // app/(dashboard)/documents/recent/page.tsx
 
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import type { Document } from "@/lib/supabase";
+import { createSupabaseServerClient } from "@/lib/supabase/server"; // CORRECTED: Use the new server client
+import type { Document } from "@/lib/supabase/client";
 import { RecentDocumentList } from "./_components/recent-document-list";
 
 export const dynamic = 'force-dynamic';
@@ -11,13 +10,11 @@ type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null;
 };
 
-export default async function RecentDocumentsPage() {
-  const supabase = createServerComponentClient({ cookies });
+async function getRecentDocuments() {
+  const supabase = await createSupabaseServerClient(); // <-- FIX: Add 'await'
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-  // --- FIX IS HERE ---
-  await supabase.auth.getSession();
 
   const { data: documents, error } = await supabase
     .from("documents")
@@ -27,7 +24,13 @@ export default async function RecentDocumentsPage() {
 
   if (error) {
     console.error("Error fetching recent documents:", error);
+    return [];
   }
+  return documents || [];
+}
+
+export default async function RecentDocumentsPage() {
+  const documents = await getRecentDocuments();
 
   return (
     <div className="space-y-6">

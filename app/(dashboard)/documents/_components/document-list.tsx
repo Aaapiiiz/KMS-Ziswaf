@@ -1,4 +1,4 @@
-// app/(dashboard)/documents/_components/document-list.tsx (NEW FILE - Client Component)
+// app/(dashboard)/documents/_components/document-list.tsx
 
 "use client"
 
@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DocumentFilters, DocumentFilterValues } from "@/components/document-filters"
 import { useAuth } from "@/hooks/use-auth"
-import type { Document } from "@/lib/supabase"
-import { supabase } from "@/lib/supabase"
+import type { Document } from "@/lib/supabase/client"
+import { supabase } from "@/lib/supabase/client"
 import { FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle, Search, Link as LinkIcon } from "lucide-react"
 
 type DocumentWithUploader = Document & {

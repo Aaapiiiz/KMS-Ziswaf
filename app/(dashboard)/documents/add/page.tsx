@@ -12,9 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { FileText, Upload, X, AlertCircle, Link as LinkIcon, Loader2, Info } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/lib/supabase";
-import type { Document } from "@/lib/supabase";
-// import { BreadcrumbNav } from "@/components/breadcrumb-nav";
+import { supabase } from "@/lib/supabase/client"; // <-- FIX: Import from the new client file
+import type { Document } from "@/lib/supabase/client";
 
 const categories = ["Panduan", "SOP", "Template", "Laporan", "Evaluasi", "Proposal", "Desain", "Notulensi", "Analisis", "Checklist", "Update"];
 const priorities = ["low", "medium", "high"] as const;

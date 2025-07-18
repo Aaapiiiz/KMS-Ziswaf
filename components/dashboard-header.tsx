@@ -4,7 +4,9 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { UserNav } from "@/components/user-nav";
-import { BreadcrumbNav } from "@/components/breadcrumb-nav"; // It renders the one and only breadcrumb
+import { BreadcrumbNav } from "@/components/breadcrumb-nav";
+import { ClientOnly } from "@/components/client-only";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function DashboardHeader() {
   return (
@@ -15,7 +17,10 @@ export function DashboardHeader() {
         <BreadcrumbNav />
       </div>
       <div className="ml-auto flex items-center gap-4">
-        <UserNav />
+        {/* Bungkus UserNav dengan ClientOnly dan berikan fallback */}
+        <ClientOnly fallback={<Skeleton className="h-8 w-8 rounded-full" />}>
+          <UserNav />
+        </ClientOnly>
       </div>
     </header>
   );

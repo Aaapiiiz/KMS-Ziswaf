@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -56,6 +56,7 @@ export function NotificationClient() {
           throw error;
         }
 
+      // FIX for TypeScript error: Transform the data to ensure sender is an object
       const transformedData = data.map(n => ({
         ...n,
         // Ensure sender is an object, not an array with one object

@@ -15,8 +15,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Search, Eye, Check, X, Clock, AlertCircle, Loader2 } from "lucide-react";
 import { AdminRouteGuard } from "@/components/admin-route-guard";
-import { getDocumentsForVerification, updateDocumentVerificationStatus } from "@/lib/supabase";
-import type { Document, User } from "@/lib/supabase";
+import { getDocumentsForVerification, updateDocumentVerificationStatus } from "@/lib/supabase/client";
+import type { Document, User } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Penyaluran", "Audit"];

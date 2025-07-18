@@ -1,23 +1,19 @@
-// app/providers.tsx (FILE BARU)
+// app/providers.tsx
 
-"use client"; // Komponen ini adalah 'Client Component' karena menggunakan state dan context.
+"use client";
 
 import type React from "react";
-import type { Session } from "@supabase/supabase-js";
 import { AuthProvider } from "@/hooks/use-auth";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { NotificationProvider } from "@/hooks/use-notifications";
 
-// Komponen ini akan menjadi satu-satunya tempat untuk semua provider client-side
 export function Providers({
   children,
-  initialSession,
 }: {
   children: React.ReactNode;
-  initialSession: Session | null;
 }) {
   return (
-    <AuthProvider initialSession={initialSession}>
+    <AuthProvider>
       <SidebarProvider>
         <NotificationProvider>
           {children}

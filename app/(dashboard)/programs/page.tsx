@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { GraduationCap, Heart, DollarSign, Users, ArrowRight, BookOpen } from "lucide-react";
+import { GraduationCap, Heart, DollarSign, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 // Mock data for program categories, summarizing data from other pages
@@ -37,22 +37,7 @@ const programCategories = [
     link: "/programs/social-aid",
     color: "text-emerald-500",
     bgColor: "bg-emerald-50",
-  },
-  {
-    id: "knowledge-management",
-    name: "Program Manajemen Pengetahuan",
-    description: "Inisiatif internal untuk meningkatkan kolaborasi, transfer pengetahuan, dan inovasi antar departemen di dalam organisasi.",
-    icon: BookOpen,
-    stats: {
-      programCount: 5,
-      totalBudget: "N/A",
-      totalRecipients: "Internal",
-    },
-    tags: ["Kolaborasi", "Inovasi", "Internal", "Sistem"],
-    link: "/activities",
-    color: "text-purple-500",
-    bgColor: "bg-purple-50",
-  },
+  }
 ];
 
 // Calculate overall stats

@@ -14,8 +14,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label"
 import { Search, Plus, MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react"
 import { AdminRouteGuard } from "@/components/admin-route-guard"
-import { getUsers, supabase, updateUser } from "@/lib/supabase" // MODIFIED: import updateUser
-import type { User } from "@/lib/supabase"
+import { getUsers, supabase, updateUser } from "@/lib/supabase/client" 
+import type { User } from "@/lib/supabase/client"
 
 const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Operasional", "Audit", "Penyaluran"]
 const roles = ["Semua", "admin", "user"]

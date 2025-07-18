@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation" // <<< 1. IMPORT useRouter
+import { useRouter } from "next/navigation" 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -60,15 +60,23 @@ export default function LoginPage() {
 
     try {
       await login(email, password)
-      // <<< 3. GANTI window.location.href DENGAN router.push
-      router.push("/dashboard") 
+      // router.push("/dashboard") 
     } catch (err) {
       console.error("Login failed:", err)
       setError("Email atau password tidak valid")
     } finally {
       setIsLoading(false)
     }
-  }
+  };
+
+  const { user, loading } = useAuth();
+  useEffect(() => {
+    // Jika proses loading selesai dan user sudah terdeteksi,
+    // maka navigasikan ke dashboard.
+    if (!loading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, loading, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -80,8 +88,8 @@ export default function LoginPage() {
         <FloatingParticles />
         <div className="absolute inset-0 grid-pattern-overlay opacity-40"></div>
       </div>
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 sm:px-8 lg:px-16 xl:px-24 py-8 lg:py-12">
+        <div className="w-full grid lg:grid-cols-2 gap-12 items-center mx-auto">
           <div className="hidden lg:block space-y-8">
             <div className="space-y-6">
               <div className="flex items-center space-x-4">
@@ -223,7 +231,7 @@ export default function LoginPage() {
                       </Button>
                     </div>
                   </div>
-                  <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
+                  {/* <div className="bg-gradient-to-r from-emerald-50 via-cyan-50 to-emerald-50 p-6 rounded-2xl border border-emerald-100">
                     <p className="font-semibold text-emerald-800 mb-3 text-sm flex items-center">
                       <Sparkles className="w-4 h-4 mr-2" />🚀 Demo Credentials:
                     </p>
@@ -237,7 +245,7 @@ export default function LoginPage() {
                         <span className="text-xs">user@ziswaf.com / user123</span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4 pt-6">
                   <Button

@@ -32,7 +32,7 @@ interface DocumentFiltersProps {
 const categories = ["Semua", "Panduan", "Template", "SOP", "Laporan", "Strategi", "Checklist"];
 const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "SDM", "IT", "Keuangan", "Marketing", "Audit"];
 const priorities = ["Semua", "high", "medium", "low"];
-const timeFilters = ["Semua", "today", "week", "month"];
+// const timeFilters = ["Semua", "today", "week", "month"];
 
 const initialFilters: DocumentFilterValues = {
   searchQuery: "",
@@ -44,7 +44,7 @@ const initialFilters: DocumentFilterValues = {
   showMandatoryOnly: false,
 };
 
-export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters = ['category', 'department', 'priority', 'favorites', 'mandatory'], resultCount }: DocumentFiltersProps) {
+export function DocumentFilters({ onFilterChange, onViewChange, visibleFilters = ['category', 'department', 'priority', 'showFavoritesOnly', 'showMandatoryOnly'], resultCount }: DocumentFiltersProps) {
   const [filters, setFilters] = useState<DocumentFilterValues>(initialFilters);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 

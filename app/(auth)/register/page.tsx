@@ -3,7 +3,7 @@
 import type React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase"; // ** ADDED THIS IMPORT **
+import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,7 +108,7 @@ export default function RegisterPage() {
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
         </div>
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div className="relative z-10 flex items-center justify-center min-h-screen px-4 sm:px-8 lg:px-16 py-8">
           <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 backdrop-blur-xl">
             <CardContent className="pt-8 text-center space-y-6">
               <div className="relative w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto">
@@ -147,8 +147,8 @@ export default function RegisterPage() {
         <div className="absolute top-40 left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
         <FloatingParticles />
       </div>
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 sm:px-8 lg:px-16 xl:px-24 py-8 lg:py-12">
+        <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center mx-auto">
           <div className="hidden lg:block space-y-8">
             <div className="space-y-6">
               <div className="flex items-center space-x-4">

@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCircle, Search } from "lucide-react"
-import type { Document } from "@/lib/supabase"
-import { supabase } from "@/lib/supabase" // Import supabase client
+import type { Document } from "@/lib/supabase/client"
+import { supabase } from "@/lib/supabase/client" // Import supabase client
 import { useAuth } from "@/hooks/use-auth" // Import useAuth
 
 type DocumentWithUploader = Document & {
