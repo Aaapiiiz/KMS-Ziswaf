@@ -1,22 +1,29 @@
-// ngejerwisokto/app/(auth)/login/page.tsx (DEBUGGING VERSION)
+// app/(auth)/login/page.tsx (Final "Quiet Console" Version)
 "use client"
 
 import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation" 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, BookOpen, Sparkles, CheckCircle, Shield, Zap, TrendingUp, Users } from "lucide-react"
+import {
+  Eye,
+  EyeOff,
+  BookOpen,
+  Users,
+  Shield,
+  Zap,
+  TrendingUp,
+  Sparkles,
+  CheckCircle,
+} from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
-// --- KITA AKAN IMPORT SUPABASE CLIENT LANGSUNG UNTUK DEBUGGING ---
-import { supabase } from "@/lib/supabase/client";
-
-// FloatingParticles component remains the same
+// FloatingParticles component (tidak ada perubahan)
 const FloatingParticles = () => {
   const [isMounted, setIsMounted] = useState(false)
   useEffect(() => { setIsMounted(true) }, [])
@@ -46,57 +53,31 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const { user, loading } = useAuth(); // Kita tetap gunakan ini untuk redirect
+  const { user, loading, login } = useAuth()
 
-  // --- INI FUNGSI LOGIN YANG TELAH DIMODIFIKASI UNTUK DEBUGGING ---
+  // --- PERUBAHAN UTAMA DI SINI ---
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
-    console.log("--- [LOGIN DEBUG] ---");
-    console.log("1. Memulai proses login untuk email:", email);
-    
-    try {
-      // Kita panggil supabase.auth.signInWithPassword langsung di sini
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
+    // Panggil fungsi login dan tunggu hasilnya
+    const result = await login(email, password);
 
-      console.log("2. Hasil dari supabase.auth.signInWithPassword:");
-      console.log("   - Error:", signInError);
-      console.log("   - Data:", data);
+    // Periksa apakah hasil yang dikembalikan mengandung properti error
+    if (result.error) {
+      console.log("Login attempt failed (handled):", result.error.message); // Gunakan console.log atau warn
+      setError("Email atau password tidak valid");
+    } 
+    // Jika tidak ada error, onAuthStateChange di AuthProvider akan mendeteksi
+    // perubahan sesi dan useEffect di bawah ini akan melakukan redirect.
 
-      if (signInError) {
-        console.error("3. Terjadi error saat login:", signInError.message);
-        throw signInError;
-      }
-
-      if (!data.session) {
-        console.error("3. LOGIN GAGAL: Tidak ada session yang dikembalikan oleh Supabase.");
-        setError("Login berhasil, tetapi tidak ada sesi yang dibuat. Hubungi admin.");
-      } else {
-        console.log("3. LOGIN BERHASIL: Session dibuat.", data.session);
-        // Biarkan onAuthStateChange yang menangani redirect
-        // router.push("/dashboard"); // Kita tidak redirect manual lagi
-      }
-
-    } catch (err) {
-      console.error("4. Terjadi kesalahan di dalam blok catch:", err)
-      const errorMessage = err instanceof Error ? err.message : "Email atau password tidak valid";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false)
-      console.log("5. Proses login selesai.");
-      console.log("--- [SELESAI LOGIN DEBUG] ---");
-    }
+    setIsLoading(false)
   };
-  
-  // Efek ini untuk redirect setelah login berhasil (dideteksi oleh useAuth)
+
+  // useEffect untuk redirect (tidak ada perubahan)
   useEffect(() => {
     if (!loading && user) {
-      console.log("[Redirect Effect] User terdeteksi, mengarahkan ke /dashboard");
       router.push("/dashboard");
     }
   }, [user, loading, router]);
@@ -203,6 +184,7 @@ export default function LoginPage() {
                   </CardDescription>
                 </div>
               </CardHeader>
+
               <form onSubmit={handleLogin}>
                 <CardContent className="space-y-6">
                   {error && (
@@ -260,7 +242,16 @@ export default function LoginPage() {
                     className="w-full h-14 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 hover:from-emerald-700 hover:via-cyan-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-base"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Memproses..." : "Masuk ke Dashboard"}
+                    {isLoading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Memproses...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <span>Masuk ke Dashboard</span>
+                      </div>
+                    )}
                   </Button>
                   <div className="text-center text-sm text-gray-600">
                     Belum memiliki akun?{" "}

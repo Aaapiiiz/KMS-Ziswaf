@@ -1,4 +1,4 @@
-// hooks/use-auth.tsx
+// hooks/use-auth.tsx (Final Version with ESLint Fix)
 
 "use client";
 
@@ -12,7 +12,7 @@ interface AuthContextType {
   user: AppUser | null;
   userRole: "admin" | "user" | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ error: Error | null }>;
   logout: () => Promise<void>;
 }
 
@@ -47,7 +47,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     getSessionAndProfile();
 
+    // --- PERUBAHAN DI SINI ---
+    // Hapus parameter _event and session karena tidak digunakan
     const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      // Jika ada perubahan sesi (login/logout), panggil getSessionAndProfile lagi
       getSessionAndProfile();
     });
 
@@ -56,16 +59,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [getSessionAndProfile]);
 
-  const value = {
+  const value: AuthContextType = {
     user,
     userRole: user?.role ?? null,
     loading,
     login: async (email: string, password: string) => {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      return { error }; 
     },
     logout: async () => {
       await supabase.auth.signOut();
+      setUser(null);
       router.push('/login');
     },
   };

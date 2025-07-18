@@ -1,3 +1,4 @@
+// ngejerwisokto/app/(auth)/register/page.tsx (Updated with Quieter Error Handling)
 "use client";
 
 import type React from "react";
@@ -12,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, BookOpen, CheckCircle, Users, Shield, Zap, Star, Sparkles, Crown } from "lucide-react";
 
-// This component is for client-side only rendering to prevent hydration mismatch. It's already correct.
+// FloatingParticles component (tidak berubah)
 const FloatingParticles = () => {
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => { setIsMounted(true) }, []);
@@ -51,7 +52,7 @@ export default function RegisterPage() {
 
   const departments = ["Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Operasional", "Audit", "Penyaluran"];
 
-  // --- THIS IS THE CORRECTED SUBMIT FUNCTION ---
+  // --- FUNGSI SUBMIT YANG DIPERBARUI ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -64,38 +65,37 @@ export default function RegisterPage() {
       return;
     }
 
-    try {
-      // This is the call to Supabase to create a new user.
-      // We pass the user's name and department in the `options.data` field.
-      // Our database trigger will use this data to populate the public.users table.
-      const {error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name,
-            department: formData.department,
-          },
+    // Panggil Supabase dan simpan hasilnya
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          name: formData.name,
+          department: formData.department,
         },
-      });
+      },
+    });
 
-      if (signUpError) {
-        // If Supabase returns an error (e.g., user already exists), throw it.
-        throw signUpError;
+    // Periksa apakah ada error
+    if (signUpError) {
+      console.log("Registration attempt failed (handled):", signUpError.message); // Gunakan console.log atau warn
+      
+      // Berikan pesan yang lebih spesifik jika memungkinkan
+      if (signUpError.message.includes("User already registered")) {
+        setError("Email ini sudah terdaftar. Silakan gunakan email lain atau login.");
+      } else {
+        setError("Gagal melakukan pendaftaran. Silakan coba lagi.");
       }
       
-      // If sign-up is successful, show the success message.
-      setSuccess(true);
-
-    } catch (err) {
-      console.error("Registration failed:", err);
-      // Display a user-friendly error message.
-      setError(err instanceof Error ? err.message : "Gagal melakukan pendaftaran. Silakan coba lagi.");
-    } finally {
       setIsLoading(false);
+      return; // Hentikan eksekusi
     }
+    
+    // Jika tidak ada error, lanjutkan ke state sukses
+    setSuccess(true);
+    setIsLoading(false);
   };
-  // --- END OF CORRECTED SUBMIT FUNCTION ---
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -104,6 +104,7 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+        {/* ... sisa JSX untuk halaman sukses (tidak berubah) ... */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -141,6 +142,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* ... sisa JSX untuk form registrasi (tidak berubah) ... */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -226,7 +228,6 @@ export default function RegisterPage() {
                   </CardDescription>
                 </div>
               </CardHeader>
-
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-5">
                   {error && (<Alert variant="destructive" className="border-red-200 bg-red-50"><AlertDescription className="text-red-700">{error}</AlertDescription></Alert>)}
@@ -246,7 +247,6 @@ export default function RegisterPage() {
         </div>
       </div>
       <style jsx>{`
-        .grid-pattern-overlay { background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
         @keyframes blob { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
         .animate-blob { animation: blob 7s infinite; }
