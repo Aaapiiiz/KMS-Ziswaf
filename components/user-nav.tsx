@@ -14,15 +14,15 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, User, Lock, Settings } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth" // Import the useAuth hook
+import { LogOut, User, Lock, Settings, Loader2 } from "lucide-react" // Import Loader2
+import { useAuth } from "@/hooks/use-auth"
 
 export function UserNav() {
   const { user, logout, loading } = useAuth()
 
   if (loading) {
-    return <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
-  }
+    return <div className="flex items-center justify-center h-8 w-8"><Loader2 className="h-4 w-4 animate-spin" /></div>
+  }  
   if (!user) {
     return null;
   } 

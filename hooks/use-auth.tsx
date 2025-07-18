@@ -1,10 +1,10 @@
-// hooks/use-auth.tsx (Final Version with ESLint Fix)
+// hooks/use-auth.tsx (Final Corrected Version)
 
 "use client";
 
 import type React from "react";
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // useRouter tetap dibutuhkan untuk logout
 import { supabase } from "@/lib/supabase/client";
 import type { User as AppUser } from "@/lib/supabase/client"; 
 
@@ -18,8 +18,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// FIX 1: Ganti React.Node menjadi React.ReactNode
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
+  // FIX 2: Kembalikan useRouter karena dibutuhkan oleh fungsi logout baru
+  const router = useRouter(); 
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -47,10 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     getSessionAndProfile();
 
-    // --- PERUBAHAN DI SINI ---
-    // Hapus parameter _event and session karena tidak digunakan
     const { data: authListener } = supabase.auth.onAuthStateChange(() => {
-      // Jika ada perubahan sesi (login/logout), panggil getSessionAndProfile lagi
       getSessionAndProfile();
     });
 
@@ -68,8 +67,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error }; 
     },
     logout: async () => {
-      await supabase.auth.signOut();
-      setUser(null);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error logging out:", error.message);
+      }
+      // Pindahkan router.push ke sini untuk memastikan redirect terjadi setelah signOut selesai
+      // Ini lebih baik daripada mengandalkan layout, karena ini adalah aksi langsung.
       router.push('/login');
     },
   };

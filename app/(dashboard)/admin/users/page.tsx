@@ -1,4 +1,4 @@
-// app/(dashboard)/admin/users/page.tsx
+// ngejerwisokto/app/(dashboard)/admin/users/page.tsx (FINAL CORRECTED CODE)
 "use client"
 
 import { useState, useEffect } from "react"
@@ -10,6 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+// --- VERIFIKASI BARIS INI ---
+// Pastikan 'DialogTrigger' ada di sini.
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Search, Plus, MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react"
@@ -63,7 +65,6 @@ export default function UsersPage() {
       return
     }
     
-    // Step 1: Create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: newUser.email,
       password: newUser.password,
@@ -81,8 +82,6 @@ export default function UsersPage() {
       return
     }
     
-    // The handle_new_user trigger should have created the user in public.users table.
-    // We just need to update its role if it's admin.
     if (authData.user && newUser.role === 'admin') {
         const { error: roleError } = await updateUser(authData.user.id, { role: 'admin' });
         if (roleError) {
@@ -92,7 +91,7 @@ export default function UsersPage() {
     }
     
     alert("User added successfully!");
-    await fetchUsers(); // Refresh the user list
+    await fetchUsers();
     setIsAddUserOpen(false);
     setNewUser({ name: "", email: "", department: "", role: "user", password: "" });
   }
@@ -103,11 +102,12 @@ export default function UsersPage() {
         alert(`Failed to update user: ${error.message}`);
     } else {
         alert("User updated successfully!");
-        setUsers(users.map(u => u.id === userId ? { ...u, ...data } : u));
+        setUsers(currentUsers => 
+          currentUsers.map(u => u.id === userId ? { ...u, ...data } : u)
+        );
         setEditingUser(null);
     }
   }
-
 
   const getRoleColor = (role: string) => (role === "admin" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700")
   const getStatusColor = (status: string) => {
@@ -163,7 +163,6 @@ export default function UsersPage() {
             </DialogContent>
           </Dialog>
         </div>
-
         <Card>
           <CardContent className="p-6">
             <div className="space-y-4">
@@ -176,15 +175,13 @@ export default function UsersPage() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader><CardTitle>Daftar Pengguna</CardTitle><CardDescription>Total {filteredUsers.length} pengguna ditemukan</CardDescription></CardHeader>
           <CardContent>
             <Table>
-              
               <TableHeader><TableRow><TableHead>Pengguna</TableHead><TableHead>Departemen</TableHead><TableHead>Role</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
               <TableBody>
-                {loading ? (<TableRow><TableCell colSpan={6} className="text-center py-8"><Loader2 className="mx-auto w-6 h-6 animate-spin" /></TableCell></TableRow>) 
+                {loading ? (<TableRow><TableCell colSpan={5} className="text-center py-8"><Loader2 className="mx-auto w-6 h-6 animate-spin" /></TableCell></TableRow>) 
                 : filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
                     <TableRow key={user.id}>
@@ -192,29 +189,23 @@ export default function UsersPage() {
                       <TableCell>{user.department}</TableCell>
                       <TableCell><Badge className={getRoleColor(user.role)}>{getRoleText(user.role)}</Badge></TableCell>
                       <TableCell><Badge className={getStatusColor(user.status)}>{getStatusText(user.status)}</Badge></TableCell>
-                      {/* <TableCell className="text-sm text-gray-500">{user.last_login ? new Date(user.last_login).toLocaleString("id-ID") : "Never"}</TableCell> */}
                       <TableCell className="text-right">
                         <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end"><DropdownMenuLabel>Aksi</DropdownMenuLabel>
                             <DropdownMenuItem onSelect={() => setEditingUser(user)}><Edit className="mr-2 h-4 w-4" />Edit Pengguna</DropdownMenuItem>
-                            {/* <DropdownMenuItem><Mail className="mr-2 h-4 w-4" />Kirim Email</DropdownMenuItem> */}
                             <DropdownMenuSeparator />
-                            {/* {user.status === "active" ? (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'inactive' })}><UserX className="mr-2 h-4 w-4" />Nonaktifkan</DropdownMenuItem>) 
-                            : (<DropdownMenuItem onClick={() => handleUpdateUser(user.id, { status: 'active' })}><UserCheck className="mr-2 h-4 w-4" />Aktifkan</DropdownMenuItem>)} */}
-                            {/* <DropdownMenuSeparator /> */}
                             <DropdownMenuItem className="text-red-600"><Trash2 className="mr-2 h-4 w-4" />Hapus Pengguna</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))
-                ) : (<TableRow><TableCell colSpan={6} className="py-8 text-center text-gray-500">Tidak ada pengguna ditemukan.</TableCell></TableRow>)}
+                ) : (<TableRow><TableCell colSpan={5} className="py-8 text-center text-gray-500">Tidak ada pengguna ditemukan.</TableCell></TableRow>)}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       </div>
-
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader><DialogTitle>Edit Pengguna</DialogTitle><DialogDescription>Perbarui informasi dan role untuk {editingUser?.name}.</DialogDescription></DialogHeader>
