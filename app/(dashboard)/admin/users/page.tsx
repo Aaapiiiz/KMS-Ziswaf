@@ -1,4 +1,4 @@
-// ngejerwisokto/app/(dashboard)/admin/users/page.tsx (FINAL CORRECTED CODE)
+// app/(dashboard)/admin/users/page.tsx (Final Version with Server Action)
 "use client"
 
 import { useState, useEffect } from "react"
@@ -10,14 +10,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-// --- VERIFIKASI BARIS INI ---
-// Pastikan 'DialogTrigger' ada di sini.
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Search, Plus, MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react"
 import { AdminRouteGuard } from "@/components/admin-route-guard"
-import { getUsers, supabase, updateUser } from "@/lib/supabase/client" 
+import { getUsers, updateUser } from "@/lib/supabase/client" 
 import type { User } from "@/lib/supabase/client"
+// --- PERUBAHAN 1: Import Server Action yang baru ---
+import { adminCreateUser } from "./actions";
 
 const departments = ["Semua", "Pendayagunaan", "Penghimpunan", "Keuangan", "SDM", "IT", "Marketing", "Operasional", "Audit", "Penyaluran"]
 const roles = ["Semua", "admin", "user"]
@@ -26,6 +26,7 @@ const statuses = ["Semua", "active", "inactive", "pending"]
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false); // State untuk loading submit
   const [searchQuery, setSearchQuery] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("Semua")
   const [roleFilter, setRoleFilter] = useState("Semua")
@@ -35,6 +36,7 @@ export default function UsersPage() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false)
   const [newUser, setNewUser] = useState({ name: "", email: "", department: "", role: "user" as "admin" | "user", password: "" })
 
+  // Fungsi fetchUsers tidak perlu diubah, akan dipicu oleh revalidatePath
   const fetchUsers = async () => {
     try {
       setLoading(true)
@@ -59,41 +61,29 @@ export default function UsersPage() {
     return matchesSearch && matchesDepartment && matchesRole && matchesStatus
   })
 
+  // --- PERUBAHAN 2: Ganti fungsi handleAddUser ---
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email || !newUser.department || !newUser.password) {
-      alert("Please fill all required fields.")
-      return
+      alert("Mohon lengkapi semua field yang wajib diisi.");
+      return;
     }
     
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: newUser.email,
-      password: newUser.password,
-      options: {
-        data: {
-          name: newUser.name,
-          department: newUser.department,
-        },
-      },
-    })
+    setIsSubmitting(true);
+    
+    // Panggil Server Action
+    const result = await adminCreateUser(newUser);
 
-    if (authError) {
-      console.error("Error creating auth user:", authError)
-      alert(`Failed to create user: ${authError.message}`)
-      return
+    if (result?.error) {
+      alert(`Gagal membuat pengguna: ${result.error}`);
+    } else {
+      alert("Pengguna berhasil ditambahkan!");
+      // fetchUsers() tidak lagi diperlukan karena revalidatePath di server action
+      // akan memicu pembaruan data secara otomatis.
+      setIsAddUserOpen(false);
+      setNewUser({ name: "", email: "", department: "", role: "user", password: "" });
     }
     
-    if (authData.user && newUser.role === 'admin') {
-        const { error: roleError } = await updateUser(authData.user.id, { role: 'admin' });
-        if (roleError) {
-            console.error("Error setting user role to admin:", roleError);
-            alert("User created, but failed to set admin role.");
-        }
-    }
-    
-    alert("User added successfully!");
-    await fetchUsers();
-    setIsAddUserOpen(false);
-    setNewUser({ name: "", email: "", department: "", role: "user", password: "" });
+    setIsSubmitting(false);
   }
 
   const handleUpdateUser = async (userId: string, updates: Partial<User>) => {
@@ -143,7 +133,7 @@ export default function UsersPage() {
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="add-name" className="text-right">Nama</Label><Input id="add-name" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} className="col-span-3"/></div>
                 <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="add-email" className="text-right">Email</Label><Input id="add-email" type="email" value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} className="col-span-3"/></div>
-                <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="add-password" className="text-right">Password</Label><Input id="add-password" type="password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} className="col-span-3"/></div>
+                <div className="grid grid-cols-4 items-center gap-4"><Label htmlFor="add-password" className="text-right">Password</Label><Input id="add-password" type="password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} className="col-span-3" placeholder="Min. 6 karakter"/></div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="add-department" className="text-right">Departemen</Label>
                   <Select value={newUser.department} onValueChange={(value) => setNewUser({ ...newUser, department: value })}>
@@ -159,7 +149,13 @@ export default function UsersPage() {
                   </Select>
                 </div>
               </div>
-              <DialogFooter><Button variant="outline" onClick={() => setIsAddUserOpen(false)}>Batal</Button><Button type="submit" onClick={handleAddUser}>Tambah</Button></DialogFooter>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddUserOpen(false)} disabled={isSubmitting}>Batal</Button>
+                <Button type="submit" onClick={handleAddUser} disabled={isSubmitting}>
+                    {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {isSubmitting ? 'Menambahkan...' : 'Tambah'}
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
