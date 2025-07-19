@@ -1,9 +1,9 @@
 // lib/supabase/client.ts (FINAL CORRECTED VERSION)
 
-// "use client";
+"use client";
 
-// import { createClient } from "@supabase/supabase-js"
-import { createClient, type PostgrestError } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr"; // <-- GANTI IMPORT INI
+import type { PostgrestError } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -108,7 +108,6 @@ export const updateDocumentVerificationStatus = async (
   verifiedBy: string,
   comment?: string
 ) => {
-  // Step 1: Update the document status
   const { error: updateError } = await supabase
     .from("documents")
     .update({
@@ -117,12 +116,10 @@ export const updateDocumentVerificationStatus = async (
       verified_at: new Date().toISOString(),
     })
     .eq("id", documentId)
-    .select() // PENTING: .select() memaksa Supabase mengembalikan baris yang diperbarui.
-              // Data inilah yang akan disiarkan oleh Realtime ke semua klien.
 
   if (updateError) {
-    console.error("Error updating document status:", updateError);
-    throw updateError;
+    console.error("Error updating document status:", updateError)
+    throw updateError
   }
 
   if (comment && comment.trim() !== "") {
@@ -132,10 +129,8 @@ export const updateDocumentVerificationStatus = async (
       comment: comment,
       comment_type: status === "approved" ? "approval_note" : "revision_request",
     })
-
     if (commentError) {
-      // Log the error but don't throw, as the main action succeeded.
-      console.error("Error adding verification comment:", commentError)
+       console.error("Error adding verification comment:", commentError);
     }
   }
-};
+}

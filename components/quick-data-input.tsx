@@ -257,7 +257,7 @@ export function QuickDataInput() {
                       id="target-amount"
                       placeholder="0"
                       value={formatCurrency(ziswafData.targetAmount)}
-                      onChange={(e) => setZiswafData({ ...ziswafData, targetAmount: e.target.value.replace(/\D/g, "") })}
+                      onChange={(e) => handleCurrencyChange(e.target.value, "targetAmount", setZiswafData, ziswafData)}
                     />
                   </div>
                   <div className="space-y-2">
@@ -266,7 +266,9 @@ export function QuickDataInput() {
                       id="realized-amount"
                       placeholder="0"
                       value={formatCurrency(ziswafData.realizedAmount)}
-                      onChange={(e) => setZiswafData({ ...ziswafData, realizedAmount: e.target.value.replace(/\D/g, "") })}
+                      onChange={(e) =>
+                        handleCurrencyChange(e.target.value, "realizedAmount", setZiswafData, ziswafData)
+                      }
                     />
                   </div>
                 </div>
@@ -368,7 +370,9 @@ export function QuickDataInput() {
                         placeholder="0"
                         className="pl-10"
                         value={formatCurrency(metricsData.monthlyTarget)}
-                        onChange={(e) => setMetricsData({ ...metricsData, monthlyTarget: e.target.value.replace(/\D/g, "") })}
+                        onChange={(e) =>
+                          handleCurrencyChange(e.target.value, "monthlyTarget", setMetricsData, metricsData)
+                        }
                       />
                     </div>
                   </div>
@@ -381,7 +385,9 @@ export function QuickDataInput() {
                         placeholder="0"
                         className="pl-10"
                         value={formatCurrency(metricsData.monthlyRealized)}
-                        onChange={(e) => setMetricsData({ ...metricsData, monthlyRealized: e.target.value.replace(/\D/g, "") })}
+                        onChange={(e) =>
+                          handleCurrencyChange(e.target.value, "monthlyRealized", setMetricsData, metricsData)
+                        }
                       />
                     </div>
                   </div>
@@ -458,7 +464,7 @@ export function QuickDataInput() {
                       id="activity-budget"
                       placeholder="0"
                       value={formatCurrency(activityData.budget)}
-                      onChange={(e) => setActivityData({ ...activityData, budget: e.target.value.replace(/\D/g, "") })}
+                      onChange={(e) => handleCurrencyChange(e.target.value, "budget", setActivityData, activityData)}
                     />
                   </div>
                   <div className="space-y-2">

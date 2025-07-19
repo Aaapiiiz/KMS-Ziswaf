@@ -1,6 +1,6 @@
 // app/(dashboard)/documents/_components/document-list.tsx
 
-"use client";
+"use client"
 
 import { useState, useEffect, useMemo } from "react"
 // import Link from "next/link"
@@ -16,88 +16,40 @@ import { FileText, Calendar, Heart, Star, Eye, Download, Clock, CheckCircle, XCi
 
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string } | null
-};
+}
 
-export function DocumentList() {
-  const [documents, setDocuments] = useState<DocumentWithUploader[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const { userRole } = useAuth();
+interface DocumentListProps {
+  initialDocuments: DocumentWithUploader[]
+}
+
+export function DocumentList({ initialDocuments }: DocumentListProps) {
+  const [documents, setDocuments] = useState<DocumentWithUploader[]>(initialDocuments)
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const { userRole } = useAuth()
   const router = useRouter(); 
 
   const [activeFilters, setActiveFilters] = useState<DocumentFilterValues>({
     searchQuery: "", category: "Semua", department: "Semua", priority: "Semua",
     time: "Semua", showFavoritesOnly: false, showMandatoryOnly: false,
-  });
+  })
   
+  // Update local state if initial props change
   useEffect(() => {
-    // 1. Ambil data awal saat komponen dimuat
-    const fetchDocuments = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("documents")
-        .select(`*, uploaded_by ( name, email )`)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching documents on client:", error);
-      } else {
-        setDocuments((data as DocumentWithUploader[]) || []);
-      }
-      setLoading(false);
-    };
-
-    fetchDocuments();
-
-    // --- MULAI LOGIKA REALTIME ---
-    // 2. Buat channel untuk mendengarkan perubahan pada tabel 'documents'
-    const channel = supabase.channel('realtime-documents')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE', // Hanya dengarkan event UPDATE
-          schema: 'public',
-          table: 'documents'
-        },
-        (payload) => {
-          // Ketika ada update, `payload.new` akan berisi data baris yang diperbarui
-          const updatedDocument = payload.new as DocumentWithUploader;
-          console.log('Perubahan dokumen diterima:', updatedDocument);
-
-          // Perbarui state lokal dengan data baru
-          setDocuments(currentDocuments =>
-            currentDocuments.map(doc =>
-              // Jika ID dokumen sama, ganti dengan data baru, jika tidak, biarkan seperti semula
-              doc.id === updatedDocument.id ? { ...doc, ...updatedDocument } : doc
-            )
-          );
-        }
-      )
-      .subscribe();
-
-    // 3. Bersihkan listener saat komponen di-unmount untuk mencegah memory leak
-    return () => {
-      supabase.removeChannel(channel);
-    };
-    // --- AKHIR LOGIKA REALTIME ---
-
-  }, []); // Dependency array kosong agar ini hanya berjalan sekali saat komponen mount
-
-  // ... sisa kode komponen tidak perlu diubah, karena mereka akan otomatis me-render ulang
-  // saat state `documents` diperbarui oleh listener realtime.
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
 
   const filteredDocuments = useMemo(() => {
-    const { searchQuery, category, department, priority, showFavoritesOnly, showMandatoryOnly } = activeFilters;
+    const { searchQuery, category, department, priority, showFavoritesOnly, showMandatoryOnly } = activeFilters
     return documents.filter((doc) => {
-      const matchesSearch = !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || (doc.description && doc.description.toLowerCase().includes(searchQuery.toLowerCase())) || doc.tags?.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesCategory = category === "Semua" || doc.category === category;
-      const matchesDepartment = department === "Semua" || doc.department === department;
-      const matchesPriority = priority === "Semua" || doc.priority === priority;
-      const matchesFavorites = !showFavoritesOnly || doc.is_starred;
-      const matchesMandatory = !showMandatoryOnly || doc.is_mandatory;
-      return matchesSearch && matchesCategory && matchesDepartment && matchesPriority && matchesFavorites && matchesMandatory;
-    });
-  }, [documents, activeFilters]);
+      const matchesSearch = !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || (doc.description && doc.description.toLowerCase().includes(searchQuery.toLowerCase())) || doc.tags?.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      const matchesCategory = category === "Semua" || doc.category === category
+      const matchesDepartment = department === "Semua" || doc.department === department
+      const matchesPriority = priority === "Semua" || doc.priority === priority
+      const matchesFavorites = !showFavoritesOnly || doc.is_starred
+      const matchesMandatory = !showMandatoryOnly || doc.is_mandatory
+      return matchesSearch && matchesCategory && matchesDepartment && matchesPriority && matchesFavorites && matchesMandatory
+    })
+  }, [documents, activeFilters])
 
   const toggleFavorite = async (docId: string, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -110,6 +62,21 @@ export function DocumentList() {
     if (error) { // Revert on error
         setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_starred: !newFavoriteStatus } : doc)))
         alert("Gagal memperbarui favorit.")
+    }
+  }
+
+  const toggleMandatory = async (docId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (userRole !== "admin") return
+    const docToUpdate = documents.find((doc) => doc.id === docId)
+    if (!docToUpdate) return
+    const newMandatoryStatus = !docToUpdate.is_mandatory
+    // Optimistic UI update
+    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: newMandatoryStatus } : doc)))
+    const { error } = await supabase.from("documents").update({ is_mandatory: newMandatoryStatus }).eq("id", docId)
+    if (error) { // Revert on error
+        setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: !newMandatoryStatus } : doc)))
+        alert("Gagal memperbarui status wajib.")
     }
   }
 
@@ -136,10 +103,13 @@ export function DocumentList() {
       a.remove();
       window.URL.revokeObjectURL(downloadUrl);
   }
+
   const handleView = (doc: DocumentWithUploader, e: React.MouseEvent) => {
       e.stopPropagation();
+      // Always navigate to the internal detail page, regardless of document type.
       router.push(`/documents/${doc.id}`);
   }
+
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" })
   const formatFileSize = (sizeInBytes?: number | null) => {
     if (!sizeInBytes) return "N/A"
@@ -153,19 +123,6 @@ export function DocumentList() {
       case "pending": return <Badge className="bg-yellow-100 text-yellow-700"><Clock className="h-3 w-3 mr-1" />Pending</Badge>
       case "rejected": return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" />Ditolak</Badge>
       default: return null
-    }
-  }
-    const toggleMandatory = async (docId: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (userRole !== "admin") return
-    const docToUpdate = documents.find((doc) => doc.id === docId)
-    if (!docToUpdate) return
-    const newMandatoryStatus = !docToUpdate.is_mandatory
-    setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: newMandatoryStatus } : doc)))
-    const { error } = await supabase.from("documents").update({ is_mandatory: newMandatoryStatus }).eq("id", docId)
-    if (error) {
-        setDocuments((prev) => prev.map((doc) => (doc.id === docId ? { ...doc, is_mandatory: !newMandatoryStatus } : doc)))
-        alert("Gagal memperbarui status wajib.")
     }
   }
 
@@ -205,20 +162,14 @@ export function DocumentList() {
   return (
     <>
       <DocumentFilters onFilterChange={setActiveFilters} onViewChange={setViewMode} visibleFilters={["category", "department", "priority", "showFavoritesOnly", "showMandatoryOnly"]} resultCount={filteredDocuments.length} />
-      
-      {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      ) : viewMode === "grid" ? (
+      {viewMode === "grid" ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredDocuments.map((doc) => (<DocumentCard key={doc.id} document={doc} />))}
         </div>
       ) : (
         <div className="text-center p-8 bg-gray-50 rounded-lg">List view coming soon!</div>
       )}
-
-      {!loading && !filteredDocuments.length && (
+      {!filteredDocuments.length && (
         <Card><CardContent className="flex flex-col items-center justify-center py-12"><Search className="h-12 w-12 text-muted-foreground mb-4" /><h3 className="text-lg font-semibold mb-2">Tidak Ada Dokumen Ditemukan</h3><p className="text-muted-foreground text-center mb-4">Tidak ada dokumen yang sesuai dengan hak akses atau filter Anda.</p></CardContent></Card>
       )}
     </>
