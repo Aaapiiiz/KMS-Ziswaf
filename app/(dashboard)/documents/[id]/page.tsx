@@ -19,6 +19,11 @@ const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("id-ID", { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
+// --- PERBAIKAN: Definisikan tipe props dengan benar ---
+interface DocumentDetailPageProps {
+  params: { id: string };
+}
+
 type DocumentWithUploader = Document & {
   uploaded_by: { name: string; email: string; avatar_url?: string } | null;
 };
@@ -71,6 +76,7 @@ export default function DocumentDetailPage() {
   const safePreviewUrl = doc.document_type === 'link' ? (doc.external_url || '#') : (doc.file_url || '#');
 
   return (
+    // ... sisa JSX tidak berubah
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-4">

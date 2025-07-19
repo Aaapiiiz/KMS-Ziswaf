@@ -15,6 +15,7 @@ async function getRecentDocuments() {
 
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  await supabase.auth.getSession();
 
   const { data: documents, error } = await supabase
     .from("documents")
