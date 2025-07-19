@@ -1,5 +1,6 @@
 "use client"
 
+import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,7 +19,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Plus, TrendingUp, Target, FileText, Users, DollarSign, Activity } from "lucide-react"
-import { toast } from "@/hooks/use-toast"
 
 const ziswafAreas = ["Pendidikan", "Kesehatan", "Ekonomi", "Sosial", "Dakwah"]
 const months = [
@@ -70,21 +70,21 @@ export function QuickDataInput() {
 
   const handleZiswafSubmit = () => {
     if (!ziswafData.area || !ziswafData.targetAmount || !ziswafData.realizedAmount || !ziswafData.month) {
-      toast({
-        title: "Error",
-        description: "Mohon lengkapi semua field yang diperlukan",
-        variant: "destructive",
-      })
+      // toast({
+      //   title: "Error",
+      //   description: "Mohon lengkapi semua field yang diperlukan",
+      //   variant: "destructive",
+      // })
       return
     }
 
     // Here you would typically save to database
     console.log("Saving Ziswaf data:", ziswafData)
 
-    toast({
-      title: "Berhasil",
-      description: "Data laporan ziswaf berhasil disimpan",
-    })
+    // toast({
+    //   title: "Berhasil",
+    //   description: "Data laporan ziswaf berhasil disimpan",
+    // })
 
     // Reset form
     setZiswafData({
@@ -98,20 +98,20 @@ export function QuickDataInput() {
 
   const handleMetricsSubmit = () => {
     if (!metricsData.totalDocuments || !metricsData.totalUsers) {
-      toast({
-        title: "Error",
-        description: "Mohon lengkapi data yang diperlukan",
-        variant: "destructive",
-      })
+      // toast({
+      //   title: "Error",
+      //   description: "Mohon lengkapi data yang diperlukan",
+      //   variant: "destructive",
+      // })
       return
     }
 
     console.log("Saving Metrics data:", metricsData)
 
-    toast({
-      title: "Berhasil",
-      description: "Data dashboard berhasil diperbarui",
-    })
+    // toast({
+    //   title: "Berhasil",
+    //   description: "Data dashboard berhasil diperbarui",
+    // })
 
     setMetricsData({
       totalDocuments: "",
@@ -124,20 +124,20 @@ export function QuickDataInput() {
 
   const handleActivitySubmit = () => {
     if (!activityData.name || !activityData.description) {
-      toast({
-        title: "Error",
-        description: "Nama dan deskripsi aktivitas harus diisi",
-        variant: "destructive",
-      })
+      // toast({
+      //   title: "Error",
+      //   description: "Nama dan deskripsi aktivitas harus diisi",
+      //   variant: "destructive",
+      // })
       return
     }
 
     console.log("Saving Activity data:", activityData)
 
-    toast({
-      title: "Berhasil",
-      description: "Aktivitas baru berhasil ditambahkan",
-    })
+    // toast({
+    //   title: "Berhasil",
+    //   description: "Aktivitas baru berhasil ditambahkan",
+    // })
 
     setActivityData({
       name: "",
@@ -155,10 +155,22 @@ export function QuickDataInput() {
     return new Intl.NumberFormat("id-ID").format(number)
   }
 
-  const handleCurrencyChange = (value: string, field: string, setState: any, state: any) => {
-    const numericValue = value.replace(/\D/g, "")
-    setState({ ...state, [field]: numericValue })
-  }
+  // --- PERBAIKAN DI SINI ---
+  // Fungsi ini dibuat generik untuk menerima berbagai bentuk state object
+  // dengan aman, yang menyelesaikan semua error TypeScript.
+  const handleCurrencyChange = <T extends Record<string, string>>(
+    value: string,
+    field: keyof T,
+    setState: React.Dispatch<React.SetStateAction<T>>,
+    state: T
+  ) => {
+    const numericValue = value.replace(/\D/g, "");
+    setState({
+      ...state,
+      [field]: numericValue,
+    });
+  };
+
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
